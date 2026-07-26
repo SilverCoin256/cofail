@@ -62,7 +62,11 @@ families. The honest reading is therefore that open-model failure is governed by
 latent dimensions beyond unidimensional ability. We also reconcile two apparently contradictory
 statistics exactly --- the excess variance is $29\times$ the null while its covariance with the
 margin-model prediction is strongly negative --- and show the effect is not an artifact of
-duplicate models, chain mixing, or the choice of spectral functional.
+duplicate models, chain mixing, or the choice of spectral functional. A pre-registered test on
+real model responses (not just correctness) finds that our own critique does \emph{not} rescue
+one specific published claim: the reported association between model accuracy and error
+agreement attenuates only $12\%$ under conditioning and remains significant, so that finding is
+reported as robust rather than reinterpreted.
 \end{abstract}
 
 \section{Introduction}
@@ -454,6 +458,37 @@ $16.0$ raw.
 estimator reports SES $+0.05$; on eight latent model families $+6.75$; on exact clones $+2.64$;
 on column-shuffled real data $-1.33$.
 
+\subsection{Real responses: the accuracy--agreement claim survives conditioning}
+\label{sec:h4}
+
+Everything above concerns \emph{correctness} (binary failure). Section~\ref{sec:degeneracy}'s
+Proposition 3 concerns \emph{which wrong answer} two models give, and predicted --- and, in
+simulation, demonstrated --- that this can look like ``more correlated errors'' purely from
+per-item distractor attractiveness, with no shared behaviour at all. We pre-registered a direct
+test of whether that critique undermines \citet{kim2025correlated}'s specific empirical claim,
+with a kill condition (K7) stated in advance: if the accuracy--agreement slope survives margin
+conditioning with confidence interval excluding zero, our critique does not apply here, and we
+report their finding as robust. We reconstruct each model's chosen answer from per-choice
+log-likelihoods on a $600$-model ARC subsample, recovering the gold answer from cross-model
+agreement where models are correct (agreement among correct models $1.0000$ on $1{,}144/1{,}172$
+items; the recovered gold reproduces each model's own reported accuracy on $99.01\%$ of cells,
+which we take as validating the reconstruction rather than assuming it).
+
+\textbf{K7 fires.} The raw slope of agreement-when-both-wrong against mean pair accuracy is
+$+0.585$ ($95\%$ CI $[0.577, 0.594]$); conditioned on the composition-preserving null it is
+$+0.514$ ($[0.506, 0.522]$) --- an attenuation of only $12.1\%$. The claim that more accurate
+models give more similar wrong answers is not an artifact of item-level distractor composition:
+it survives our conditioning almost fully. We report this as prominently as the alternative,
+per the pre-registration.
+
+Two things are true at once, and both matter. The mean-level excess vanishes:
+$0.7332$ observed versus $0.7324$ expected under conditional independence
+($+0.00085$), essentially zero, echoing Proposition 3's degeneracy result. But the
+\emph{relationship between accuracy and agreement} is not a mean-level statistic, and it is not
+absorbed by the same conditioning. Composition-based conditioning and accuracy-slope
+conditioning are different operations; only the latter bears on \citeauthor{kim2025correlated}'s
+claim, and it does not remove it.
+
 \section{Related work}
 
 \citet{kim2025correlated} measure agreement-when-both-wrong across 349 models against a uniform
@@ -496,10 +531,16 @@ participation ratio does not measure an effective number of independent models
 
 Pre-registered kill condition K5 failed --- declared \texttt{base\_model} coverage was $23.3\%$
 against a $40\%$ threshold, with $315$ of $1{,}362$ model repositories no longer retrievable ---
-so the lineage decomposition is dropped rather than estimated on a biased subset. The
-multi-category result is established analytically and in simulation; a real-response analysis
-must be explicit about the estimator, since the pooled agreement ratio is composition-invariant
-but the pair-averaged form is not.
+so the lineage decomposition is dropped rather than estimated on a biased subset.
+
+Section~\ref{sec:h4}'s real-response result is a limitation on the paper's own critique, stated
+plainly: Proposition 3 shows composition alone \emph{can} manufacture apparent agreement, but on
+real ARC responses the specific published claim it was aimed at does not turn out to be an
+instance of that artifact. The two findings do not contradict --- they concern different
+statistics, mean-level agreement versus the accuracy--agreement slope --- but a reader taking
+only the abstract's mention of Proposition 3 could reasonably expect more debunking than the
+data supports, which is why the full result is reported in Section~\ref{sec:h4} rather than
+folded silently into the mean-level finding.
 
 \section{Reproducibility and use of AI assistance}
 

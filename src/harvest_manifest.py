@@ -34,10 +34,18 @@ _done = 0
 
 def list_models():
     cache = os.path.join(OUT, "manifest_models.json")
-    if os.path.exists(cache):
+    refresh = os.environ.get("MM_REFRESH_MODELS") == "1"
+    if os.path.exists(cache) and not refresh:
         return json.load(open(cache))
-    ids = [d.id for d in api.list_datasets(author=ORG, limit=None) if "/details_" in d.id]
-    ids.sort()
+    # MM_REFRESH_MODELS=1 re-queries the archive rather than trusting the cached list --
+    # this is what lets Layer C (src/monitor.py) discover models added since the last run,
+    # instead of silently replaying the same frozen snapshot forever.
+    prior = set(json.load(open(cache))) if os.path.exists(cache) else set()
+    ids = sorted({d.id for d in api.list_datasets(author=ORG, limit=None) if "/details_" in d.id})
+    new = sorted(set(ids) - prior)
+    if refresh and prior:
+        print(f"model list refresh: {len(prior)} cached, {len(ids)} live, "
+              f"{len(new)} new since last refresh", flush=True)
     json.dump(ids, open(cache, "w"))
     return ids
 

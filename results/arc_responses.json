@@ -1,0 +1,42 @@
+{
+ "bench": "arc",
+ "N": 600,
+ "M_used": 1144,
+ "K_max": 5,
+ "gold_recovery": {
+  "items_recovered": 1144,
+  "agreement_among_correct_models": 1.0,
+  "reproduces_reported_acc_frac": 0.9901340326340327
+ },
+ "proposition3": {
+  "observed_agreement_both_wrong": 0.7299497143520219,
+  "uniform_baseline": 0.25,
+  "apparent_excess_vs_uniform": 0.47994971435202194,
+  "composition_permutation_null_mean": 0.6006801172266194,
+  "composition_permutation_null_sd": 0.0003132855453765207,
+  "excess_over_composition_null": 0.12926959712540254,
+  "n_perm": 8
+ },
+ "H4": {
+  "n_pairs": 38238,
+  "mean_observed_agreement": 0.7332220171235859,
+  "mean_conditional_independence_expectation": 0.7323709177765049,
+  "mean_excess_over_conditional_independence": 0.0008510993470809632,
+  "slope_raw_excess_vs_accuracy": {
+   "beta": 0.5851126908217555,
+   "ci95": [
+    0.5770147507326289,
+    0.5938069797505606
+   ]
+  },
+  "slope_conditioned_excess_vs_accuracy": {
+   "beta": 0.5140634340761816,
+   "ci95": [
+    0.5058705379777241,
+    0.5223544326616322
+   ]
+  },
+  "attenuation": 0.12142832972190287,
+  "K7_H4_supported": false
+ }
+}

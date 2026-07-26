@@ -223,3 +223,41 @@ Each row is a simulated population with **no clusters, no clones, no shared line
 - Tier-2 response harvest (Proposition 3 / H4 on real responses) written but not run.
 - Prior-art sweep angles and the venue-verification agent died on a session limit; the venue
   shortlist below rests on my own verified searches, not on the workflow.
+
+---
+
+# Tier-2 real-response result (2026-07-26, same day, after corrections)
+
+600-model ARC subsample, responses reconstructed from per-choice log-likelihoods.
+Gold-recovery validation: agreement among correct models on shared items = **1.0000**
+(1144/1172 items); recovered gold reproduces each model's own reported accuracy on **99.01%**
+of cells.
+
+**Proposition 3 on real data:** observed P(same wrong | both wrong) = 0.7299 vs uniform
+baseline 0.25 (apparent excess +0.4799, matching the "big number" the prior-art baseline would
+report) — but excess over the **composition-preserving null** = **+0.1293** (null sd 3.1e-4).
+Unlike the synthetic counterexample (which nets ~0 by construction), real ARC responses show a
+genuine, non-degenerate excess over composition alone. This is a different, honest finding from
+the simulation and is reported as such.
+
+**H4 / K7 — the pre-registered test of whether this rescues Kim et al.'s claim: it does not.**
+Slope of agreement-when-both-wrong vs. mean pair accuracy: raw +0.5851 [+0.5770, +0.5938],
+conditioned on the composition-preserving null +0.5141 [+0.5059, +0.5224]. Attenuation = **12.1%**.
+**K7 fires: H4 refuted, meaning the critique does NOT apply here — Kim et al.'s specific
+comparative claim (more accurate models → more correlated errors) is robust to this
+conditioning**, and is reported as such, per the pre-registration's advance commitment to report
+this outcome as prominently as the alternative.
+
+Mean-level excess is separately near zero (0.7332 observed vs 0.7324 conditional-independence
+expectation, +0.00085) — the two results are compatible: mean-level agreement is explained by
+conditioning, the accuracy-agreement *slope* is not. These are different statistics.
+
+## Final kill-condition status
+
+| condition | outcome |
+|---|---|
+| K1′ | FIRED — H1b refuted |
+| K5 | FAILED — 23.3% coverage, lineage dropped |
+| K6 | PASS, all four benchmarks |
+| K7 | **FIRED — H4 refuted; prior-art claim reported as robust** |
+| K2, K3, K4 | not applicable (K2 blocked by K5) / satisfied (K4, via burn-in + independent-chain checks) |

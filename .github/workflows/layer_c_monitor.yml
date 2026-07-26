@@ -1,0 +1,62 @@
+name: Layer C monitor
+
+# The longitudinal evidence engine. Runs independently of any one contributor's machine or any
+# one chat session: it re-checks the open-model archive for models added since the last run,
+# harvests only the delta (the existing harvesters cache/resume, so this costs nothing extra for
+# models already seen), recomputes the calibrated residual-concentration statistics, and commits
+# one dated row to results/timeseries.csv plus one CHANGELOG.md entry. This is what keeps
+# producing evidence after the paper is published, without a second research program.
+#
+# Manual runs (workflow_dispatch) are for on-demand refreshes; the schedule is the actual
+# "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show.
+
+on:
+  schedule:
+    - cron: "17 6 3 * *"   # 06:17 UTC on the 3rd of each month -- an off-tick time, not :00
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: layer-c-monitor
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e ".[harvest]"
+
+      - name: Refresh model list (discover new models since last run)
+        run: MM_REFRESH_MODELS=1 python src/harvest_manifest.py
+        env:
+          MM_WORKERS: "6"
+
+      - name: Harvest delta (existing .npz files cache; only new models are fetched)
+        run: python src/harvest_matrix.py arc winogrande truthfulqa gsm8k
+        env:
+          MM_WORKERS: "6"
+
+      - name: Run the monitor (recompute calibrated statistics, append timeseries + changelog)
+        run: python src/monitor.py arc winogrande truthfulqa gsm8k
+
+      - name: Regenerate the cohort figure
+        run: python src/figures.py
+
+      - name: Commit results
+        run: |
+          git config user.name "layer-c-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add results/ substrate/ figures/ CHANGELOG.md
+          git diff --cached --quiet && echo "nothing new this cycle" && exit 0
+          git commit -m "Layer C monthly refresh: $(date -u +%Y-%m-%d)"
+          git push
