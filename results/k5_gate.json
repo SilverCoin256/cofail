@@ -1,0 +1,118 @@
+{
+ "bench": "arc",
+ "n_models": 1362,
+ "fetched": 1047,
+ "errors": 315,
+ "unresolvable_ids": 0,
+ "models_with_declared_parent": 317,
+ "coverage": 0.2327459618208517,
+ "K5_threshold": 0.4,
+ "K5_pass": false,
+ "source_breakdown": {
+  "None": 1044,
+  "card_data.base_model": 318
+ },
+ "top_parents": [
+  [
+   "mistralai/Mistral-7B-v0.1",
+   27
+  ],
+  [
+   "microsoft/phi-2",
+   16
+  ],
+  [
+   "Kukedlc/NeuralSirKrishna-7b",
+   12
+  ],
+  [
+   "liminerity/M7-7b",
+   9
+  ],
+  [
+   "Kukedlc/Neural4gsm8k",
+   9
+  ],
+  [
+   "meta-llama/Meta-Llama-3-8B-Instruct",
+   7
+  ],
+  [
+   "WizardLM/WizardMath-7B-V1.1",
+   7
+  ],
+  [
+   "flemmingmiguel/MBX-7B-v3",
+   7
+  ],
+  [
+   "mlabonne/NeuralBeagle14-7B",
+   7
+  ],
+  [
+   "Kukedlc/NeuralMaxime-7B-slerp",
+   7
+  ],
+  [
+   "Open-Orca/Mistral-7B-OpenOrca",
+   6
+  ],
+  [
+   "yam-peleg/Experiment26-7B",
+   6
+  ],
+  [
+   "akjindal53244/Mistral-7B-v0.1-Open-Platypus",
+   5
+  ],
+  [
+   "macadeliccc/WestLake-7B-v2-laser-truthy-dpo",
+   5
+  ],
+  [
+   "mistralai/Mistral-7B-Instruct-v0.2",
+   5
+  ],
+  [
+   "FelixChao/WestSeverus-7B-DPO-v2",
+   5
+  ],
+  [
+   "senseable/WestLake-7B-v2",
+   4
+  ],
+  [
+   "BioMistral/BioMistral-7B",
+   4
+  ],
+  [
+   "CultriX/NeuralTrix-7B-dpo",
+   4
+  ],
+  [
+   "paulml/NeuralOmniWestBeaglake-7B",
+   4
+  ],
+  [
+   "HuggingFaceH4/zephyr-7b-beta",
+   4
+  ],
+  [
+   "AiMavenAi/AiMaven-Prometheus",
+   4
+  ],
+  [
+   "mlabonne/OmniBeagle-7B",
+   4
+  ],
+  [
+   "DevaMalla/llama7b",
+   4
+  ],
+  [
+   "microsoft/Orca-2-13b",
+   4
+  ]
+ ],
+ "n_distinct_parents": 332
+}
