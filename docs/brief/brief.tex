@@ -1,0 +1,71 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage[margin=1.6cm]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
+\pagestyle{empty}
+
+\definecolor{blue}{HTML}{1D5FB0}
+\definecolor{orange}{HTML}{C2531F}
+\definecolor{muted}{HTML}{6B6A65}
+
+\begin{document}
+\begin{center}
+{\Large\bfseries How Many Independent Models Does an Open-Model Ecosystem Contain?}\\[3pt]
+{\small\color{muted} One-page research brief \quad\textbullet\quad Shaurya Gupta \quad\textbullet\quad
+\href{https://github.com/SilverCoin256/cofail}{github.com/SilverCoin256/cofail}}
+\end{center}
+\vspace{4pt}
+
+\noindent\textbf{The question.} If many independently developed AI models are deployed as an
+ensemble, a judging panel, or competing screening vendors, how much of that plurality is real?
+The standard evidence — how often pairs of models fail on the same test item, versus a baseline
+assuming independence — cannot answer this, for a provable reason.
+
+\vspace{4pt}
+\noindent\textbf{The result.} The mean co-failure rate across a model population is a function of
+\emph{item difficulty alone}; it is invariant under any randomization that preserves that
+difficulty, so its excess over such a baseline is exactly zero, not merely small. That degeneracy
+turns out to be a known result independently in three fields (ecology's V-ratio, psychometrics'
+Cronbach's $\alpha$, Fleiss's rater agreement) that had never been connected to AI evaluation.
+Conditioning on the one \emph{exact, fit-free} null available — the distribution implied by the
+Rasch model's own sufficient statistics, requiring no estimated parameters — removes that
+artifact and leaves a real second-order signal: residual correlation \textbf{6$\times$} the null,
+concentrated in \textbf{5} extra latent dimensions, across \textbf{1{,}228--1{,}373 open models
+per benchmark} on four benchmarks, harvested at \$0 compute cost from public evaluation logs.
+
+\vspace{4pt}
+\noindent\textbf{What makes this a research process rather than a result.}
+\begin{itemize}[leftmargin=14pt,itemsep=1pt,topsep=2pt]
+\item A pre-registered primary hypothesis came back with an inconsistent sign across benchmarks.
+Its kill condition, written in advance, called that a refutation --- reported as refuted, not
+reinterpreted.
+\item An adversarial review, run deliberately against the project's own headline finding before
+submission, found that "$\sim$1{,}300 models behave like $\sim$24 independent ones" is
+\href{https://github.com/SilverCoin256/cofail/blob/main/results/RESULTS_DIGEST.md}{algebraically
+incapable} of distinguishing one weak shared factor from many tight clusters. \textbf{The claim
+was withdrawn} and replaced with the diagnostics that can tell the two apart.
+\item A closely related paper turned up in a deliberate prior-art search on the same archive.
+Rather than abandon the direction, the project narrowed to the specific open question that paper
+leaves unanswered.
+\item A separate pre-registered test, aimed at a published claim in prior work, came back against
+the project's own hypothesis: the claim survives conditioning almost fully (88\% of the effect
+remains) and is reported as robust, exactly as committed to in advance.
+\end{itemize}
+
+\vspace{4pt}
+\noindent\textbf{What keeps happening after this document.} A scheduled process re-checks the
+public archive monthly, on GitHub's own infrastructure, and appends a dated row to a public time
+series --- the same frozen method applied to more data, not a new claim.
+
+\vspace{6pt}
+\noindent{\footnotesize\color{muted} Full paper, pre-registration, code, and every results
+artifact: \href{https://github.com/SilverCoin256/cofail}{github.com/SilverCoin256/cofail}. Claude
+(Anthropic) was used as a coding and analysis assistant throughout; research direction,
+pre-registered commitments, and final synthesis are the author's own.}
+
+\end{document}

@@ -1,5 +1,10 @@
 # cofail — measuring correlated failure between models, at the exact conditional null
 
+[![Layer C monitor](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml/badge.svg)](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml)
+
+**[Project page](https://silvercoin256.github.io/cofail/)** · **[Paper (PDF)](docs/paper.pdf)** ·
+**[One-page brief](docs/brief/brief.pdf)** · **[Layer C — live changelog](CHANGELOG.md)**
+
 Do independently developed language models fail on the same inputs more than chance? The usual
 evidence is a co-failure or agreement rate compared against an independence baseline. That
 comparison cannot answer the question, for a reason that is arithmetic rather than statistical:

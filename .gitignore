@@ -2,10 +2,10 @@
 __pycache__/
 *.pyc
 .harvest.lock
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/*.bbl
-paper/*.blg
-paper/*.synctex.gz
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.synctex.gz
 .DS_Store

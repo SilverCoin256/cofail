@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Many Independent Models Does an Open-Model Ecosystem Contain?</title>
+<meta name="description" content="A pre-registered study of correlated failure across 1,300+ open language models, at the exact conditional null implied by Rasch sufficiency.">
+<style>
+  :root {
+    --bg: #fcfcfb; --bg2: #f3f2ee; --ink: #14130f; --ink2: #52514e; --muted: #8a8983;
+    --line: #e4e2da; --blue: #1d5fb0; --orange: #c2531f; --aqua: #0f8a5f;
+    --card: #ffffff; --shadow: 0 1px 2px rgba(20,19,15,0.06), 0 8px 24px rgba(20,19,15,0.05);
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      --bg: #14130f; --bg2: #1b1a16; --ink: #f3f2ee; --ink2: #c3c2b7; --muted: #8a8983;
+      --line: #2c2b26; --blue: #6fa8e8; --orange: #e8985f; --aqua: #4fd19a;
+      --card: #1b1a16; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14130f; --bg2: #1b1a16; --ink: #f3f2ee; --ink2: #c3c2b7; --muted: #8a8983;
+    --line: #2c2b26; --blue: #6fa8e8; --orange: #e8985f; --aqua: #4fd19a;
+    --card: #1b1a16; --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+  header.hero { padding: 76px 0 40px; border-bottom: 1px solid var(--line); }
+  .kicker { font-family: var(--mono); font-size: 12.5px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+  h1 { font-family: var(--serif); font-size: 2.5rem; line-height: 1.16; margin: 0 0 20px;
+    font-weight: 600; letter-spacing: -0.01em; }
+  .dek { font-size: 1.15rem; color: var(--ink2); max-width: 620px; margin: 0 0 28px; }
+  .byline { font-size: 0.92rem; color: var(--muted); }
+  .byline a { color: var(--ink2); }
+  nav.links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  nav.links a { font-size: 0.88rem; padding: 8px 14px; border: 1px solid var(--line);
+    border-radius: 7px; text-decoration: none; color: var(--ink); font-weight: 500;
+    transition: border-color .15s, background .15s; }
+  nav.links a:hover { border-color: var(--blue); background: var(--bg2); }
+  nav.links a.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  main { padding: 8px 0 60px; }
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  h2 { font-family: var(--serif); font-size: 1.55rem; font-weight: 600; margin: 0 0 18px;
+    letter-spacing: -0.005em; }
+  h3 { font-size: 1.02rem; font-weight: 650; margin: 26px 0 10px; }
+  p { margin: 0 0 16px; color: var(--ink2); font-size: 1rem; }
+  p.lead { color: var(--ink); font-size: 1.06rem; }
+  strong { color: var(--ink); font-weight: 650; }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; background: var(--bg2);
+    padding: 1px 5px; border-radius: 4px; }
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 24px 0; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 16px 14px; box-shadow: var(--shadow); }
+  .stat .n { font-family: var(--mono); font-size: 1.5rem; font-weight: 600; color: var(--blue); }
+  .stat .l { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+  .withdrawn { border-left: 3px solid var(--orange); background: var(--bg2); border-radius: 0 8px 8px 0;
+    padding: 16px 20px; margin: 18px 0; }
+  .withdrawn .tag { font-family: var(--mono); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--orange); font-weight: 700; }
+  .timeline { border-left: 2px solid var(--line); margin-left: 6px; padding-left: 24px; }
+  .tl-item { position: relative; margin-bottom: 22px; }
+  .tl-item::before { content: ""; position: absolute; left: -29px; top: 5px; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--blue); }
+  .tl-item.fired::before { background: var(--orange); }
+  .tl-item .tl-t { font-weight: 650; font-size: 0.95rem; }
+  .tl-item p { margin: 4px 0 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 18px 0; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); }
+  th { font-weight: 650; color: var(--ink2); font-size: 0.78rem; text-transform: uppercase;
+    letter-spacing: 0.03em; }
+  td.n { font-family: var(--mono); }
+  .disclosure { background: var(--bg2); border-radius: 10px; padding: 20px 22px; font-size: 0.92rem; }
+  footer { padding: 36px 0 70px; color: var(--muted); font-size: 0.85rem; }
+  footer a { color: var(--ink2); }
+  a { color: var(--blue); }
+  .badge-row img { height: 20px; vertical-align: middle; }
+  @media (max-width: 620px) {
+    h1 { font-size: 1.9rem; } .stat-row { grid-template-columns: repeat(2, 1fr); }
+    header.hero { padding: 48px 0 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">Research note · Statistics / ML evaluation</div>
+    <h1>How Many Independent Models Does an Open&#8209;Model Ecosystem Contain?</h1>
+    <p class="dek">A pre-registered study of correlated failure across 1,300+ open language
+      models, run at the one conditional null that requires no fitting: the distribution
+      implied by the sufficient statistics of the Rasch model itself.</p>
+    <p class="byline">Shaurya Gupta · high school researcher ·
+      <a href="mailto:shauryaguptaa8@gmail.com">shauryaguptaa8@gmail.com</a></p>
+    <nav class="links">
+      <a class="primary" href="paper.pdf">Read the paper (PDF)</a>
+      <a href="https://github.com/SilverCoin256/cofail">GitHub repository</a>
+      <a href="https://github.com/SilverCoin256/cofail/blob/main/CHANGELOG.md">Layer C — live changelog</a>
+      <a href="https://github.com/SilverCoin256/cofail/blob/main/docs/PRIOR_ART_LEDGER.md">Prior-art ledger</a>
+    </nav>
+    <div class="badge-row" style="margin-top:16px">
+      <img src="https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml/badge.svg" alt="Layer C monitor status">
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <section>
+    <h2>The question</h2>
+    <p class="lead">If a dozen AI companies each release a competing model, how many
+      <em>genuinely different</em> screeners does that actually give you?</p>
+    <p>That question matters wherever multiple models are meant to provide independent
+      evidence — an ensemble, a panel of AI judges, competing resume-screening vendors. If the
+      models all share the same blind spots, the appearance of diversity is doing no real work.
+      A growing body of research measures this by checking how often pairs of models fail on
+      the same test items, compared against a baseline where their failures are assumed
+      unrelated.</p>
+    <p>That comparison turns out to be broken in a specific, provable way — and fixing it
+      changes the answer.</p>
+  </section>
+
+  <section>
+    <h2>What almost everyone measures, and why it doesn't mean what it looks like</h2>
+    <p>The standard co-failure statistic is fixed almost entirely by how <em>hard</em> the test
+      items are, not by anything the models are doing. Prove it out with basic algebra and the
+      mean co-failure rate across a population of models depends <strong>only</strong> on how
+      many models fail each item — never on which models, never on any shared behaviour. Any
+      randomisation that keeps the same item-difficulty pattern reproduces the exact same number
+      every time.</p>
+    <p>That result already existed — independently, in three different fields (ecology's
+      "V-ratio," psychometrics' Cronbach's alpha, and Fleiss's measure of rater agreement) —
+      and none of them had been connected to how AI models get evaluated. Finding and citing
+      that connection, rather than presenting the identity as new, was itself a correction made
+      partway through this project (see "what didn't survive," below).</p>
+  </section>
+
+  <section>
+    <h2>What's actually there</h2>
+    <p>Once the item-difficulty artifact is removed by conditioning on it exactly — no
+      curve-fitting, no estimated parameters, just the null implied by the model's own sufficient
+      statistics — a real, second-order signal remains: residual correlation between models
+      that is roughly <strong>six times</strong> what the null predicts, concentrated in about
+      five extra dimensions beyond a single shared notion of "ability."</p>
+    <p>Simulated control populations rule out the boring explanation (models simply varying in
+      how discriminating their answer choices are) and point toward a real one: a handful of
+      latent skill dimensions the standard one-parameter model doesn't capture — not, as it
+      first appeared, a small number of duplicated models hiding in the data.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="n">1,362</div><div class="l">ARC-Challenge models analysed</div></div>
+      <div class="stat"><div class="n">0.248</div><div class="l">observed residual rms correlation</div></div>
+      <div class="stat"><div class="n">0.039</div><div class="l">…vs. under the exact null</div></div>
+      <div class="stat"><div class="n">5</div><div class="l">dimensions above the null's edge</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What didn't survive</h2>
+    <p class="lead">The most useful part of this project, for anyone deciding whether to trust
+      it, is what got thrown out.</p>
+
+    <div class="withdrawn">
+      <div class="tag">Claim withdrawn</div>
+      <p style="margin-top:8px"><strong>"1,362 models behave like 24 independent ones."</strong>
+        That headline came out of an early run and looked clean. An adversarial review of the
+        whole project — run deliberately against its own results before submission — found that
+        the statistic behind it is <em>algebraically</em> a rescaled measure of average pairwise
+        correlation: it cannot tell one weak shared factor apart from many tight clusters of
+        near-duplicate models. Verified by hand, the claim was pulled and replaced with the
+        diagnostics that can actually tell those two cases apart.</p>
+    </div>
+
+    <div class="timeline" style="margin-top:26px">
+      <div class="tl-item fired">
+        <div class="tl-t">Pre-registered hypothesis, refuted by its own kill condition</div>
+        <p>The original primary statistic was committed to in writing before the confirmatory
+          run. It came out with an inconsistent sign across benchmarks. The kill condition
+          written in advance said that outcome would count as a refutation, not a
+          reinterpretation — so it's reported as refuted.</p>
+      </div>
+      <div class="tl-item">
+        <div class="tl-t">A scooping risk, found by searching rather than hoping</div>
+        <p>A closely related paper (Jo, Garg &amp; Raghavan, Feb 2026) turned up in a deliberate
+          prior-art search on the same public data. Rather than abandon the direction, the
+          project narrowed to the specific open question that paper leaves unanswered — which
+          conditioning null is the non-arbitrary one — and answered it.</p>
+      </div>
+      <div class="tl-item fired">
+        <div class="tl-t">A pre-registered test that went against the project's own argument</div>
+        <p>Part of the analysis predicted that a specific claim in prior work (that more
+          accurate models make more similar mistakes) might be a measurement artifact. Tested
+          directly against real model responses — not simulation — the claim survived almost
+          fully (88% of the effect remains after conditioning). Reported as robust, exactly as
+          committed to in advance.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it was built</h2>
+    <p>Everything runs on public data and costs nothing to reproduce. Reading only the
+      accuracy column of each evaluation file — 1.4&nbsp;KB out of a 63&nbsp;MB file, for the
+      largest benchmark — made it possible to harvest 1,300+ models per benchmark with no GPU,
+      no API budget, and no bulk downloads.</p>
+    <p>Two data problems had to be found and fixed before any of the above was possible: item
+      identifiers silently changed format partway through the archive's history (a naive join
+      returns <em>zero</em> matched items), and the evaluation harness restructured its output
+      schema mid-way through, moving the accuracy field into a different location. Both are
+      documented in the repository rather than quietly patched over.</p>
+  </section>
+
+  <section>
+    <h2>A living instrument, not a one-off</h2>
+    <p>The repository re-checks the public archive for newly released models every month, on
+      GitHub's own infrastructure — independent of any one laptop or chat session — and appends
+      one row to a public time series. Nothing about the method changes between runs; the same
+      frozen estimator is simply re-applied to more data, and any future change to the method
+      itself has to go through the same pre-registration discipline as the original study.</p>
+    <table>
+      <tr><th>Benchmark</th><th>Models</th><th>PR observed</th><th>PR under exact null</th><th>ratio</th></tr>
+      <tr><td>ARC-Challenge</td><td class="n">1,362</td><td class="n">23.6</td><td class="n">449.6 &#177; 3.1</td><td class="n">0.052</td></tr>
+      <tr><td>Winogrande</td><td class="n">1,361</td><td class="n">20.1</td><td class="n">493.0 &#177; 3.2</td><td class="n">0.041</td></tr>
+      <tr><td>TruthfulQA</td><td class="n">1,334</td><td class="n">17.4</td><td class="n">309.4 &#177; 2.4</td><td class="n">0.056</td></tr>
+      <tr><td>GSM8K</td><td class="n">1,228</td><td class="n">118.6</td><td class="n">553.3 &#177; 2.6</td><td class="n">0.214</td></tr>
+    </table>
+    <p style="font-size:0.85rem;color:var(--muted)">Live, current numbers:
+      <a href="https://github.com/SilverCoin256/cofail/blob/main/results/timeseries.csv">timeseries.csv</a> ·
+      <a href="https://github.com/SilverCoin256/cofail/blob/main/CHANGELOG.md">CHANGELOG.md</a></p>
+  </section>
+
+  <section>
+    <h2>How this was made, disclosed</h2>
+    <div class="disclosure">
+      <p style="margin-bottom:10px">Claude (Anthropic) was used as a coding and analysis
+        assistant throughout this project: it wrote the data-harvesting, estimation, and
+        figure-generation code, ran the adversarial review that led to the claim withdrawal
+        above, and assisted in drafting. The research direction, the pre-registered hypotheses
+        and kill conditions, verification of every derivation, and the final synthesis are the
+        author's own, who takes full responsibility for the content.</p>
+      <p style="margin-bottom:0">This matches the disclosure in the paper itself and follows
+        COPE guidance that AI tools cannot be listed as authors but their use should be stated
+        plainly.</p>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Code: MIT license. Evaluation data redistributed under the Open LLM Leaderboard
+      archive's own terms — this repository stores derived outcome matrices, not source text.</p>
+    <p><a href="https://github.com/SilverCoin256/cofail">github.com/SilverCoin256/cofail</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
