@@ -42,12 +42,12 @@ jobs:
           MM_WORKERS: "6"
 
       - name: Harvest delta (existing .npz files cache; only new models are fetched)
-        run: python src/harvest_matrix.py arc winogrande truthfulqa gsm8k
+        run: python src/harvest_matrix.py arc winogrande truthfulqa gsm8k hellaswag
         env:
           MM_WORKERS: "6"
 
       - name: Run the monitor (recompute calibrated statistics, append timeseries + changelog)
-        run: python src/monitor.py arc winogrande truthfulqa gsm8k
+        run: python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 
       - name: Regenerate the cohort figure
         run: python src/figures.py

@@ -16,7 +16,7 @@ RES = os.path.join(HERE, "..", "results")
 FIG = os.path.join(HERE, "..", "figures")
 os.makedirs(FIG, exist_ok=True)
 
-BENCHES = ["arc", "winogrande", "truthfulqa", "gsm8k"]
+BENCHES = ["arc", "winogrande", "truthfulqa", "gsm8k", "hellaswag"]
 NICE = {"arc": "ARC-Challenge", "winogrande": "Winogrande",
         "truthfulqa": "TruthfulQA", "gsm8k": "GSM8K", "hellaswag": "HellaSwag"}
 # Okabe-Ito, colourblind-safe
@@ -60,8 +60,18 @@ def fig2_closed_form():
     lim = [0, max(xs + ys) * 1.15]
     ax[0].plot(lim, lim, "--", c=CB["grey"], lw=1, label="y = x")
     ax[0].scatter(xs, ys, s=55, c=CB["obs"], zorder=3)
-    for b, x, y in zip(bs, xs, ys):
-        ax[0].annotate(NICE[b], (x, y), textcoords="offset points", xytext=(7, -3), fontsize=7.5)
+    # ARC and TruthfulQA sit close together on this axis (~0.113 vs ~0.116) and collide under a
+    # fixed offset; stagger any pair within 8% of the axis range instead of a uniform offset.
+    order = sorted(range(len(bs)), key=lambda i: xs[i])
+    offsets = [(7, -3)] * len(bs)
+    span = lim[1] - lim[0]
+    for k in range(1, len(order)):
+        i, j = order[k - 1], order[k]
+        if abs(xs[j] - xs[i]) < 0.06 * span:
+            offsets[i] = (7, -11)
+            offsets[j] = (7, 6)
+    for b, x, y, off in zip(bs, xs, ys, offsets):
+        ax[0].annotate(NICE[b], (x, y), textcoords="offset points", xytext=off, fontsize=7.5)
     ax[0].set_xlim(lim); ax[0].set_ylim(lim)
     ax[0].set_xlabel("closed form  $[N\\,\\mathrm{Var}_m(f)+\\mathrm{Var}_i(p)-\\bar f(1-\\bar f)]/(N-1)$")
     ax[0].set_ylabel("measured naive excess")

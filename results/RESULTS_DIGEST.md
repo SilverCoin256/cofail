@@ -261,3 +261,29 @@ conditioning, the accuracy-agreement *slope* is not. These are different statist
 | K6 | PASS, all four benchmarks |
 | K7 | **FIRED — H4 refuted; prior-art claim reported as robust** |
 | K2, K3, K4 | not applicable (K2 blocked by K5) / satisfied (K4, via burn-in + independent-chain checks) |
+
+---
+
+# Fifth benchmark: HellaSwag (2026-07-26, same day, after HellaSwag harvest completed)
+
+Harvest: 1362 models, 10042 items, 0 rejected, 111.9 min (largest file size of the five).
+
+| check | result |
+|---|---|
+| K6 (closed form) | PASS — empirical 0.148717716, closed form 0.148717716, residual −5.55e-17 |
+| E1 T (independent-chain) | T_obs 5.098e-3 vs null 5.085e-3, SES +10.6, ratio 1.002 — **above** null |
+| E3 N_eff (independent-chain) | obs 27.3 vs null 958.0±3.2, ratio 0.028 — most extreme of all five |
+| E7 mixing | plateaus by 5–10 trades/N, flat to 200 (9.8% cells changed, lower than others but consistent) |
+
+Sign tally for T across all five is now 3 below / 2 above (ARC, Winogrande, GSM8K below;
+TruthfulQA, HellaSwag above) — reconfirms K1′ (inconsistent sign, H1b refuted) rather than
+changing the verdict. PR ratio (0.028) is the smallest of the five, i.e. the strongest
+concentration signal, consistent in direction with the other four.
+
+Deep robustness suite (dedup, misspecification controls, exact variance reconciliation) was
+run on the primary four only; HellaSwag is added as a fifth confirmatory point with the same
+core pipeline (E0–E7, independent-chain nulls), not the full robustness battery. The paper
+states this scope distinction explicitly rather than implying uniform depth across all five.
+
+All paper tables, figures, and abstract language updated from "four" to "five benchmarks."
+Recompiled clean, 12 pages, zero LaTeX errors, verified by rendering the changed pages.

@@ -150,4 +150,4 @@ def main(benches):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:] or ["arc", "winogrande", "truthfulqa", "gsm8k"])
+    main(sys.argv[1:] or ["arc", "winogrande", "truthfulqa", "gsm8k", "hellaswag"])

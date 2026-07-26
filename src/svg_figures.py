@@ -201,9 +201,9 @@ def fig_misspec():
 # ============================================================ Figure: corrected residual summary
 
 def fig_residual_summary():
-    order = ["arc", "winogrande", "truthfulqa", "gsm8k"]
+    order = ["arc", "winogrande", "truthfulqa", "gsm8k", "hellaswag"]
     nice = {"arc": "ARC-Challenge", "winogrande": "Winogrande", "truthfulqa": "TruthfulQA",
-            "gsm8k": "GSM8K"}
+            "gsm8k": "GSM8K", "hellaswag": "HellaSwag"}
     rows = []
     for b in order:
         p = os.path.join(RES, f"{b}_null_independent.json")

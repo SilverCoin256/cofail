@@ -35,7 +35,7 @@ the row and column margins of a model-by-item outcome matrix are the jointly suf
 statistics of the Rasch family, the uniform distribution over margin-matched matrices is the
 unique \emph{exact, fit-free} conditional null for that entire family: it estimates no
 parameters, applies no penalty, and makes no identification choice. We report what the answer
-is at that null, on $1{,}228$--$1{,}373$ open models per benchmark across four benchmarks --- a
+is at that null, on $1{,}228$--$1{,}373$ open models per benchmark across five benchmarks --- a
 population three times larger than previously analysed.
 
 At the mean level there is nothing to find, and this is a theorem rather than a measurement:
@@ -44,9 +44,9 @@ margin-preserving null is identically zero. We show this degeneracy has been pro
 independently in three literatures --- as Schluter's V-ratio in ecology, as Kuder--Richardson /
 Cronbach's $\alpha$ in psychometrics, and as Fleiss's observed agreement for the multi-category
 case --- and give the translation between them, since none is cited in the model-evaluation
-literature. Empirically the measured excess matches the closed form to $10^{-16}$ on all four
+literature. Empirically the measured excess matches the closed form to $10^{-16}$ on all five
 benchmarks. Our pre-registered dispersion statistic came out \emph{below} its null on three of
-four benchmarks and above on one; its pre-registered kill condition fired and we report it as
+five benchmarks and above on two; its pre-registered kill condition fired and we report it as
 refuted.
 
 What survives is second-order and large. Conditioning on the margins leaves residual correlation
@@ -250,6 +250,7 @@ ARC-Challenge & 1362 & 1165 & 0.527 & 2023-07 -- 2024-06 \\
 Winogrande & 1361 & 1267 & 0.734 & 2023-09 -- 2024-06 \\
 TruthfulQA (mc1) & 1334 & 786 & 0.368 & 2023-07 -- 2024-06 \\
 GSM8K & 1228 & 1319 & 0.348 & 2023-09 -- 2024-06 \\
+HellaSwag & 1362 & 9404 & 0.613 & 2023-07 -- 2024-06 \\
 \bottomrule
 \end{tabular}
 \caption{Substrate after removing degenerate rows and columns. For comparison,
@@ -264,14 +265,15 @@ GSM8K & 1228 & 1319 & 0.348 & 2023-09 -- 2024-06 \\
 
 Measured excess versus Lemma~\ref{lem:alpha}: ARC $+0.113180719$ vs $+0.113180719$ (residual
 $-2.8\times10^{-17}$); Winogrande $+0.057265401$ ($-1.4\times10^{-17}$); TruthfulQA
-$+0.115767366$ ($+1.4\times10^{-17}$); GSM8K $+0.042311309$ ($+7.6\times10^{-17}$). Over $400$
+$+0.115767366$ ($+1.4\times10^{-17}$); GSM8K $+0.042311309$ ($+7.6\times10^{-17}$); HellaSwag
+$+0.148717716$ ($-5.6\times10^{-17}$). Over $400$
 curveball replicates per benchmark, with both margins exactly preserved, the maximum deviation of
 mean co-failure from its observed value is $0.00\times10^{0}$, as Lemma~\ref{lem:mean} requires.
 Of a reported excess as large as $+0.116$, none survives conditioning.
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.92\linewidth]{../figures/fig2_closed_form.pdf}
-\caption{Lemma~\ref{lem:alpha} predicts the measured excess exactly on all four benchmarks
+\caption{Lemma~\ref{lem:alpha} predicts the measured excess exactly on all five benchmarks
 (panel a); the residual sits at machine precision, well below the $10^{-9}$ validation
 threshold set in the pre-registration (panel b).}
 \label{fig:closedform}
@@ -293,6 +295,7 @@ ARC-Challenge & $7.640\times10^{-3}$ & $8.331\times10^{-3}$ & $-70.9$ & $0.917$ 
 Winogrande & $1.310\times10^{-3}$ & $2.322\times10^{-3}$ & $-149.8$ & $0.564$ \\
 TruthfulQA & $1.277\times10^{-2}$ & $1.164\times10^{-2}$ & $+80.1$ & $1.098$ \\
 GSM8K & $4.576\times10^{-2}$ & $4.623\times10^{-2}$ & $-38.5$ & $0.990$ \\
+HellaSwag & $5.098\times10^{-3}$ & $5.085\times10^{-3}$ & $+10.6$ & $1.002$ \\
 \bottomrule
 \end{tabular}
 \caption{Independent-chain nulls, $R=200$ chains each burned in $50$ trades per model.}
@@ -310,6 +313,7 @@ ARC-Challenge & 1362 & $23.6$ & $449.3\pm3.4$ & $0.052$ & $1.9$ \\
 Winogrande & 1361 & $20.1$ & $493.8\pm3.0$ & $0.041$ & $3.6$ \\
 TruthfulQA & 1334 & $17.4$ & $309.7\pm2.4$ & $0.056$ & $1.5$ \\
 GSM8K & 1228 & $118.6$ & $553.1\pm2.2$ & $0.214$ & $2.1$ \\
+HellaSwag & 1362 & $27.3$ & $958.0\pm3.2$ & $0.028$ & $1.5$ \\
 \bottomrule
 \end{tabular}
 \caption{The last column shows why calibration is not optional: uncalibrated, the participation
@@ -319,7 +323,7 @@ ratio reads $1.5$--$3.6$, which is not a finding but the single shared difficult
 
 \begin{figure}[t]\centering
 \includegraphics[width=0.92\linewidth]{../figures/fig_residual_summary.pdf}
-\caption{Observed participation ratio against its exact-margin null, all four benchmarks. Read
+\caption{Observed participation ratio against its exact-margin null, all five benchmarks. Read
 this alongside Section~\ref{sec:notneff}: PR is reported here as a calibrated summary
 statistic, not as a count of independent models.}
 \label{fig:residualsummary}
