@@ -12,7 +12,7 @@ or carried over from an earlier draft.
 | Winogrande | 1361 | 1267 | 0.734 | 2023-09 … 2024-06 | 10 |
 | TruthfulQA (mc1) | 1334 | 786 | 0.368 | 2023-07 … 2024-06 | 12 |
 | GSM8K | 1228 | 1319 | 0.348 | 2023-09 … 2024-06 | 10 |
-| HellaSwag | in progress | 10042 | — | — | — |
+| HellaSwag | 1362 | 9404 | 0.581 | 2023-07 … 2024-06 | 12 |
 
 Harvested from `open-llm-leaderboard-old` at **$0 compute cost** by reading only the metric
 column of each parquet (1.4 KB out of a 63 MB file for HellaSwag). Item identity is the row
@@ -140,6 +140,10 @@ independent models, large apparent error correlation.
 | K6 (closed form matches measurement) | **PASS on all four benchmarks** |
 | K7 (accuracy–agreement slope survives conditioning) | not yet run — needs tier-2 responses |
 
+*This table is the state as of the first confirmatory run and is left unedited as a dated
+record. It is superseded twice below: by "C5. Pre-registered gate outcomes, final" and then by
+"Final kill-condition status". Read the last one.*
+
 ---
 
 # CORRECTIONS after adversarial review (2026-07-26, later same day)
@@ -213,14 +217,19 @@ Each row is a simulated population with **no clusters, no clones, no shared line
 |---|---|
 | K1′ dispersion T above null in ≥2 of 3 | **FIRED — H1b refuted**, reported as refuted |
 | K5 base_model coverage ≥40% | **FAILED — 23.3%** (317/1362; 315 repos no longer retrievable) → lineage contribution **dropped** |
-| K6 closed form matches measurement | **PASS**, all four benchmarks, residual ≤7.6e-17 |
+| K6 closed form matches measurement | **PASS**, all five benchmarks, residual ≤7.6e-17 |
 | K4 chain convergence | **PASS** (plateau by 10 trades/N; 40× burn-in changes null 0.3%) |
-| K2, K3, K7 | not run — K2 blocked by K5; K7 needs tier-2 responses |
+| K2, K3 | not run — K2 blocked by K5 |
+| K7 | **FIRED** — tier-2 responses harvested and run 2026-07-26; H4 refuted |
 
 ## C6. Still outstanding
 
-- HellaSwag harvest paused at 100/1362 to free API budget; resumable.
-- Tier-2 response harvest (Proposition 3 / H4 on real responses) written but not run.
+- ~~HellaSwag harvest paused at 100/1362~~ — **completed 2026-07-26**; see the fifth-benchmark
+  section at the end of this file.
+- ~~Tier-2 response harvest (Proposition 3 / H4 on real responses) written but not run.~~ —
+  **run 2026-07-26**; K7 fired, H4 refuted. See the K7 section.
+- Deep robustness suite (dedup, misspecification controls, exact variance reconciliation) is run
+  on the primary four benchmarks only, not on HellaSwag. Stated as such in the paper.
 - Prior-art sweep angles and the venue-verification agent died on a session limit; the venue
   shortlist below rests on my own verified searches, not on the workflow.
 
@@ -258,7 +267,7 @@ conditioning, the accuracy-agreement *slope* is not. These are different statist
 |---|---|
 | K1′ | FIRED — H1b refuted |
 | K5 | FAILED — 23.3% coverage, lineage dropped |
-| K6 | PASS, all four benchmarks |
+| K6 | PASS, all five benchmarks |
 | K7 | **FIRED — H4 refuted; prior-art claim reported as robust** |
 | K2, K3, K4 | not applicable (K2 blocked by K5) / satisfied (K4, via burn-in + independent-chain checks) |
 
