@@ -296,3 +296,105 @@ states this scope distinction explicitly rather than implying uniform depth acro
 
 All paper tables, figures, and abstract language updated from "four" to "five benchmarks."
 Recompiled clean, 12 pages, zero LaTeX errors, verified by rendering the changed pages.
+
+---
+
+# NeurIPS redesign: three pre-registered tests of a "positive capability" spine (2026-07-28)
+
+The NeurIPS brief requires a contribution of the form "because we discovered X, researchers can
+now do Y." Three candidate Y's were specified with kill conditions written BEFORE execution and
+tested in order. All three controls are recorded here including the two that fired.
+
+## KS1/KS2 — panel selection by conditioned diversity (`src/selection_killtest.py`)
+
+Leakage guard: all selection statistics on a SEL item half, majority-vote accuracy on a disjoint
+EVAL half. 600-model ARC response tensor, 8 item-split seeds, panel sizes {3,5,7,9,11,15}.
+
+| k | cond-div vote | naive-div vote | top-acc vote | paired diff [95% CI] |
+|---|---|---|---|---|
+| 3 | 0.7714 | 0.7509 | 0.8066 | +0.0205 [+0.0022,+0.0422] |
+| 5 | 0.7802 | 0.7745 | 0.7987 | +0.0057 [−0.0011,+0.0133] |
+| 7 | 0.7725 | 0.7616 | 0.7649 | +0.0109 [+0.0039,+0.0188] |
+| 9 | 0.7710 | 0.7557 | 0.7472 | +0.0153 [+0.0083,+0.0229] |
+| 11 | 0.7649 | 0.7559 | 0.7430 | +0.0090 [+0.0033,+0.0149] |
+| 15 | 0.7555 | 0.7502 | 0.7358 | +0.0052 [−0.0002,+0.0111] |
+
+**KS1 nominally passes (4/6). KS2 FIRES.** Conditioned-diversity panels have higher mean member
+accuracy at *every* panel size (e.g. 0.7426 vs 0.7309 at k=3), so the vote win is confounded with
+simply selecting better models. This experiment cannot establish the claim and is retained only
+as a record. Note also that `top-acc` beats both diversity strategies at k=3,5 and loses at
+k=7..15 — a crossover, not a clean win for diversity.
+
+## KI1/KI2 — incremental predictive validity (`src/incremental_validity.py`)
+
+The design the ensemble-diversity literature actually uses (Kuncheva & Whitaker 2003,
+*Machine Learning* 51(2):181–207): sample panels, regress ensemble accuracy on diversity
+statistics, ask what survives controlling for member accuracy. 5,999 panels, stratified over
+accuracy bands so member accuracy varies enough to be controlled.
+
+| nested model | R² | ΔR² | F |
+|---|---|---|---|
+| M0: mean member accuracy + panel size | 0.9928 | — | — |
+| M1: + disagreement + double-fault | 0.9945 | +0.0017 | 923.7 |
+| M2: + margin-conditioned R | 0.9947 | **+0.0002** | 219.5 |
+
+**KI1 FIRES and KI2 is violated.** The conditioned measure adds ΔR² = +0.0002 — significant at
+n≈6000 but practically nil — and enters with a *positive* coefficient, the wrong sign for the
+proposed mechanism. Member accuracy plus panel size alone explains 99.28% of ensemble-accuracy
+variance. The "better diversity metric → better ensembles" spine is dead.
+
+Independent corroboration of Lemma 1: standardised OLS coefficients blow up to member_acc=+316.2
+and double_fault=+275.4, the signature of near-perfect collinearity between double-fault and the
+margins — which is exactly what Lemma 1 predicts, now visible inside the canonical ML
+diversity-regression framework rather than only as an identity.
+
+## KR1/KD1 — does accuracy ranking select for conditioned redundancy? (`src/rank_redundancy.py`, `..._control.py`)
+
+Fixed-width accuracy window (10% of models) swept across the accuracy range; the sweep controls
+the obvious confound that *any* narrow band might show elevated correlation.
+
+| bench | ρ(window accuracy, mean R) | ρ under margin-preserving null | top window R | median | ratio |
+|---|---|---|---|---|---|
+| ARC | +0.837 | −0.047 | +0.502 | +0.215 | 2.33× |
+| Winogrande | +0.920 | +0.150 | +0.674 | +0.299 | 2.25× |
+| TruthfulQA | +0.823 | +0.003 | +0.510 | +0.239 | 2.13× |
+| GSM8K | +0.635 | −0.034 | +0.163 | +0.024 | 6.81× |
+| HellaSwag | +0.562 | +0.081 | +0.462 | +0.186 | 2.49× |
+
+**KR1 survives 5/5**: the null profile is flat at ~0.000 across the whole accuracy range while the
+observed profile rises steeply toward the top. Not a banding artifact and not a margin artifact.
+
+**KD1 FIRES (2/5).** Re-running the identical sweep after removing near-duplicate models
+(agreement ≥ 0.95, recomputing the Rasch fit from scratch each time) collapses the gradient on
+three benchmarks:
+
+| bench | ratio @ no dedup | @0.99 | @0.97 | @0.95 | @0.90 | KD1 |
+|---|---|---|---|---|---|---|
+| ARC | 2.33× | 2.19× | 1.55× | 0.86× | 0.78× | fail |
+| Winogrande | 2.25× | 1.83× | 1.54× | 1.66× | 1.55× | pass |
+| TruthfulQA | 2.13× | 1.88× | 1.36× | 0.94× | 0.06× | fail |
+| GSM8K | 6.81× | 4.62× | 6.00× | 5.39× | 5.43× | pass |
+| HellaSwag | 2.49× | 2.00× | 0.54× | 0.35× | 0.28× | fail |
+
+Top-of-leaderboard conditioned redundancy is **substantially a duplicate-fine-tune artifact** on
+ARC, TruthfulQA and HellaSwag. It survives aggressive deduplication only on GSM8K (essentially
+unmoved, 6.8×→5.4×) and partially on Winogrande. The general claim is refuted as stated.
+
+## What these three tests establish
+
+Every candidate positive capability died under its own pre-registered control. That is itself the
+finding: the residual structure this project measures does not convert into a downstream selection
+advantage, and the one striking population-level gradient is mostly duplication. The reusable
+results are (a) the degeneracy, now demonstrated inside the ML diversity-regression framework,
+(b) the null-calibrated instrument, and (c) the evidence that leaderboard model populations must
+be deduplicated before any correlation analysis — 36–64% of models removed at the 0.95 threshold.
+
+### Reconciling KD1 with E5 (they are not in conflict)
+
+E5 above reports that removing two-thirds of the models moves *global* N_eff by only ~5, and
+concludes the concentration is not a duplicate artifact. KD1 reports that the same deduplication
+destroys the *top-decile-versus-median* redundancy gradient on three benchmarks. Both are correct
+and they are different statistics: duplicates are not spread uniformly over the accuracy range,
+they pool at the top of the leaderboard, so removing them barely moves a population-wide summary
+while sharply flattening a profile measured *along* the accuracy axis. E5's conclusion stands as
+stated (global concentration is not duplication) and must not be extended to the gradient claim.
