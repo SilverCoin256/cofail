@@ -497,3 +497,31 @@ newly computed values rather than by any of the planned experiments.
 4. Cut to 9 pages and anonymise; deposit the pre-registration on OSF and the artifact on Zenodo.
 5. Fill in the upstream license table in `docs/DATASHEET.md` and withhold the reconstructed ARC
    answer key from any public release.
+
+## X7 feasibility check — the v2 replication is NOT a drop-in repeat of the v1 harvest
+
+The blueprint above assumed the v2 leaderboard could be harvested by the same $0
+column-selective parquet trick that made v1 free. **Checked directly, and it cannot.**
+
+The v2 archive exists and is reachable, under a different naming convention
+(`open-llm-leaderboard/<org>__<model>-details`, versus v1's
+`open-llm-leaderboard-old/details_<org>__<model>`). But v2 stores per-sample outcomes as
+**JSON, not parquet**, so there is no column to read selectively — the whole file must come down.
+
+Measured on `meta-llama__Meta-Llama-3-70B-Instruct-details`: 120 sample files totalling
+**1,107 MB for one model** across three snapshots, i.e. ~369 MB per model per snapshot. MMLU-Pro
+alone is **403 MB per model per snapshot**. Extrapolated to a 1,000-model population that is
+roughly **369 GB**, against the ~1.4 KB per model per benchmark that v1 cost.
+
+**Consequences for the roadmap.**
+- A full six-task, 1,000-model v2 replication is not feasible on a personal connection, and any
+  plan that assumes otherwise will fail in week one of Phase 2.
+- A scoped version is feasible and should replace it: **ARC-Challenge in v2 is 9.4 MB per model
+  per snapshot**, so ~300 models is ~2.8 GB. GPQA (198 items) is smaller still. That is enough to
+  answer the recency objection on one task with a matched comparison against the v1 arm.
+- **Drop MMLU-Pro from any harvest plan** unless a parquet mirror is found.
+- Revised §17 Phase 2: replicate on v2 ARC-Challenge and GPQA at ~300 models, not all six tasks at
+  full population.
+
+This is recorded because the cheapest way to lose a month is to plan around a harvest method that
+does not transfer, and the check took ten minutes.
