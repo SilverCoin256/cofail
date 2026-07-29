@@ -65,7 +65,17 @@ families. The honest reading is therefore that open-model failure is governed by
 latent dimensions beyond unidimensional ability. We also reconcile two apparently contradictory
 statistics exactly --- the excess variance is $29\times$ the null while its covariance with the
 margin-model prediction is strongly negative --- and show the effect is not an artifact of
-duplicate models, chain mixing, or the choice of spectral functional. A pre-registered test on
+duplicate models, chain mixing, or the choice of spectral functional.
+
+We also state what the test cannot see, because it is not a detail. A planted-signal power study
+gives full power against shared failure modes at a planted rms of $0.048$, well below the
+$0.099$--$0.294$ observed, and detects copying of a reference model from a copy rate of $0.1$; but
+against the alternative in which every model shares one item-difficulty profile and differs only
+in overall ability --- arguably the strongest form of monoculture --- power equals the nominal
+$\alpha$ of $0.05$. That alternative \emph{is} the null, so the test has no power against it by
+construction. This is the Narcissus effect of \citet{colwell1984} in exact form: we measure
+departures from a shared difficulty profile and cannot measure the shared profile itself. A
+pre-registered test on
 real model responses (not just correctness) finds that our own critique does \emph{not} rescue
 one specific published claim: the reported association between model accuracy and error
 agreement attenuates only $12\%$ under conditioning and remains significant, so that finding is
@@ -143,7 +153,20 @@ $\sum_{i\neq j}F_{im}F_{jm}=(\sum_i F_{im})^2-\sum_i F_{im}^2=c_m^2-c_m$ since $
 \end{proof}
 
 Consequently any randomisation preserving the column margins leaves $O$ invariant with zero
-variance, and the standardised effect size for $O$ is $0/0$.
+variance, and the standardised effect size for $O$ is $0/0$. Note the scope precisely: the
+invariance follows from preserving the \emph{item} margins alone. A null preserving only the model
+margins does not leave $O$ invariant, so Lemma~\ref{lem:mean} does not by itself impugn analyses
+whose baseline conditions on model accuracy.
+
+\paragraph{$O$ is the double-fault measure.} For a machine-learning reader, $O$ is not an unfamiliar
+quantity: mean pairwise co-failure is exactly the \emph{double-fault} diversity measure, one of the
+ten catalogued by \citet{kuncheva2003} in the classifier-ensemble literature. Lemma~\ref{lem:mean}
+therefore says that a standard ensemble-diversity measure is determined by the item margins. The
+effect is visible in the canonical diversity-regression design of that literature: over $5{,}999$
+sampled panels drawn from our ARC response data, mean member accuracy and panel size alone explain
+$R^2=0.9928$ of majority-vote accuracy, and the standardised regression coefficients on member
+accuracy and double-fault diverge to $+316$ and $+275$ --- the signature of the near-perfect
+collinearity Lemma~\ref{lem:mean} predicts.
 
 \paragraph{This is not new, in three separate fields.} In ecology it is the degeneracy of
 Schluter's V-ratio \citep{schluter1984}. \citet{gotelli2000} states plainly that ``the V ratio
@@ -460,6 +483,39 @@ autocorrelations between $-0.14$ and $+0.07$. A $2000$-trades-per-model burn-in 
 $N_{\text{eff}}$ null of $450.8$ against $449.3$ at $50$ --- a $40\times$ longer burn-in moves it
 by $0.3\%$. Both margins are exactly preserved at every checkpoint.
 
+\paragraph{The sampler is uniform, verified rather than asserted.} \citet{carstens2015} proved
+curveball converges to the uniform distribution on the fibre provided failed trades are counted as
+steps; our implementation does so. We test it directly. Enumerating every binary matrix with given
+margins on four small fibres (sizes $48$, $90$, $204$, $1170$) and drawing $60{,}000$ thinned
+samples, a $\chi^2$ test against uniformity is not rejected on any of them
+($p = 0.05, 0.23, 0.73, 0.15$). Across all five benchmarks, four dispersed chains give
+Gelman--Rubin $\hat R$ between $0.98$ and $1.03$ at the burn-in actually used.
+
+\paragraph{The null is not the finite-sample noise floor.} A natural objection is that the exact
+null's residual-correlation rms simply reproduces the $1/\sqrt{M}$ sampling floor. It does not,
+but the margin is modest: the exact null sits at $1.25$--$2.01\times$ the analytic floor
+($0.0446$ vs $0.0293$ on ARC; $0.0207$ vs $0.0103$ on HellaSwag). Two further rungs are
+informative. Conditioning on model margins alone lands \emph{exactly} on that floor on every
+benchmark, while conditioning on item margins alone reproduces the full both-margin null to within
+$6\%$ ($0.0445$ vs $0.0446$ on ARC). Empirically, the item margins do essentially all of the
+conditioning work; the joint-sufficiency framing is correct as stated but overstates what is
+load-bearing here.
+
+\paragraph{Deduplication does not drive the result.} Recomputing every headline statistic on
+populations deduplicated at agreement thresholds $0.99$ through $0.90$, refitting the Rasch model
+and redrawing the null each time, $14$ of $15$ statistic--benchmark pairs move by less than
+$1.5\times$ between the full population and the $0.95$-deduplicated one, which discards
+$36$--$64\%$ of models. The exception is HellaSwag's participation ratio ($2.44\times$). The
+eigenvalue count above the null edge is unchanged on four of five benchmarks.
+
+\paragraph{Power, and one blind spot.} On planted data ($400$ models, $700$ items, $20$ datasets
+per condition, $\alpha=0.05$; null conditions reject at $0.017$), the test reaches power $1.00$
+against shared failure modes at a planted rms of $0.048$ --- far below the $0.099$--$0.294$
+observed --- and detects copying of a reference model with power $0.65$ at a copy rate of $0.05$
+and $1.00$ from $0.10$. Against the alternative in which all models share one item-difficulty
+profile and differ only in ability, power is $0.05$: exactly $\alpha$, because that alternative is
+the null. We state this as a property of the design rather than a caveat \citep{colwell1984}.
+
 \paragraph{Functional choice.} On ARC, $91.35\%$ of spectral mass is positive. The participation
 ratio is insensitive to the treatment of negative eigenvalues: $23.6$ clipped, $23.5$ absolute,
 $16.0$ raw.
@@ -574,6 +630,8 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Besag \& Clifford(1989)]{besag1989} J.~Besag and P.~Clifford. Generalized Monte Carlo significance tests. \emph{Biometrika}, 76:633--642, 1989.
 \bibitem[Bommasani et al.(2022)]{bommasani2022homogenization} R.~Bommasani, K.~A. Creel, A.~Kumar, D.~Jurafsky, and P.~Liang. Picking on the same person: Does algorithmic monoculture homogenize outcomes? \emph{NeurIPS}, 2022.
 \bibitem[Cheverud(2001)]{cheverud2001} J.~M. Cheverud. A simple correction for multiple comparisons in interval mapping genome scans. \emph{Heredity}, 87:52--58, 2001.
+\bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015. Erratum: \emph{Phys.\ Rev.\ E} 94:039902, 2016.
+\bibitem[Colwell \& Winkler(1984)]{colwell1984} R.~K. Colwell and D.~W. Winkler. A null model for null models in biogeography. In \emph{Ecological Communities: Conceptual Issues and the Evidence}, pages 344--359. Princeton University Press, 1984.
 \bibitem[Connor \& Simberloff(1979)]{connor1979} E.~F. Connor and D.~Simberloff. The assembly of species communities: chance or competition? \emph{Ecology}, 60:1132--1140, 1979.
 \bibitem[Cronbach(1951)]{cronbach1951} L.~J. Cronbach. Coefficient alpha and the internal structure of tests. \emph{Psychometrika}, 16:297--334, 1951.
 \bibitem[Fleiss(1971)]{fleiss1971} J.~L. Fleiss. Measuring nominal scale agreement among many raters. \emph{Psychological Bulletin}, 76:378--382, 1971.
@@ -582,6 +640,7 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Jo et al.(2026)]{jo2026subjectivity} N.~Jo, N.~Garg, and M.~Raghavan. The subjectivity of monoculture. \emph{arXiv:2602.24086}, 2026.
 \bibitem[Kim et al.(2025)]{kim2025correlated} Correlated errors in large language models. \emph{arXiv:2506.07962}, 2025.
 \bibitem[Kleinberg \& Raghavan(2021)]{kleinberg2021monoculture} J.~Kleinberg and M.~Raghavan. Algorithmic monoculture and social welfare. \emph{PNAS}, 118(22), 2021.
+\bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Kuder \& Richardson(1937)]{kuder1937} G.~F. Kuder and M.~W. Richardson. The theory of the estimation of test reliability. \emph{Psychometrika}, 2:151--160, 1937.
 \bibitem[Laloux et al.(1999)]{laloux1999} L.~Laloux, P.~Cizeau, J.-P. Bouchaud, and M.~Potters. Noise dressing of financial correlation matrices. \emph{Physical Review Letters}, 83:1467, 1999.
 \bibitem[Li \& Ji(2005)]{liji2005} J.~Li and L.~Ji. Adjusting multiple testing in multilocus analyses using the eigenvalues of a correlation matrix. \emph{Heredity}, 95:221--227, 2005.

@@ -432,3 +432,68 @@ Colwell & Winkler 1984, Carstens 2015 + erratum, and the Open LLM Leaderboard v2
 novelty of the redesigned contribution in §14 has not been checked against the literature.** That
 sweep must be run before any of this is executed — if the duplication result is already published,
 §3 changes again.
+
+---
+
+# ADDENDUM — Phase 0 and Phase 1 executed (2026-07-28, same day)
+
+The blueprint above was written before any of its own experiments were run. Six of them have now
+been run. **The picture improved substantially, and §3 and §22 should be read subject to this.**
+
+## What was run, and what it found
+
+| # | Experiment | Result |
+|---|---|---|
+| X5 | Noise-floor ladder | **PASS.** The exact null sits at 1.25–2.01× the analytic 1/√(M−3) floor, not on it. The reviewer objection is refuted. *But* column-margin conditioning alone reproduces the both-margin null to within 6%, so item margins do essentially all the work. |
+| X6 | Sampler validation | **PASS.** χ² against complete enumeration on four fibres (to size 1,170) does not reject uniformity (p = 0.05–0.73); Gelman–Rubin R̂ = 0.98–1.03 on all five benchmarks. "Exact" is now earned. |
+| X1/X2 | Duplication audit | **14 of 15 statistic–benchmark pairs robust.** Removing 36–64% of each population moves the headline ratios ≤1.46×. Only HellaSwag's PR ratio is duplication-driven (2.44×). |
+| X4 | Power study | **PASS, plus the Narcissus answer.** Power 1.00 against shared failure modes at planted rms 0.048 (real data: 0.099–0.294); copying detected from c ≥ 0.1; and power **exactly 0.05 = α** against the shared-difficulty alternative, because that alternative *is* the null. |
+| X3 | Null ladder | Permutation rungs (R0–R3) usable and reported. The fitted rungs (2PL, MIRT) are **not** — see below. |
+| — | Dimensionality (q*) | **RETRACTED.** Three fitting attempts disagreed; the third revealed that with free per-item loadings, q=1 is 2PL, not Rasch, so the ladder counted from the wrong baseline. Left open for an established IRT package. |
+
+## The consequence for §3
+
+**F2 (the duplication confound) is now largely answered rather than conceded**, which was the
+single most-cited objection across all six reviewer personas. F4 (Narcissus) is now *quantified*
+rather than merely admitted — and quantifying a blind spot exactly is a stronger scientific
+position than not knowing it. The instrument objections behind F5 and part of F9 are answered by
+X6.
+
+The redesign in §3 should therefore be revised: the paper does **not** need to retreat entirely to
+a duplication audit. It has a defensible measurement plus a characterised instrument. The correct
+framing is now:
+
+> Mean co-failure is the double-fault diversity measure and is margin-determined. Here is the
+> exact conditional test, here is a validated sampler, here is exactly what the test can and
+> cannot detect, and here is what survives on 1,228–1,373 models across five benchmarks —
+> including after 36–64% of each population is removed as near-duplicate.
+
+## One thing found that was not on the list
+
+**A number in the paper traced to no executed run.** The manuscript reported the ARC null as
+0.0389 and an abstract claim of a "sixfold excess." No artifact in `results/` produces 0.0389;
+four independent estimates give 0.0445–0.0449, and the correct ratio is 5.5×. Fixed in three
+places and recorded in `results/RESULTS_DIGEST.md`. Most likely a scope mix — 0.039 is close to the
+cross-benchmark *mean* null (0.0398), paired with ARC's benchmark-specific observed value. It is
+the kind of defect a hostile reviewer finds, and it was found by cross-checking the paper against
+newly computed values rather than by any of the planned experiments.
+
+## Revised probability assessment
+
+| Scenario | Before | **After Phase 0/1** | Why |
+|---|---|---|---|
+| NeurIPS main track, as-is | 3–6% | **6–10%** | Still no capability claim, still 14 pages, still v1 data |
+| NeurIPS workshop | 45–60% | **60–70%** | The instrument is now validated and the leading confound answered |
+| NeurIPS D&B / Evaluations after §9–13 | 25–35% | **35–45%** | Datasheet and LICENSE now exist; power characterisation is exactly what that track rewards |
+| ICLR 2027 | 20–30% | **25–35%** | Same reasoning, broader tolerance |
+
+## What remains, in priority order
+
+1. **The dimensionality question** — the paper's central identification issue, still open. Needs
+   R `mirt` or `py-irt`, not a bespoke optimiser.
+2. **The novelty sweep** — still never run (quota). Nothing in §14's contribution statement has
+   been checked against the literature.
+3. **X7 v2 replication**, X8 MMLU subject projection, X9 contamination — all unrun.
+4. Cut to 9 pages and anonymise; deposit the pre-registration on OSF and the artifact on Zenodo.
+5. Fill in the upstream license table in `docs/DATASHEET.md` and withhold the reconstructed ARC
+   answer key from any public release.
