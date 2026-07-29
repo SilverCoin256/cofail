@@ -508,7 +508,19 @@ $1.5\times$ between the full population and the $0.95$-deduplicated one, which d
 $36$--$64\%$ of models. The exception is HellaSwag's participation ratio ($2.44\times$). The
 eigenvalue count above the null edge is unchanged on four of five benchmarks.
 
-\paragraph{Power, and one blind spot.} On planted data ($400$ models, $700$ items, $20$ datasets
+\paragraph{How many dimensions, and by a method that needs no fitting.} Counting eigenvalues above
+the null spectral edge is Horn's parallel analysis with a stronger reference distribution than
+Horn's own: instead of comparing against iid random data, we compare against the exact
+margin-preserving null, which already carries the observed ability and difficulty profiles. It
+requires no optimiser and inherits the sampler guarantees above. The retained counts are $6$
+(ARC), $5$ (Winogrande), $5$ (TruthfulQA), $4$ (GSM8K) and $12$ (HellaSwag), and they are stable
+under deduplication --- across thresholds $0.99$ to $0.90$ they move by at most one on four of the
+five benchmarks (HellaSwag ranges $8$--$12$). We report this as the dimensionality estimate and
+note its known limitation: eigenvalue-counting rules of this family tend to over-retain, so these
+are upper bounds rather than point estimates. We attempted a complementary estimate by fitting
+multidimensional IRT and comparing held-out synthetic residual correlation; three
+parameterisations disagreed materially and the attempt is reported in the repository as
+unresolved rather than folded in here. On planted data ($400$ models, $700$ items, $20$ datasets
 per condition, $\alpha=0.05$; null conditions reject at $0.017$), the test reaches power $1.00$
 against shared failure modes at a planted rms of $0.048$ --- far below the $0.099$--$0.294$
 observed --- and detects copying of a reference model with power $0.65$ at a copy rate of $0.05$
