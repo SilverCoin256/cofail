@@ -528,3 +528,65 @@ model ids on every benchmark, with ~125 models per benchmark carrying merge-rela
 top five named families covering ~25%. This is coarser than a config hash and is **not** lineage
 ground truth; it is reported to show that the `base_model` field failing at 23.3% (K5) was not
 the only weak attribution route available.
+
+## X4 / KP1–KP3 — what the test can and cannot detect (`src/power_study.py`)
+
+Planted structure at controlled strength, 400 models x 700 items, 20 datasets per condition,
+one-sided test at alpha = 0.05. Calibration check: the null conditions (s=0, c=0) reject at
+0.017 against a nominal 0.05, so the threshold is if anything slightly conservative.
+
+**Alternative A — shared failure modes** (g latent groups, per-item offset of magnitude s):
+
+| s | power (g=4) | power (g=8) | planted rms |
+|---|---|---|---|
+| 0.00 | 0.05 | 0.00 | 0.047 |
+| 0.15 | 0.05 | 0.10 | 0.047 |
+| 0.30 | 0.25 | 0.15 | 0.047 |
+| 0.50 | **1.00** | **1.00** | 0.048–0.050 |
+| 0.80 | 1.00 | 1.00 | 0.056–0.062 |
+| 1.20 | 1.00 | 1.00 | 0.075–0.092 |
+
+**KP1 passes.** Full power is reached at a planted rms of **0.048** — far below the 0.099–0.294
+seen on real data. The test is not underpowered in the regime it is applied in.
+
+**Alternative C — partial copying of a reference model:** power 0.00 at c=0, **0.65 at c=0.05**,
+**1.00 from c=0.10 onward.** **KP3: copying is detected from c ≥ 0.1.** The instrument is highly
+sensitive to duplication, which is the right property given the population is 36–64% redundant.
+
+**Alternative B — shared item difficulty only: power = 0.05, exactly the nominal alpha.**
+
+**This is the Narcissus effect, quantified.** Colwell & Winkler (1984) warned that a null
+conditioning on statistics into which the process of interest has leaked will absorb that process.
+Here the warning is exact rather than rhetorical: against the alternative "every model finds the
+same items hard, differing only in overall ability" — arguably the strongest form of monoculture —
+the test has **zero power by construction**, because that alternative *is* the null. Per KP2 this
+belongs in the abstract, not in Limitations. The instrument measures departures from a shared
+difficulty profile; it cannot measure the shared difficulty profile itself.
+
+## RETRACTED — the "q* latent dimensions" estimate (`src/dimensionality.py`)
+
+An estimate of how many latent ability dimensions reproduce the residual correlation was
+attempted, on held-out items, and **is not reported as a result.** Three independent fitting
+attempts disagreed materially about the same quantity:
+
+| attempt | 2PL-equivalent synthetic rms (ARC) |
+|---|---|
+| `null_ladder.py` R4 rung | 0.109 |
+| `dimensionality.py`, first parameterisation | 0.062 |
+| `dimensionality.py`, after the gradient-scaling fix | 0.177 / 0.214 depending on lr |
+
+Three defects were found, in order:
+1. float32 overflow in the null-ladder MIRT, which returned rms > 1 for Winogrande q=2,3,4. An
+   rms of correlations cannot exceed 1, so those rungs were discarded.
+2. Missing gradient normalisation, making theta updates ~M times too large; every fit diverged.
+3. **A specification error that invalidates the ladder's labelling.** In this parameterisation
+   `q=1` allows a free per-item loading, so it is a **2PL**, not the Rasch model. The built-in
+   calibration — q=1 must reproduce the Rasch null of ~0.045 — therefore fails by construction,
+   and the reported q* was counting from the wrong baseline.
+
+Two genuinely different approaches having failed, this stops here rather than continuing to tune a
+bespoke optimiser. **The dimensionality question remains open** and should be answered with an
+established IRT implementation (R `mirt`, or `py-irt`) rather than hand-rolled gradient ascent.
+The earlier in-sample impression that 2–4 dimensions suffice is *suggestive only* and must not be
+cited until refitted. What survives from this line of work is the permutation-based rungs of the
+ladder (R0–R3), which involve no optimiser at all and are reported above under X5.

@@ -1,0 +1,161 @@
+{
+ "N": 400,
+ "M": 700,
+ "n_trials": 20,
+ "n_null": 15,
+ "alpha": 0.05,
+ "alt_A_shared_failure_modes": [
+  {
+   "condition": "A g=4 s=0.0",
+   "power": 0.05,
+   "n_trials": 20,
+   "mean_observed_rms": 0.046704376480425205,
+   "g": 4,
+   "s": 0.0
+  },
+  {
+   "condition": "A g=4 s=0.15",
+   "power": 0.05,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04685400163313691,
+   "g": 4,
+   "s": 0.15
+  },
+  {
+   "condition": "A g=4 s=0.3",
+   "power": 0.25,
+   "n_trials": 20,
+   "mean_observed_rms": 0.047040548460564546,
+   "g": 4,
+   "s": 0.3
+  },
+  {
+   "condition": "A g=4 s=0.5",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.049746660340719825,
+   "g": 4,
+   "s": 0.5
+  },
+  {
+   "condition": "A g=4 s=0.8",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.061687993398137055,
+   "g": 4,
+   "s": 0.8
+  },
+  {
+   "condition": "A g=4 s=1.2",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.09239081362355928,
+   "g": 4,
+   "s": 1.2
+  },
+  {
+   "condition": "A g=8 s=0.0",
+   "power": 0.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04692193386389718,
+   "g": 8,
+   "s": 0.0
+  },
+  {
+   "condition": "A g=8 s=0.15",
+   "power": 0.1,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04674087526216478,
+   "g": 8,
+   "s": 0.15
+  },
+  {
+   "condition": "A g=8 s=0.3",
+   "power": 0.15,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04706308943504749,
+   "g": 8,
+   "s": 0.3
+  },
+  {
+   "condition": "A g=8 s=0.5",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04822834333781785,
+   "g": 8,
+   "s": 0.5
+  },
+  {
+   "condition": "A g=8 s=0.8",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.05587413013719741,
+   "g": 8,
+   "s": 0.8
+  },
+  {
+   "condition": "A g=8 s=1.2",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.07540182415936593,
+   "g": 8,
+   "s": 1.2
+  }
+ ],
+ "alt_B_shared_difficulty": {
+  "condition": "B (identical difficulty profile)",
+  "power": 0.05,
+  "n_trials": 20,
+  "mean_observed_rms": 0.04665747224009098
+ },
+ "alt_C_partial_copying": [
+  {
+   "condition": "C c=0.0",
+   "power": 0.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.04685471874841163,
+   "c": 0.0
+  },
+  {
+   "condition": "C c=0.05",
+   "power": 0.65,
+   "n_trials": 20,
+   "mean_observed_rms": 0.048090902193278474,
+   "c": 0.05
+  },
+  {
+   "condition": "C c=0.1",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.049894660283541926,
+   "c": 0.1
+  },
+  {
+   "condition": "C c=0.2",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.05264221505057126,
+   "c": 0.2
+  },
+  {
+   "condition": "C c=0.35",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.05492039137628951,
+   "c": 0.35
+  },
+  {
+   "condition": "C c=0.5",
+   "power": 1.0,
+   "n_trials": 20,
+   "mean_observed_rms": 0.0603490047537578,
+   "c": 0.5
+  }
+ ],
+ "KP1_min_rms_at_power_0.8": 0.04822834333781785,
+ "KP1_usable": true,
+ "KP3_copy_detection_threshold": 0.1,
+ "KP2_blind_spot_power": 0.05,
+ "calibration_false_positive_rate": 0.016666666666666666,
+ "calibration_ok": true
+}

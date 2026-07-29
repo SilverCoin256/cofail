@@ -1,4 +1,5 @@
 {
+ "partial": true,
  "q_values": [
   1,
   2,
@@ -19,10 +20,10 @@
     {
      "q": 1,
      "diverged": false,
-     "heldout_loglik": -0.424019739387527,
-     "synthetic_rms_mean": 0.06169243769308185,
-     "synthetic_rms_sd": 0.00017852191062254274,
-     "rel_gap_to_observed": 0.7562416075148006,
+     "heldout_loglik": -0.39587987990278867,
+     "synthetic_rms_mean": 0.17658245137020828,
+     "synthetic_rms_sd": 0.0005820759661299815,
+     "rel_gap_to_observed": 0.30228961447045044,
      "within_10pct": false
     },
     {
@@ -74,10 +75,5 @@
    "q_star": 3,
    "KQ2_loglik_improves": true
   }
- ],
- "q_stars": [
-  3
- ],
- "KQ1_low_dimensional_explanation": true,
- "KQ2_all_loglik_improve": true
+ ]
 }
