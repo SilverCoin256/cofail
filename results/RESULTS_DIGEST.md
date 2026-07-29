@@ -440,3 +440,37 @@ normalise every baseline, and reported ratios of order 1e10 for the column-only 
 That was an artifact, not a result: `R` normalises by sqrt(diag(D)), and when the baseline
 destroys the row margins that `P` encodes, diag(D) collapses toward zero. Fixed by refitting the
 conditioning model to each replicate (`rms_resid_refit`); the table above is the corrected run.
+
+## X6 / KV1, KV2 — is the curveball sampler actually uniform? (`src/sampler_validation.py`)
+
+"Exact" is the paper's central adjective and rested on assertion. Carstens (2015, *Phys. Rev. E*
+91:042812; erratum 94:039902, 2016) proved curveball converges to the uniform distribution on the
+fiber **provided failed trades are counted** — a proposal that cannot execute must still consume a
+step. Reading `src/nullmodel.py`: the implementation draws all row pairs up front and `continue`s
+on failure, so a failure consumes one loop iteration rather than triggering a resample. That is
+the required behaviour. Tested rather than asserted:
+
+**V1 — exhaustive-fiber chi-square.** Every binary matrix with the given margins enumerated, then
+60,000 thinned draws chi-squared against uniform.
+
+| row margins | col margins | fiber size | χ² | df | p | verdict |
+|---|---|---|---|---|---|---|
+| 2,2,2,2 | 2,2,2,2 | 90 | 111.64 | 89 | 0.053 | not rejected |
+| 3,2,2,1 | 2,2,2,2 | 48 | 53.84 | 47 | 0.229 | not rejected |
+| 3,3,2,2,2 | 3,3,3,3 | 204 | 190.42 | 203 | 0.727 | not rejected |
+| 2,3,1,2,2 | 2,2,2,2,2 | 1170 | 1219.43 | 1169 | 0.149 | not rejected |
+
+**V2 — Gelman–Rubin, 4 dispersed chains, at the burn-in the paper actually uses (50 trades/N).**
+
+| bench | R̂ |
+|---|---|
+| ARC | 0.9882 |
+| Winogrande | 1.0300 |
+| TruthfulQA | 0.9894 |
+| GSM8K | 0.9807 |
+| HellaSwag | 1.0272 |
+
+**KV1 and KV2 both survive.** Uniformity is not rejected on any fiber up to size 1,170, and all
+five benchmarks mix at the burn-in in use. The "exact is an unverified adjective" objection is
+answered, and this also closes the single-chain concern flagged under E7 — the multi-chain SDs
+here (2e-4 to 6e-4) are the honest ones to quote.
