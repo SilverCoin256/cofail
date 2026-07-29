@@ -21,6 +21,8 @@ Where the two sources agree, I say so. Where I could not check something, I mark
 
 ## 1. Fatal weaknesses
 
+> **Read §1 with the addendum at the end of this file.** Six of its experiments have since been run and four of its findings are superseded — each superseded passage below is struck through in place rather than deleted, so the original audit stays legible as a dated record.
+
 Ranked by how much each raises P(reject), consolidated across six reviewer personas and my own
 experiments. "Convergent" means ≥3 personas raised it independently.
 
@@ -48,9 +50,7 @@ important finding in this document, because it means F1 is not a framing problem
   survives on GSM8K (6.81×→5.39×, essentially unmoved) and partially on Winogrande.
 
 **F2. The population is not a sample of independent models. (Critical, convergent — 4/6.)**
-Reviewers called this "the single most likely confound a reviewer names." **My KD1 result confirms
-it empirically**: deduplication at 0.95 removes 36–64% of models and *reverses* the headline
-gradient on three of five benchmarks. The existing E5 analysis is not a defence — it measures a
+Reviewers called this "the single most likely confound a reviewer names." **Partly confirmed, partly refuted.** KD1 shows deduplication at 0.95 removes 36–64% of models and *reverses* the accuracy-**gradient** on three of five benchmarks. But X1/X2 (see the addendum) then showed the **population-level** statistics are robust: 14 of 15 statistic–benchmark pairs move by less than 1.5×. The confound is real for the gradient claim and largely answered for the headline measurement. The existing E5 analysis is not a defence — it measures a
 global summary, and duplicates pool at the top of the leaderboard, which is exactly where the
 gradient lives.
 
@@ -66,8 +66,8 @@ signature of the phenomenon: if models share training data they share *which ite
 that is encoded in the item margins. Ecology named this failure mode in 1984 — Colwell & Winkler,
 "A null model for null models in biogeography," ch. 20 in *Ecological Communities*, Princeton UP,
 pp. 344–359 — **in the same literature the paper borrows curveball from, and does not cite it.**
-Verified by search. The paper has no power analysis characterising what alternatives its test can
-detect.
+Verified by search. ~~The paper has no power analysis characterising what alternatives its test
+can detect.~~ **It does now (X4, see the addendum): power is 1.00 against shared failure modes at planted rms 0.048 and exactly α=0.05 against the shared-difficulty alternative. F4 is now quantified rather than open — which is a stronger position than the objection assumed.**
 
 **F5. C1 is 25-year-old psychometrics. (Critical, convergent — 3/6.)** The exact fixed-margin
 conditional Rasch test is standard: Ponocny (2001) *Psychometrika* 66:437–460, Verhelst (2008),
@@ -87,7 +87,7 @@ work it is aimed at.
 1/√M is 0.029 (ARC), 0.036 (TruthfulQA), 0.028 (GSM8K). To reported precision the elaborate exact
 null coincides with the naive sampling floor — so the machinery may buy nothing empirically over a
 trivial baseline. **This is a checkable arithmetic claim and it should be checked before
-submission.** [UNVERIFIED — I did not run this comparison.]
+submission.** ~~[UNVERIFIED — I did not run this comparison.]~~ **RUN AND REFUTED (X5, see the addendum): the exact null sits at 1.25–2.01× the analytic floor, not on it. This objection does not stand, though the margin is a factor of 1.3–2 rather than an order of magnitude.**
 
 **F8. Data recency and harness heterogeneity. (Major, convergent — 4/6.)** July 2023–June 2024
 leaderboard v1: pre-Llama-3.1, pre-Qwen-2.5, pre-reasoning-model. The suite was retired for
@@ -100,7 +100,7 @@ conventions, so shared scoring artifacts masquerade as shared behaviour.
 "Verified empirically to 1e-16" is a floating-point tautology — it verifies that the code
 implements arithmetic.
 
-**F10. Artifact compliance. (Critical for D&B track.)** No license, no datasheet, no Croissant
+**F10. Artifact compliance. (Critical for D&B track.)** ~~No license, no datasheet~~ (both added 2026-07-28: `LICENSE`, `docs/DATASHEET.md`), no Croissant
 metadata, item axis unresolvable (anonymous bit grids), item alignment resting on a 14-model spot
 check, tier-2 release redistributes reconstructed ARC gold keys at 99.01% fidelity (a licensing
 and contamination hazard with a 1% undocumented label-error rate), and the artifact mutates on a
