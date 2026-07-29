@@ -113,3 +113,26 @@ That is a **constructive counterexample**: models with conditionally independent
 
 ## Data requirement added
 Testing Proposition 3 on real data requires **responses**, not just correctness. The archive's `predictions` (per-choice log-likelihoods) and `gold` columns permit reconstruction of each model's chosen answer at roughly 60x the bytes of the `acc` column. This is therefore run as a **second tier** on a subsample of models, with the binary analysis (Propositions 1–2) remaining the full-scale primary.
+
+---
+
+# AMENDMENT 3 — 2026-07-28 (post-hoc; recorded for completeness, not as a pre-registration)
+
+**This amendment is dated after the confirmatory analyses and therefore earns no
+pre-registration credit.** It is recorded here so that a reader of the original hypotheses is not
+left with a claim the project has since withdrawn.
+
+**H3 as stated above is withdrawn in its "effective number of independent models" form.** The
+participation ratio is algebraically `N/(1+(N-1)*mean(R_ij^2))`, a monotone function of the mean
+squared residual correlation, so it cannot distinguish one weak global factor from many tight
+clusters and does not count independent models. The measurement itself stands and is reported as
+what it is — a summary of residual correlation, calibrated against the exact null — but the
+interpretive claim in H3 does not. The cohort-trend half of H3 (K3) was never confirmatorily
+tested and remains untested.
+
+Kill conditions added on 2026-07-28, each written before its own experiment ran, are documented
+with their outcomes in `results/RESULTS_DIGEST.md`: KS1/KS2 (panel selection), KI1/KI2
+(incremental validity), KR1/KD1 (rank redundancy), KN1/KN2 (noise floor), KV1/KV2 (sampler
+validation), KX1–KX3 (duplication audit), KP1–KP3 (power study), KQ1/KQ2 (dimensionality,
+retracted). Four fired. They are listed here rather than above because they postdate the original
+registration and must not be presented as part of it.
