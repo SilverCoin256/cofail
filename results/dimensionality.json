@@ -1,0 +1,83 @@
+{
+ "q_values": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+ ],
+ "benchmarks": [
+  {
+   "bench": "arc",
+   "N": 1362,
+   "M": 1165,
+   "n_train_items": 582,
+   "n_test_items": 583,
+   "observed_heldout_rms": 0.253088466264101,
+   "by_q": [
+    {
+     "q": 1,
+     "diverged": false,
+     "heldout_loglik": -0.424019739387527,
+     "synthetic_rms_mean": 0.06169243769308185,
+     "synthetic_rms_sd": 0.00017852191062254274,
+     "rel_gap_to_observed": 0.7562416075148006,
+     "within_10pct": false
+    },
+    {
+     "q": 2,
+     "diverged": false,
+     "heldout_loglik": -0.25759072708322395,
+     "synthetic_rms_mean": 0.2165100961400756,
+     "synthetic_rms_sd": 0.0009148019767218512,
+     "rel_gap_to_observed": 0.14452800107396196,
+     "within_10pct": false
+    },
+    {
+     "q": 3,
+     "diverged": false,
+     "heldout_loglik": -0.24587906230450263,
+     "synthetic_rms_mean": 0.23412738180621165,
+     "synthetic_rms_sd": 0.000507030126273917,
+     "rel_gap_to_observed": 0.07491880107291495,
+     "within_10pct": true
+    },
+    {
+     "q": 4,
+     "diverged": false,
+     "heldout_loglik": -0.2371453686538956,
+     "synthetic_rms_mean": 0.24916439060417747,
+     "synthetic_rms_sd": 0.0014468279668851788,
+     "rel_gap_to_observed": 0.015504758940016974,
+     "within_10pct": true
+    },
+    {
+     "q": 5,
+     "diverged": false,
+     "heldout_loglik": -0.2310057341670091,
+     "synthetic_rms_mean": 0.24737378602140866,
+     "synthetic_rms_sd": 0.0013032309952329178,
+     "rel_gap_to_observed": 0.022579773495995548,
+     "within_10pct": true
+    },
+    {
+     "q": 6,
+     "diverged": false,
+     "heldout_loglik": -0.22579829771848645,
+     "synthetic_rms_mean": 0.24870225380231561,
+     "synthetic_rms_sd": 0.001018010952327218,
+     "rel_gap_to_observed": 0.017330748123497233,
+     "within_10pct": true
+    }
+   ],
+   "q_star": 3,
+   "KQ2_loglik_improves": true
+  }
+ ],
+ "q_stars": [
+  3
+ ],
+ "KQ1_low_dimensional_explanation": true,
+ "KQ2_all_loglik_improve": true
+}
