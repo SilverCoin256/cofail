@@ -49,9 +49,12 @@ benchmarks. Our pre-registered dispersion statistic came out \emph{below} its nu
 five benchmarks and above on two; its pre-registered kill condition fired and we report it as
 refuted.
 
-What survives is second-order and large. Conditioning on the margins leaves residual correlation
-with root-mean-square $0.248$ against $0.039$ under the exact null --- a sixfold excess --- and
-five eigenvalues above the null spectral edge. We deliberately do \emph{not} report this as an
+What survives is second-order and large. On ARC, conditioning on the margins leaves residual
+correlation with root-mean-square $0.2483$ against $0.0449$ under the exact null --- a $5.5$-fold
+excess --- and five eigenvalues above the null spectral edge; across the five benchmarks the
+excess ranges from $2.9\times$ (GSM8K) to $11.9\times$ (HellaSwag). The effect is not an artifact
+of near-duplicate models: removing every model that agrees with a retained model above $0.95$
+discards $36$--$64\%$ of each population and moves these ratios by at most $1.14\times$. We deliberately do \emph{not} report this as an
 ``effective number of independent models'': we show that the participation ratio is
 algebraically $N/(1+(N-1)\overline{R_{ij}^2})$, so it cannot distinguish one weak global factor
 from many tight clusters, and we give the diagnostics that can. Misspecification controls show
@@ -349,8 +352,10 @@ The diagnostics that can tell them apart give a clear answer on ARC:
 $\lambda_1^2/\sum\lambda_k^2 = 0.540$ (one-factor $\approx0.99$, clone blocks $\approx0.10$);
 deflating the leading eigenvector raises PR only from $16.0$ to $46.8$, not to $\approx N$; and
 five observed eigenvalues exceed the null's maximum eigenvalue of $28.7$. We therefore report
-the primitive quantity, $\mathrm{rms}\,|R_{ij}| = 0.2483$ against $0.0389$ under the null, and
-the count of dimensions above the null spectral edge.
+the primitive quantity, $\mathrm{rms}\,|R_{ij}| = 0.2483$ against $0.0449$ under the null, and
+the count of dimensions above the null spectral edge. The null value is the pooled mean of four
+dispersed curveball chains ($25$ draws each, $\hat R = 0.988$; Section~\ref{sec:robust}), and
+agrees with three independent estimates of it to within $0.0004$.
 
 \subsection{Misspecification controls: what else could produce this}
 
@@ -394,8 +399,9 @@ small number of extra ability dimensions is a substantial one, and the observed
 $\lambda_1^2/\sum\lambda^2 = 0.540$ sits near the two-dimensional case ($0.457$) and far from
 the clone case ($0.102$). We therefore state the finding as: after conditioning on item
 difficulty and unidimensional ability, open-model failure retains correlated structure of
-roughly five dimensions and sixfold excess rms correlation, whose signature is that of
-additional latent ability dimensions rather than of duplicated models.
+roughly five dimensions and a $5.5$-fold excess rms correlation on ARC ($2.9$--$11.9\times$ across
+the five benchmarks), whose signature is that of additional latent ability dimensions rather than
+of duplicated models.
 
 \subsection{Reconciling two opposite-looking results}
 \label{sec:reconcile}

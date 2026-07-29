@@ -119,6 +119,123 @@
    "rungs_containing_observed": [
     "R8_mirt_q4"
    ]
+  },
+  {
+   "bench": "winogrande",
+   "N": 1361,
+   "M": 1267,
+   "observed_rms": 0.2690666633310429,
+   "rungs": {
+    "R0_iid_bernoulli": {
+     "mean": 0.028144935496977323,
+     "sd": 1.5908291976634125e-05,
+     "ci95": [
+      0.0281249873438145,
+      0.02816032295126863
+     ],
+     "n": 4,
+     "excess_ratio": 9.56003837208793,
+     "observed_inside_band": false,
+     "note": ""
+    },
+    "R1_row_margins_only": {
+     "mean": 0.028138956311317426,
+     "sd": 1.245563559458331e-05,
+     "ci95": [
+      0.028123114294308475,
+      0.028150716734577676
+     ],
+     "n": 4,
+     "excess_ratio": 9.562069763860604,
+     "observed_inside_band": false,
+     "note": ""
+    },
+    "R2_col_margins_only": {
+     "mean": 0.0393906614298148,
+     "sd": 0.00017021492218380888,
+     "ci95": [
+      0.03923202186094985,
+      0.03955494465067386
+     ],
+     "n": 4,
+     "excess_ratio": 6.830722144903773,
+     "observed_inside_band": false,
+     "note": ""
+    },
+    "R3_exact_fixed_fixed": {
+     "mean": 0.04085983082351298,
+     "sd": 0.0004841850494397223,
+     "ci95": [
+      0.04011064852604695,
+      0.041579938800705686
+     ],
+     "n": 8,
+     "excess_ratio": 6.585114473264222,
+     "observed_inside_band": false,
+     "note": "the paper's null"
+    },
+    "R4_2pl": {
+     "mean": 0.12547970434652922,
+     "sd": 0.0008751933240697135,
+     "ci95": [
+      0.12445014748951576,
+      0.12641776075991695
+     ],
+     "n": 4,
+     "excess_ratio": 2.1443042500959266,
+     "observed_inside_band": false,
+     "note": "2PL fit 11s"
+    },
+    "R6_mirt_q2": {
+     "mean": 1.005612490038335,
+     "sd": 0.0,
+     "ci95": [
+      1.005612490038335,
+      1.005612490038335
+     ],
+     "n": 4,
+     "excess_ratio": 0.26756495767150407,
+     "observed_inside_band": false,
+     "note": "MIRT q=2 fit 7s"
+    },
+    "R7_mirt_q3": {
+     "mean": 1.0109729383072228,
+     "sd": 0.0,
+     "ci95": [
+      1.0109729383072228,
+      1.0109729383072228
+     ],
+     "n": 4,
+     "excess_ratio": 0.26614625687366983,
+     "observed_inside_band": false,
+     "note": "MIRT q=3 fit 43s"
+    },
+    "R8_mirt_q4": {
+     "mean": 1.0294806887329546,
+     "sd": 3.377038452865782e-05,
+     "ci95": [
+      1.0294387384032944,
+      1.0295143644815898
+     ],
+     "n": 4,
+     "excess_ratio": 0.26136154497681724,
+     "observed_inside_band": false,
+     "note": "MIRT q=4 fit 49s"
+    },
+    "R9_mirt_q5": {
+     "mean": 0.2856100868594856,
+     "sd": 0.0008254410372627754,
+     "ci95": [
+      0.28466866184410267,
+      0.2863710644221318
+     ],
+     "n": 4,
+     "excess_ratio": 0.9420768933256138,
+     "observed_inside_band": false,
+     "note": "MIRT q=5 fit 7s"
+    }
+   },
+   "rungs_containing_observed": []
   }
  ]
 }
