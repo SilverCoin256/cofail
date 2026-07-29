@@ -398,3 +398,45 @@ and they are different statistics: duplicates are not spread uniformly over the 
 they pool at the top of the leaderboard, so removing them barely moves a population-wide summary
 while sharply flattening a profile measured *along* the accuracy axis. E5's conclusion stands as
 stated (global concentration is not duplication) and must not be extended to the gradient claim.
+
+---
+
+# Phase 0 of the NeurIPS redesign (2026-07-28)
+
+## X5 / KN1, KN2 — does the exact conditional null buy anything? (`src/noise_floor.py`)
+
+A reviewer objected that the reported null rms (~0.039) is close to 1/sqrt(M), so "the elaborate
+exact null coincides with the naive noise floor and the machinery buys nothing." This is the
+cheapest experiment that could kill the project, so it ran first.
+
+rms of margin-conditioned residual correlation under five reference distributions. The Rasch
+conditioning model is **refitted to each replicate** — see the note below.
+
+| bench | observed | R3 exact fixed-fixed | row-margin only | col-margin only | iid Bernoulli | 1/sqrt(M−3) |
+|---|---|---|---|---|---|---|
+| ARC | 0.2483 | 0.0446 | 0.0293 | 0.0445 | 0.0293 | 0.0293 |
+| Winogrande | 0.2691 | 0.0409 | 0.0281 | 0.0397 | 0.0282 | 0.0281 |
+| TruthfulQA | 0.2942 | 0.0584 | 0.0357 | 0.0578 | 0.0357 | 0.0357 |
+| GSM8K | 0.0987 | 0.0345 | 0.0276 | 0.0326 | 0.0276 | 0.0276 |
+| HellaSwag | 0.2457 | 0.0207 | 0.0103 | 0.0191 | 0.0103 | 0.0103 |
+
+**KN1 survives 5/5. The reviewer objection is refuted:** the exact null sits at 1.25–2.01× the
+analytic floor, not at it. But the margin is a factor of 1.3–2, not an order of magnitude, and the
+paper should report the floor alongside the null rather than let a reader assume a larger gap.
+
+**A finding this experiment was not designed to produce, and which qualifies the paper's central
+argument.** Column-margin-only conditioning reproduces the exact both-margin null almost exactly —
+0.0445 vs 0.0446 on ARC, 0.0578 vs 0.0584 on TruthfulQA, within 6% on all five. Meanwhile
+row-margin-only conditioning lands exactly on the iid/analytic floor on every benchmark. So
+**essentially all of the conditioning work is done by the item margins; the model-ability margins
+are nearly inert for this statistic.** That is consistent with Lemma 1, which is a statement about
+item margins alone, but it means the "jointly sufficient statistics" framing overstates what is
+empirically load-bearing. KN2 as coded compares against the *larger* of the two one-sided
+discrepancies and therefore passes on the row comparison; the honest reading of the column
+comparison is that it nearly fails. Reported here rather than resolved in the framing's favour.
+
+**Correctness note.** The first version of this script reused the observed-data Rasch fit `P` to
+normalise every baseline, and reported ratios of order 1e10 for the column-only and iid arms.
+That was an artifact, not a result: `R` normalises by sqrt(diag(D)), and when the baseline
+destroys the row margins that `P` encodes, diag(D) collapses toward zero. Fixed by refitting the
+conditioning model to each replicate (`rms_resid_refit`); the table above is the corrected run.
