@@ -147,17 +147,25 @@
     <p>Once the item-difficulty artifact is removed by conditioning on it exactly — no
       curve-fitting, no estimated parameters, just the null implied by the model's own sufficient
       statistics — a real, second-order signal remains: residual correlation between models
-      that is roughly <strong>six times</strong> what the null predicts, concentrated in about
-      five extra dimensions beyond a single shared notion of "ability."</p>
+      that is <strong>5.5 times</strong> what the null predicts on ARC (2.9× to 11.9× across the
+      five benchmarks), concentrated in a handful of extra dimensions beyond a single shared
+      notion of "ability."</p>
     <p>Simulated control populations rule out the boring explanation (models simply varying in
       how discriminating their answer choices are) and point toward a real one: a handful of
       latent skill dimensions the standard one-parameter model doesn't capture — not, as it
-      first appeared, a small number of duplicated models hiding in the data.</p>
+      first appeared, a small number of duplicated models hiding in the data. That last point is
+      now tested rather than assumed: throwing away every model that agrees with another above
+      95% discards 36–64% of the population and moves these ratios by less than 1.5×.</p>
+    <p>And one thing the method <em>cannot</em> see, stated plainly because it matters: if every
+      model found exactly the same items hard and differed only in overall skill, this test would
+      be silent. That case is the null. On planted data it detects shared failure modes and
+      copied models easily, but against a purely shared difficulty profile its detection rate is
+      exactly the 5% you'd get by chance.</p>
     <div class="stat-row">
       <div class="stat"><div class="n">1,362</div><div class="l">ARC-Challenge models analysed</div></div>
       <div class="stat"><div class="n">0.248</div><div class="l">observed residual rms correlation</div></div>
-      <div class="stat"><div class="n">0.039</div><div class="l">…vs. under the exact null</div></div>
-      <div class="stat"><div class="n">5</div><div class="l">dimensions above the null's edge</div></div>
+      <div class="stat"><div class="n">0.045</div><div class="l">…vs. under the exact null</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">dimensions above the null's edge</div></div>
     </div>
   </section>
 
