@@ -212,10 +212,10 @@ def fig_residual_summary():
         ratio = e["N_eff"]["ratio"]
         rows.append((nice[b], e["N_eff"]["observed"], e["N_eff"]["null_mean"],
                     e["N_eff"]["null_sd"], ratio))
-    # ARC-specific extra diagnostics from the reconcile/misspec runs, hardcoded from
-    # results/RESULTS_DIGEST.md section C2 (executed values)
-    extra = {"ARC-Challenge": (0.2483, 0.0389, 5), "Winogrande": (None, None, None),
-             "TruthfulQA": (None, None, None), "GSM8K": (None, None, None)}
+    # (An `extra` dict of ARC-specific diagnostics used to sit here, hardcoding a null rms of
+    # 0.0389 -- the same value that turned out to trace to no executed run. It was assigned and
+    # never read, so it never reached a rendered figure. Deleted rather than repaired: dead code
+    # holding an unverifiable constant is how that constant gets picked up later.)
 
     W, H = 640, 330
     left, right, top, bot = 130, 600, 30, 230
