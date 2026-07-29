@@ -520,13 +520,26 @@ note its known limitation: eigenvalue-counting rules of this family tend to over
 are upper bounds rather than point estimates. We attempted a complementary estimate by fitting
 multidimensional IRT and comparing held-out synthetic residual correlation; three
 parameterisations disagreed materially and the attempt is reported in the repository as
-unresolved rather than folded in here. On planted data ($400$ models, $700$ items, $20$ datasets
+unresolved rather than folded in here.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.9\linewidth]{../figures/fig_power.pdf}
+\caption{Detection power against three planted alternatives
+(\texttt{results/power\_study.json}). The dashed line is the design's blind spot rather than a weak
+result: a population in which every model shares one item-difficulty profile and differs only in
+overall ability is exactly what the null describes, so no test conditioning on the item margins
+can separate it from chance.}
+\label{fig:power}
+\end{figure}
+
+\paragraph{Power, and one blind spot.} On planted data ($400$ models, $700$ items, $20$ datasets
 per condition, $\alpha=0.05$; null conditions reject at $0.017$), the test reaches power $1.00$
 against shared failure modes at a planted rms of $0.048$ --- far below the $0.099$--$0.294$
 observed --- and detects copying of a reference model with power $0.65$ at a copy rate of $0.05$
 and $1.00$ from $0.10$. Against the alternative in which all models share one item-difficulty
 profile and differ only in ability, power is $0.05$: exactly $\alpha$, because that alternative is
-the null. We state this as a property of the design rather than a caveat \citep{colwell1984}.
+the null (Figure~\ref{fig:power}). We state this as a property of the design rather than a caveat
+\citep{colwell1984}.
 
 \paragraph{Functional choice.} On ARC, $91.35\%$ of spectral mass is positive. The participation
 ratio is insensitive to the treatment of negative eigenvalues: $23.6$ clipped, $23.5$ absolute,

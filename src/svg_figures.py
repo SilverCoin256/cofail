@@ -275,7 +275,78 @@ def fig_residual_summary():
     save("fig_residual_summary", W, H, elems)
 
 
+def fig_power():
+    """Detection power against three planted alternatives, from results/power_study.json.
+
+    The scientific point is the contrast between the two rising curves and the flat one: the test
+    sees shared failure modes and copied models easily, and is blind by construction to a shared
+    item-difficulty profile, because that alternative IS the null. The blind spot is drawn as a
+    line at alpha rather than described in a caption, so it cannot be skimmed past.
+    """
+    d = json.load(open(os.path.join(RES, "power_study.json")))
+    alpha = d["alpha"]
+    A = [a for a in d["alt_A_shared_failure_modes"] if a["g"] == 8]
+    C = d["alt_C_partial_copying"]
+    B = d["alt_B_shared_difficulty"]["power"]
+
+    # H must clear the second caption line at bot+76; at H=300 it was clipped off the canvas.
+    W, H = 620, 326
+    left, right, top, bot = 62, 430, 34, 232
+
+    def X(t):
+        return left + t * (right - left)
+
+    def Y(p):
+        return bot - p * (bot - top)
+
+    e = [text(left, 20, "What the exact conditional null can and cannot detect",
+              size=12.5, weight="600")]
+    for p in (0, 0.25, 0.5, 0.75, 1.0):
+        e.append(f'<line x1="{left}" y1="{Y(p):.1f}" x2="{right}" y2="{Y(p):.1f}" '
+                 f'stroke="{MUTED}" stroke-width="0.6"/>\n')
+        e.append(text(left - 8, Y(p) + 3.5, f"{p:.2f}", size=9, fill=INK2, anchor="end"))
+    e.append(text(left - 46, (top + bot) / 2, "power", size=10, fill=INK2, anchor="middle",
+                  style=f'transform="rotate(-90 {left-46} {(top+bot)/2})"'))
+
+    def curve(rows, key, lo, hi, colour, label, ly):
+        pts = []
+        for r in rows:
+            t = (r[key] - lo) / (hi - lo)
+            pts.append(f"{X(t):.1f},{Y(r['power']):.1f}")
+        e.append(f'<polyline points="{" ".join(pts)}" fill="none" stroke="{colour}" '
+                 f'stroke-width="2.4"/>\n')
+        for p in pts:
+            x, y = p.split(",")
+            e.append(f'<circle cx="{x}" cy="{y}" r="3" fill="{colour}"/>\n')
+        e.append(text(right + 12, ly, label, size=10, fill=colour, weight="600"))
+
+    curve(A, "s", 0.0, 1.2, BLUE, "shared failure modes", Y(1.0) + 4)
+    curve(C, "c", 0.0, 0.5, ORANGE, "copying a reference model", Y(1.0) + 20)
+
+    e.append(f'<line x1="{left}" y1="{Y(B):.1f}" x2="{right}" y2="{Y(B):.1f}" '
+             f'stroke="{AQUA}" stroke-width="2.4" stroke-dasharray="6 3"/>\n')
+    e.append(text(right + 12, Y(B) + 3.5, "shared item difficulty only", size=10,
+                  fill=AQUA, weight="600"))
+    e.append(text(right + 12, Y(B) + 16, f"power = {B:.2f} = α", size=9, fill=INK2))
+
+    e.append(f'<line x1="{left}" y1="{bot}" x2="{right}" y2="{bot}" stroke="{INK}" '
+             f'stroke-width="1"/>\n')
+    e.append(text((left + right) / 2, bot + 24, "planted strength (rescaled per alternative)",
+                  size=10, fill=INK2, anchor="middle"))
+    e.append(text(left, bot + 40, "none", size=9, fill=INK2))
+    e.append(text(right, bot + 40, "strong", size=9, fill=INK2, anchor="end"))
+
+    e.append(text(left, bot + 62,
+                  "Full power is reached at a planted rms of 0.048 — far below the "
+                  "0.099–0.294 observed on real data.", size=9.5, fill=INK2))
+    e.append(text(left, bot + 76,
+                  "The flat line is not a weak result: that alternative is the null, so the test "
+                  "has no power against it by construction.", size=9.5, fill=INK2))
+    save("fig_power", W, H, e)
+
+
 if __name__ == "__main__":
     fig_reconcile()
     fig_misspec()
     fig_residual_summary()
+    fig_power()

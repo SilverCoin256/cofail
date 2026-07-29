@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="326" viewBox="0 0 620 326" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="620" height="326" fill="#fcfcfb"/>
+<text x="62.0" y="20.0" font-size="12.5" fill="#0b0b0b" text-anchor="start" font-weight="600" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >What the exact conditional null can and cannot detect</text>
+<line x1="62" y1="232.0" x2="430" y2="232.0" stroke="#c9c8c0" stroke-width="0.6"/>
+<text x="54.0" y="235.5" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >0.00</text>
+<line x1="62" y1="182.5" x2="430" y2="182.5" stroke="#c9c8c0" stroke-width="0.6"/>
+<text x="54.0" y="186.0" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >0.25</text>
+<line x1="62" y1="133.0" x2="430" y2="133.0" stroke="#c9c8c0" stroke-width="0.6"/>
+<text x="54.0" y="136.5" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >0.50</text>
+<line x1="62" y1="83.5" x2="430" y2="83.5" stroke="#c9c8c0" stroke-width="0.6"/>
+<text x="54.0" y="87.0" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >0.75</text>
+<line x1="62" y1="34.0" x2="430" y2="34.0" stroke="#c9c8c0" stroke-width="0.6"/>
+<text x="54.0" y="37.5" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >1.00</text>
+<text x="16.0" y="133.0" font-size="10" fill="#52514e" text-anchor="middle" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" transform="rotate(-90 16 133.0)">power</text>
+<polyline points="62.0,232.0 108.0,212.2 154.0,202.3 215.3,34.0 307.3,34.0 430.0,34.0" fill="none" stroke="#2a78d6" stroke-width="2.4"/>
+<circle cx="62.0" cy="232.0" r="3" fill="#2a78d6"/>
+<circle cx="108.0" cy="212.2" r="3" fill="#2a78d6"/>
+<circle cx="154.0" cy="202.3" r="3" fill="#2a78d6"/>
+<circle cx="215.3" cy="34.0" r="3" fill="#2a78d6"/>
+<circle cx="307.3" cy="34.0" r="3" fill="#2a78d6"/>
+<circle cx="430.0" cy="34.0" r="3" fill="#2a78d6"/>
+<text x="442.0" y="38.0" font-size="10" fill="#2a78d6" text-anchor="start" font-weight="600" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >shared failure modes</text>
+<polyline points="62.0,232.0 98.8,103.3 135.6,34.0 209.2,34.0 319.6,34.0 430.0,34.0" fill="none" stroke="#eb6834" stroke-width="2.4"/>
+<circle cx="62.0" cy="232.0" r="3" fill="#eb6834"/>
+<circle cx="98.8" cy="103.3" r="3" fill="#eb6834"/>
+<circle cx="135.6" cy="34.0" r="3" fill="#eb6834"/>
+<circle cx="209.2" cy="34.0" r="3" fill="#eb6834"/>
+<circle cx="319.6" cy="34.0" r="3" fill="#eb6834"/>
+<circle cx="430.0" cy="34.0" r="3" fill="#eb6834"/>
+<text x="442.0" y="54.0" font-size="10" fill="#eb6834" text-anchor="start" font-weight="600" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >copying a reference model</text>
+<line x1="62" y1="222.1" x2="430" y2="222.1" stroke="#1baf7a" stroke-width="2.4" stroke-dasharray="6 3"/>
+<text x="442.0" y="225.6" font-size="10" fill="#1baf7a" text-anchor="start" font-weight="600" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >shared item difficulty only</text>
+<text x="442.0" y="238.1" font-size="9" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >power = 0.05 = α</text>
+<line x1="62" y1="232" x2="430" y2="232" stroke="#0b0b0b" stroke-width="1"/>
+<text x="246.0" y="256.0" font-size="10" fill="#52514e" text-anchor="middle" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >planted strength (rescaled per alternative)</text>
+<text x="62.0" y="272.0" font-size="9" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >none</text>
+<text x="430.0" y="272.0" font-size="9" fill="#52514e" text-anchor="end" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >strong</text>
+<text x="62.0" y="294.0" font-size="9.5" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >Full power is reached at a planted rms of 0.048 — far below the 0.099–0.294 observed on real data.</text>
+<text x="62.0" y="308.0" font-size="9.5" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >The flat line is not a weak result: that alternative is the null, so the test has no power against it by construction.</text>
+</svg>
