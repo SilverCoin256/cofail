@@ -70,9 +70,10 @@ def stat_rms(F):
 
 def fit_2pl(F, iters=250, lr=0.5):
     """P_im = sigmoid(alpha_m * (theta_i - beta_m)), fitted by projected gradient ascent on the
-    Bernoulli log-likelihood. alpha is kept positive by optimising log-alpha."""
+    Bernoulli log-likelihood. alpha is kept positive by optimising log-alpha. float32 for the same
+    memory reason as fit_mirt."""
     N, M = F.shape
-    Y = F.astype(np.float64)
+    Y = F.astype(np.float32)
     theta = np.zeros(N)
     beta = np.zeros(M)
     la = np.zeros(M)
@@ -94,26 +95,36 @@ def fit_2pl(F, iters=250, lr=0.5):
 
 
 def fit_mirt(F, q, iters=400, lr=0.35, seed=0):
-    """P_im = sigmoid(theta_i . a_m + b_m), q-dimensional compensatory MIRT, fitted by full-batch
-    gradient ascent from an SVD-based start on the centred residual."""
+    """P_im = sigmoid(theta_i . a_m + b_m), q-dimensional compensatory MIRT, full-batch gradient
+    ascent. float32 throughout: at 1362 x 9404 a single float64 temporary is 102 MB and the naive
+    version allocated several per iteration, which OOM-killed the first run on HellaSwag."""
     rng = np.random.default_rng(seed)
     N, M = F.shape
-    Y = F.astype(np.float64)
-    b = np.log(np.clip(Y.mean(0), 1e-3, 1 - 1e-3) / (1 - np.clip(Y.mean(0), 1e-3, 1 - 1e-3)))
-    th = rng.normal(0, 0.1, (N, q))
-    A = rng.normal(0, 0.1, (M, q))
+    Y = F.astype(np.float32)
+    m = np.clip(Y.mean(0), 1e-3, 1 - 1e-3)
+    b = np.log(m / (1 - m)).astype(np.float32)
+    th = rng.normal(0, 0.1, (N, q)).astype(np.float32)
+    A = rng.normal(0, 0.1, (M, q)).astype(np.float32)
+    E = np.empty_like(Y)
     for t in range(iters):
-        Z = th @ A.T + b[None, :]
-        P = 1.0 / (1.0 + np.exp(-Z))
-        E = Y - P
-        gth = E @ A / M
-        gA = E.T @ th / N
-        gb = E.mean(0)
-        th += lr * gth * 8
-        A += lr * gA * 8
-        b += lr * gb * 4
+        np.matmul(th, A.T, out=E)
+        E += b[None, :]
+        np.negative(E, out=E)
+        np.exp(E, out=E)
+        E += 1.0
+        np.reciprocal(E, out=E)      # E now holds P
+        np.subtract(Y, E, out=E)     # E now holds the residual
+        th += (lr * 8 / M) * (E @ A)
+        A += (lr * 8 / N) * (E.T @ th)
+        b += (lr * 4) * E.mean(0)
         th -= th.mean(0, keepdims=True)
-    return 1.0 / (1.0 + np.exp(-(th @ A.T + b[None, :])))
+    np.matmul(th, A.T, out=E)
+    E += b[None, :]
+    np.negative(E, out=E)
+    np.exp(E, out=E)
+    E += 1.0
+    np.reciprocal(E, out=E)
+    return E
 
 
 def sample_bernoulli(P, rng):
@@ -193,10 +204,19 @@ def run(bench, rng):
 def main(benches):
     rng = np.random.default_rng(20260728)
     res = []
+    path = os.path.join(RES, "null_ladder.json")
     for bch in benches:
         if not os.path.exists(os.path.join(SUB, f"{bch}.npz")):
             continue
-        res.append(run(bch, rng))
+        try:
+            res.append(run(bch, rng))
+        except Exception as e:                       # one benchmark must not lose the others
+            print(f"[{bch}] FAILED: {type(e).__name__}: {e}", flush=True)
+            res.append({"bench": bch, "error": f"{type(e).__name__}: {e}",
+                        "rungs": {}, "rungs_containing_observed": []})
+        # write after every benchmark; the first run of this script died on the largest matrix
+        # and lost all prior work because results were only serialised at the end
+        json.dump({"partial": True, "benchmarks": res}, open(path, "w"), indent=1)
 
     kl1 = any("R3_exact_fixed_fixed" in r["rungs_containing_observed"] for r in res)
     kl2 = any(any(k.startswith("R") and "mirt" in k for k in r["rungs_containing_observed"])
