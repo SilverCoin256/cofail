@@ -563,6 +563,24 @@ accurate models have more correlated errors. \citet{jo2026subjectivity} show tha
 item difficulty via fitted IRT attenuates such correlations substantially and sometimes reverses
 their sign, and argue the inference is null-dependent and hence subjective; our contribution is
 to identify a null on that ladder which requires no fitting, and to report the answer there.
+
+Closest in spirit is \citet{kohli2026nine}, who quantify the effective independence of a
+$9$-judge, $7$-family LLM-as-judge panel on ChaosNLI and RewardBench and find roughly two
+effective votes. The relationship to our work is worth stating precisely, because the questions
+coincide and the machinery does not. Their nulls are a difficulty-stratified permutation that
+preserves per-judge error rates within entropy bins, and a Condorcet null simulated from fitted
+per-judge, per-bin confusion matrices; both estimate a nuisance model, which is exactly the
+analyst choice Section~\ref{sec:canonical} is designed to remove, and neither preserves the item
+margins exactly. Their headline statistic is the Kish design effect
+$n_{\text{eff}} = k/(1+(k-1)\bar\phi)$. That is the same algebraic form as the participation-ratio
+identity of Section~\ref{sec:notneff}, differing in that Kish uses the mean pairwise correlation
+where the participation ratio uses the mean \emph{squared} correlation. Our negative result
+therefore transfers: a statistic of this form is a monotone function of a single summary of the
+correlation matrix and cannot separate one weak global factor from many tight clusters. They note
+the exchangeability assumption this rests on and check it against a largest-eigenvalue variant;
+we would add that the check does not rescue the interpretation, only the arithmetic. The two
+studies are complementary in scale as well: $9$ judges with $100$ human annotations per item
+against our $1{,}228$--$1{,}373$ models with no human labels.
 Foundational framing of algorithmic monoculture and outcome homogenisation is due to
 \citet{kleinberg2021monoculture} and \citet{bommasani2022homogenization}. On method, the
 fixed-fixed null and curveball come from ecology
@@ -640,6 +658,7 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Jo et al.(2026)]{jo2026subjectivity} N.~Jo, N.~Garg, and M.~Raghavan. The subjectivity of monoculture. \emph{arXiv:2602.24086}, 2026.
 \bibitem[Kim et al.(2025)]{kim2025correlated} Correlated errors in large language models. \emph{arXiv:2506.07962}, 2025.
 \bibitem[Kleinberg \& Raghavan(2021)]{kleinberg2021monoculture} J.~Kleinberg and M.~Raghavan. Algorithmic monoculture and social welfare. \emph{PNAS}, 118(22), 2021.
+\bibitem[Kohli(2026)]{kohli2026nine} G.~Kohli. Nine judges, two effective votes: Correlated errors undermine LLM evaluation panels. \emph{arXiv:2605.29800}, 2026.
 \bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Kuder \& Richardson(1937)]{kuder1937} G.~F. Kuder and M.~W. Richardson. The theory of the estimation of test reliability. \emph{Psychometrika}, 2:151--160, 1937.
 \bibitem[Laloux et al.(1999)]{laloux1999} L.~Laloux, P.~Cizeau, J.-P. Bouchaud, and M.~Potters. Noise dressing of financial correlation matrices. \emph{Physical Review Letters}, 83:1467, 1999.

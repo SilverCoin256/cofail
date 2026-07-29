@@ -150,3 +150,39 @@ Stated so a referee can check each one.
   after: removing 900 of 1362 ARC models moves `N_eff` 23.6 → 29.0.
 - **"Var(C) below null contradicts N_eff far below null."** Answered by the decomposition above;
   the reviewer's algebra was correct and it resolves rather than refutes.
+
+---
+
+## Kohli (2026), "Nine Judges, Two Effective Votes" — arXiv:2605.29800, 28 May 2026
+
+Found 2026-07-28 while running the novelty check by hand, after the automated sweeps failed on a
+quota. **Verified by reading the paper directly**, not from a search summary — a first-pass
+automated summary of this paper asserted that it used a both-margin-preserving permutation, a
+participation ratio, and a degeneracy result about item margins. **All three were wrong.** Recorded
+here as a caution: the leading-question failure mode of automated summarisation is exactly how a
+false novelty kill, or a false all-clear, enters a prior-art ledger.
+
+**What it actually does** (Sections 3.3–3.5 of that paper):
+- Nulls: (a) a permutation stratified by human-entropy bin that shuffles each judge's error vector
+  independently, preserving per-judge error rates and coarse difficulty structure; (b) a Condorcet
+  null simulated from fitted per-judge, per-bin 3×3 confusion matrices. **Neither preserves the
+  item margins exactly, and both estimate a nuisance model.**
+- Statistic: the **Kish design effect** `n_eff = k/(1+(k−1)·φ̄)` over mean pairwise phi, with
+  `n_eff^eigen = k/λ_max` as a robustness check. **Not** a participation ratio.
+- Scale: 9 judges, 7 families, 1,000 items, ChaosNLI (MNLI/SNLI/AlphaNLI) + RewardBench, with 100
+  human annotations per item.
+- **No degeneracy theorem.** Nothing corresponding to our Lemma 1.
+
+**Effect on our claims.**
+- C1 (exact fit-free conditional null): **survives.** Their nulls are fitted or stratified, which
+  is the class of choice our argument is aimed at.
+- C2 (the degeneracy of mean co-failure): **survives.** They do not state or use it.
+- C3 (calibrated measurement at scale): **survives**, and the scale gap is ~150×.
+- C4 (the withdrawn "effective number of models"): **this is the interesting one.** Their headline
+  statistic has the same algebraic form as the participation-ratio identity that made us withdraw
+  ours — Kish uses mean φ where PR uses mean φ². So our negative result is not merely a
+  self-correction; it bears directly on the headline number of a paper published two months ago.
+  That is now stated in Related Work.
+
+**Net:** not a novelty kill. It is a same-question, different-machinery neighbour that the paper
+must cite and position against, and it converts C4 from a confession into a contribution.
