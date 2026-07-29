@@ -48,9 +48,19 @@ the model count, and an uncalibrated figure is not interpretable. See the caveat
 the participation ratio does and does not measure.
 
 ```bash
-cofail selftest                    # verify the identities on synthetic data
-cofail neff --matrix F.npy --n-null 40 --json out.json
+cofail audit --matrix F.npy --json report.json   # start here
+cofail selftest                                  # verify the identities on synthetic data
+cofail pr    --matrix F.npy --n-null 40          # the participation ratio on its own
 ```
+
+`cofail audit` is the command to reach for before reporting any model-agreement number. It runs
+four checks in one pass: whether your reported excess is a margin artifact, how much of your model
+population is near-duplicate (with a warning if removing pairs above 0.95 agreement discards more
+than a fifth of it), what survives conditioning, and — stated explicitly because it is easy to
+misread a null result — what the test structurally cannot detect.
+
+`cofail neff` still works but is **deprecated and prints a warning**: the name asserted an
+"effective number of independent models" reading that this project withdrew. Use `cofail pr`.
 
 ## What is in here
 
