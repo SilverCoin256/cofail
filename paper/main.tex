@@ -593,6 +593,18 @@ the exchangeability assumption this rests on and check it against a largest-eige
 we would add that the check does not rescue the interpretation, only the arithmetic. The two
 studies are complementary in scale as well: $9$ judges with $100$ human annotations per item
 against our $1{,}228$--$1{,}373$ models with no human labels.
+\paragraph{Where this bears on evaluation practice.} A growing line of work fits item-response
+models to model-by-item outcome matrices in order to compress benchmarks: \citet{polo2024tiny}
+estimate full-benchmark performance from roughly $100$ items using IRT models trained on the
+evaluation results of $319$ models, and subsequent work extends the idea to anchor-item
+calibration and adaptive testing. These methods are the most direct consumers of the object we
+study, and they rest on an assumed latent dimensionality. Our estimate --- $4$ to $6$ dimensions
+above the exact null's spectral edge on four benchmarks, and $12$ on HellaSwag --- is therefore
+not only a statement about monoculture; it is a statement about whether a low-dimensional ability
+parameterisation is adequate for the population these methods are calibrated on, over a model set
+roughly four times larger than that used to fit them. The test we give requires no IRT fit of its
+own, so it can be used to check that assumption rather than presupposing it.
+
 Foundational framing of algorithmic monoculture and outcome homogenisation is due to
 \citet{kleinberg2021monoculture} and \citet{bommasani2022homogenization}. On method, the
 fixed-fixed null and curveball come from ecology
@@ -680,6 +692,7 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Neal et al.(2021)]{neal2021} Z.~P. Neal, R.~Domagalski, and B.~Sagan. Comparing alternatives to the fixed degree sequence model for extracting the backbone of bipartite projections. \emph{Scientific Reports}, 11:23929, 2021.
 \bibitem[Nyholt(2004)]{nyholt2004} D.~R. Nyholt. A simple correction for multiple testing for single-nucleotide polymorphisms in linkage disequilibrium with each other. \emph{American Journal of Human Genetics}, 74:765--769, 2004.
 \bibitem[Plerou et al.(1999)]{plerou1999} V.~Plerou, P.~Gopikrishnan, B.~Rosenow, L.~A.~N. Amaral, and H.~E. Stanley. Universal and nonuniversal properties of cross correlations in financial time series. \emph{Physical Review Letters}, 83:1471, 1999.
+\bibitem[Polo et al.(2024)]{polo2024tiny} F.~M. Polo, L.~Weber, L.~Choshen, Y.~Sun, G.~Xu, and M.~Yurochkin. tinyBenchmarks: evaluating LLMs with fewer examples. \emph{arXiv:2402.14992}, 2024.
 \bibitem[Ponocny(2001)]{ponocny2001} I.~Ponocny. Nonparametric goodness-of-fit tests for the Rasch model. \emph{Psychometrika}, 66:437--460, 2001.
 \bibitem[Rasch(1960)]{rasch1960} G.~Rasch. \emph{Probabilistic Models for Some Intelligence and Attainment Tests}. Danmarks P\ae dagogiske Institut, 1960.
 \bibitem[Schluter(1984)]{schluter1984} D.~Schluter. A variance test for detecting species associations, with some example applications. \emph{Ecology}, 65:998--1005, 1984.

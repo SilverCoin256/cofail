@@ -186,3 +186,42 @@ false novelty kill, or a false all-clear, enters a prior-art ledger.
 
 **Net:** not a novelty kill. It is a same-question, different-machinery neighbour that the paper
 must cite and position against, and it converts C4 from a confession into a contribution.
+
+## Novelty sweep, done by hand (2026-07-28)
+
+The automated sweeps died on a usage quota. What follows was searched and read directly. It is
+**partial** — it covers the areas most likely to contain a kill, not all six planned sweeps.
+
+### IRT-based benchmark compression — the nearest *consumer* of our object
+
+An active literature fits item-response models to model-by-item matrices to shrink benchmarks:
+tinyBenchmarks (Polo et al., arXiv:2402.14992 — IRT trained on the evaluation results of **319
+models**, ~100 items sufficing for MMLU), Anchor Points (multidimensional IRT with anchor-item
+calibration), "Lost in Benchmarks?" / PSN-IRT (arXiv:2505.15055), Fluid Benchmarking and adaptive
+testing (arXiv:2511.04689), Growing Pains (arXiv:2604.12843), Efficient Safety Benchmarking via
+IRT (arXiv:2606.20626), Scales++ (arXiv:2510.26384).
+
+**Does not kill anything.** None of these tests the adequacy of its own latent dimensionality with
+a fit-free null; they assume a parameterisation and estimate within it. **But it is the strongest
+"so what" available**, and it is now in the paper: our dimensionality estimate is a statement about
+whether the assumption these methods rest on holds, measured on a model population roughly 4×
+larger than the 319 used to fit tinyBenchmarks. Care taken not to assert which specific papers use
+unidimensional versus multidimensional IRT — Anchor Points is explicitly multidimensional.
+
+### Fixed-fixed / configuration nulls outside ecology
+
+Searched for applications to model-by-item evaluation matrices in ML. Found only the ecology and
+network-science lineage already cited (Strona et al. 2014; Carstens 2015 + erratum; configuration
+models with fixed degree sequences), plus *Non-Uniform Sampling of Fixed Margin Binary Matrices*
+(arXiv:2007.15043), which is relevant to the sampler-validity discussion and supports our decision
+to validate the sampler by enumeration rather than assertion.
+
+**No evidence anyone has applied the fixed-fixed null to model-by-item evaluation matrices.** This
+is a negative search result and therefore weak evidence — absence of a hit is not proof of absence.
+
+### Still unrun
+
+Three of the six planned sweeps were never executed: LLM-judge/panel construction beyond Kohli
+(2026), the algorithmic-monoculture literature since mid-2026, and a systematic search of
+GitHub/PyPI for an existing package computing these statistics. **The novelty of the contribution
+statement is therefore still not fully verified**, and this ledger should not be cited as if it were.
