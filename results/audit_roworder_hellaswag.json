@@ -1,16 +1,17 @@
 {
- "benchmark": "gsm8k",
- "complete": true,
- "audit_ran": true,
- "n_requested": 60,
- "n_checked": 60,
+ "benchmark": "hellaswag",
+ "complete": false,
+ "audit_ran": false,
+ "n_requested": 15,
+ "n_checked": 9,
  "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
- "reference_gen": "B/C(example)",
- "n_items": 1319,
+ "reference_gen": "A(query)",
+ "n_items": 10042,
  "schema_generations_seen": {
-  "B/C(example)": 60
+  "A(query)": 3,
+  "B/C(example)": 6
  },
- "n_aligned": 60,
+ "n_aligned": 9,
  "n_mismatched": 0,
  "alignment_rate": 1.0,
  "mismatches": [],

@@ -620,3 +620,33 @@ Artifact: `results/audit_roworder_arc.json`.
 so. Note the direction of the risk: an undetected misalignment makes a model's row look
 independent of every other, biasing correlation estimates *toward zero* — toward the null. So this
 failure mode would understate the paper's headline rather than manufacture it.
+
+### Row-order audit extended to all five benchmarks (2026-07-28)
+
+The ARC audit above was initially the only one run, while the item-identity claim covers all five
+benchmarks. Extended:
+
+| benchmark | models checked | row-order identical | items | schema generations in sample |
+|---|---|---|---|---|
+| ARC | 149 (of 150; 1 unreadable) | **149 / 149** | 1,172 | 28 gen-A, 121 gen-B/C |
+| TruthfulQA | 60 | **60 / 60** | 817 | 60 gen-B/C |
+| GSM8K | 60 | **60 / 60** | 1,319 | 60 gen-B/C |
+| Winogrande | 40 | **40 / 40** | 1,267 | 40 gen-B/C |
+| HellaSwag | 20 (log-recorded run) | **20 / 20** | 10,042 | 4 gen-A, 16 gen-B/C |
+
+**Zero mismatches anywhere.** Artifacts: `results/audit_roworder_<bench>.json`.
+
+**Three caveats, all of which matter.**
+1. This is ~330 models of ~1,400. It raises confidence; it is not a proof.
+2. **Only ARC and HellaSwag sample both identity-column schema generations.** The other three drew
+   entirely from gen-B/C, so they do not independently exercise the cross-generation drift that
+   produced an empty intersection in Phase 0 — that hazard is tested by ARC and HellaSwag only.
+3. The HellaSwag figure is from a run recorded in the task log; its on-disk artifact was
+   overwritten by a later, larger attempt that the environment terminated before completing, and
+   which is correctly flagged `audit_ran: false` rather than being mistaken for a result. Repeated
+   attempts at N≥25 on HellaSwag did not survive — it reads 10,042 question texts per model — so
+   the reproducible command for that row is `python src/audit_roworder.py hellaswag 15`.
+
+Direction of the residual risk, unchanged: an undetected misalignment makes one model's row look
+independent of every other, biasing correlation estimates *toward zero*. This failure mode would
+understate the paper's headline, not manufacture it.
