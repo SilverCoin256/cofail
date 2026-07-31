@@ -75,8 +75,8 @@ This is licensed by a row-order verification (`src/audit_roworder.py`, artifact
 evenly across 2023-07-18 – 2024-05-30 had byte-identical item ordering, covering both
 identity-column schema generations (28 models where the identity field is `query`, 121 where it
 is `example`). One model was unreadable due to a transient network error. A row-count guard runs
-on every read. The audit covers **all five benchmarks**, ~330 models in total, with **zero
-mismatches**: ARC 149/149, TruthfulQA 60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 20/20.
+on every read. The audit covers **all five benchmarks**, ~320 models in total, with **zero
+mismatches**: ARC 149/149, TruthfulQA 60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 12/12.
 Artifacts: `results/audit_roworder_<bench>.json`.
 
 **Only ARC and HellaSwag sample both identity-column schema generations.** The other three

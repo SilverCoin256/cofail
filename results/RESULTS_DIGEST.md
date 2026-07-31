@@ -632,7 +632,7 @@ benchmarks. Extended:
 | TruthfulQA | 60 | **60 / 60** | 817 | 60 gen-B/C |
 | GSM8K | 60 | **60 / 60** | 1,319 | 60 gen-B/C |
 | Winogrande | 40 | **40 / 40** | 1,267 | 40 gen-B/C |
-| HellaSwag | 20 (log-recorded run) | **20 / 20** | 10,042 | 4 gen-A, 16 gen-B/C |
+| HellaSwag | 12 | **12 / 12** | 10,042 | 5 gen-A, 7 gen-B/C |
 
 **Zero mismatches anywhere.** Artifacts: `results/audit_roworder_<bench>.json`.
 
@@ -641,11 +641,14 @@ benchmarks. Extended:
 2. **Only ARC and HellaSwag sample both identity-column schema generations.** The other three drew
    entirely from gen-B/C, so they do not independently exercise the cross-generation drift that
    produced an empty intersection in Phase 0 — that hazard is tested by ARC and HellaSwag only.
-3. The HellaSwag figure is from a run recorded in the task log; its on-disk artifact was
-   overwritten by a later, larger attempt that the environment terminated before completing, and
-   which is correctly flagged `audit_ran: false` rather than being mistaken for a result. Repeated
-   attempts at N≥25 on HellaSwag did not survive — it reads 10,042 question texts per model — so
-   the reproducible command for that row is `python src/audit_roworder.py hellaswag 15`.
+3. The HellaSwag row reports **12**, not the larger samples, because 12 is what the committed
+   artifact contains. Two larger HellaSwag runs (15 and 20 models) did complete with zero
+   mismatches, but the environment terminated later attempts before their artifacts were
+   finalised, and a number whose only trace is a scrollback log does not meet this project's
+   own provenance rule. The 12-model artifact is `complete: false` (the run was cut at 12 of a
+   requested 15) but `audit_ran: true`, and it spans both schema generations. Reproduce with
+   `python src/audit_roworder.py hellaswag 15`; runs at N≥25 do not survive, since HellaSwag
+   reads 10,042 question texts per model.
 
 Direction of the residual risk, unchanged: an undetected misalignment makes one model's row look
 independent of every other, biasing correlation estimates *toward zero*. This failure mode would
