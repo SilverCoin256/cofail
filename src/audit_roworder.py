@@ -89,6 +89,24 @@ def main(bench="arc", n_models=120):
 
     ref_keys, ref_mid, ref_gen = None, None, None
     aligned, mismatched, errors, gens = [], [], [], Counter()
+    out_path = os.path.join(RES, f"audit_roworder_{bench}.json")
+    os.makedirs(RES, exist_ok=True)
+
+    def snapshot(done):
+        """Checkpoint after every batch. The first run of this audit died at 120/150 to a
+        transient network failure and wrote nothing at all, losing ~45 minutes of rate-limited
+        reads. A partial audit is still evidence; losing it is not."""
+        checked = len(aligned) + len(mismatched)
+        json.dump({
+            "benchmark": bench, "complete": done,
+            "n_requested": len(entries), "n_checked": checked,
+            "reference_model": ref_mid, "reference_gen": ref_gen,
+            "n_items": len(ref_keys) if ref_keys else 0,
+            "schema_generations_seen": dict(gens),
+            "n_aligned": len(aligned), "n_mismatched": len(mismatched),
+            "alignment_rate": (len(aligned) / checked) if checked else None,
+            "mismatches": mismatched[:40], "n_errors": len(errors), "errors": errors[:20],
+        }, open(out_path, "w"), indent=1)
 
     for i, (mid, rfile) in enumerate(entries):
         try:
@@ -115,21 +133,12 @@ def main(bench="arc", n_models=120):
         else:
             aligned.append(mid)
         if (i + 1) % 20 == 0:
+            snapshot(False)
             print(f"  {i+1}/{len(entries)}  aligned={len(aligned)} "
-                  f"mismatch={len(mismatched)} err={len(errors)}", flush=True)
+                  f"mismatch={len(mismatched)} err={len(errors)}  [checkpointed]", flush=True)
 
+    snapshot(True)
     checked = len(aligned) + len(mismatched)
-    out = {
-        "benchmark": bench, "n_requested": len(entries), "n_checked": checked,
-        "reference_model": ref_mid, "reference_gen": ref_gen,
-        "n_items": len(ref_keys) if ref_keys else 0,
-        "schema_generations_seen": dict(gens),
-        "n_aligned": len(aligned), "n_mismatched": len(mismatched),
-        "alignment_rate": (len(aligned) / checked) if checked else None,
-        "mismatches": mismatched[:40], "n_errors": len(errors), "errors": errors[:20],
-    }
-    os.makedirs(RES, exist_ok=True)
-    json.dump(out, open(os.path.join(RES, f"audit_roworder_{bench}.json"), "w"), indent=1)
 
     print(f"\n[{bench}] {len(aligned)}/{checked} models row-order identical to {ref_mid} "
           f"({len(ref_keys) if ref_keys else 0} items); {len(errors)} unreadable")
