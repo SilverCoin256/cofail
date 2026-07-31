@@ -110,16 +110,34 @@ signature these matrices are used to study.
 five benchmark datasets, each with its own upstream terms. Redistribution of the derived matrices
 is governed by that chain.
 
-**[TO VERIFY — do not release until this table is filled in from the actual dataset cards]**
+Queried against the HuggingFace Hub API on **2026-07-28**. "Verified" means the license appears in
+the dataset's own card metadata or tags, read programmatically — not inferred from a paper or a
+secondary source.
 
 | benchmark | upstream dataset | declared license | share-alike? | verified |
 |---|---|---|---|---|
-| ARC-Challenge | `allenai/ai2_arc` | | | ☐ |
-| HellaSwag | `Rowan/hellaswag` | | | ☐ |
-| Winogrande | `winogrande` | | | ☐ |
-| TruthfulQA | `truthful_qa` | | | ☐ |
-| GSM8K | `gsm8k` | | | ☐ |
-| leaderboard archive | `open-llm-leaderboard-old/details_*` | | | ☐ |
+| ARC-Challenge | `allenai/ai2_arc` | **CC-BY-SA-4.0** | **YES** | ☑ card + tag |
+| TruthfulQA | `truthfulqa/truthful_qa` | Apache-2.0 | no | ☑ card + tag |
+| GSM8K | `openai/gsm8k` | MIT | no | ☑ card + tag |
+| HellaSwag | `Rowan/hellaswag` | **none declared** | unknown | ☐ no tag, no LICENSE file on the Hub |
+| Winogrande | `allenai/winogrande` | **none declared** | unknown | ☐ no tag, no LICENSE file on the Hub |
+| leaderboard archive | `open-llm-leaderboard-old/details_*` | **none declared** | unknown | ☐ no tag |
+
+**Two consequences, one of them binding.**
+
+1. **ARC is share-alike, and this is now a verified fact rather than a suspicion.** The derived ARC
+   correctness matrix, and emphatically the reconstructed ARC answer key in `arc_resp.npz`, are
+   derivatives of a CC-BY-SA-4.0 work. Releasing them under this repository's MIT terms is very
+   likely non-compliant. Any release of the ARC-derived data must carry CC-BY-SA-4.0 with
+   attribution to AI2, separately from the MIT code. **The recommendation below to withhold the
+   reconstructed answer key is therefore not merely prudential — it also removes the most
+   clearly encumbered artifact.**
+2. **Three of six upstream sources declare no license at all**, including the leaderboard archive
+   that everything here derives from. Absence of a declared license is not permission. Until this
+   is resolved with the upstream maintainers, the honest position is that redistribution rights for
+   the HellaSwag- and Winogrande-derived matrices are **unestablished**, and they should not be
+   mirrored outside this repository. Harvesting them from the archive oneself, which the released
+   code supports, raises no such question.
 
 **Known hazard, acted on.** `arc_resp.npz` embeds a reconstructed ARC answer key at 99.01%
 fidelity. Redistributing a benchmark's answer key is both a possible share-alike violation and a
@@ -152,4 +170,8 @@ Collected in one place deliberately.
 5. Contamination is unmeasured (§5).
 6. Evaluation-harness version drift across the July 2023 – June 2024 window is uncontrolled.
 7. No DOI, no checksums, no versioning; part of the artifact mutates on a schedule (§6).
-8. Upstream license chain is unverified (§6).
+8. Upstream license chain is **partly resolved** (§6, verified 2026-07-28): ARC is CC-BY-SA-4.0
+   and therefore share-alike, so the ARC-derived matrices and the reconstructed key cannot ship
+   under this repository's MIT terms; TruthfulQA (Apache-2.0) and GSM8K (MIT) are clear;
+   HellaSwag, Winogrande and the leaderboard archive itself declare **no license at all**, so
+   redistribution rights for those derivatives are unestablished.

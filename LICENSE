@@ -26,7 +26,12 @@ NOTE ON SCOPE. This MIT license covers the SOFTWARE in this repository only --
 everything under src/, cofail/, tests/, and configs/, and the text of the paper
 and documentation.
 
-It does NOT cover the derived data under substrate/. That data is a
-transformation of third-party evaluation outputs and is governed by the upstream
-terms described in docs/DATASHEET.md. See that file before redistributing any
-part of substrate/.
+It does NOT cover the derived data under substrate/. That data is a transformation of
+third-party evaluation outputs and is governed by the upstream terms documented in
+docs/DATASHEET.md section 6.
+
+Specifically, and verified against the HuggingFace Hub on 2026-07-28: ARC-Challenge is
+CC-BY-SA-4.0, which is SHARE-ALIKE, so the ARC-derived matrices are not redistributable
+under these MIT terms. HellaSwag, Winogrande and the leaderboard archive declare no
+license at all, so redistribution rights for those derivatives are unestablished.
+Read docs/DATASHEET.md before redistributing any part of substrate/.
