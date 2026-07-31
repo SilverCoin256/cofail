@@ -25,7 +25,7 @@ A model is ALIGNED if its full sequence of hashes equals the reference model's, 
 position.
 
 Run: ./.venv/bin/python src/audit_roworder.py [bench] [n_models]
-  -> results/audit_roworder.json
+  -> results/audit_roworder_<bench>.json
 """
 import hashlib, json, os, re, sys
 from collections import Counter

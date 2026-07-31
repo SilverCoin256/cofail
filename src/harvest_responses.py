@@ -11,7 +11,10 @@ of models, essentially every item is answered correctly by someone.
 
 That recovery is checked, not assumed: models correct on the same item must agree on the
 argmax, and the recovered gold must reproduce each model's `acc` out of sample. Both
-diagnostics are written to results/tier2_validation.json.
+diagnostics are written alongside the tensor: substrate/raw/<bench>_resp_rejects.json and
+substrate/raw/<bench>_resp_sample.json. The gold-recovery validation itself (agreement among
+correct models, and the fraction of cells reproducing each model's reported accuracy) is
+emitted by src/responses_analysis.py into results/<bench>_responses.json under `gold_recovery`.
 
 Cost note: `predictions` is ~60x the bytes of `acc`, so this runs on a subsample.
 """
