@@ -5,10 +5,11 @@ The project states that as a discipline; this enforces it. It exists because a n
 by cross-checking against freshly computed values, not by any planned check. A test is cheaper
 than the next such discovery.
 
-Scope: paper/workshop.tex, the submission candidate. It quotes a small, fixed set of figures, so
-an exact string match against the JSON artifacts is both possible and meaningful. main.tex quotes
-many more numbers from older runs and is not covered here; extending this to it is worthwhile but
-would need those runs re-emitted as artifacts first.
+Scope: paper/workshop.tex in full, since the submission candidate quotes a small fixed set of
+figures. paper/main.tex is covered only for the figures produced by the 2026-07-28 robustness runs
+(sampler validation, power study, noise floor, deduplication) -- those have artifacts to check
+against. Its older numbers come from runs that predate this discipline and are not yet re-emitted
+as JSON; that gap is real and is stated here rather than hidden by a passing test.
 """
 import json
 import os
@@ -90,4 +91,50 @@ def test_no_untraceable_null_value(tex):
     assert "0.0389" not in tex, (
         "0.0389 is back in the paper. It traced to no executed run; the ARC exact-null rms is "
         "~0.0449 across four independent estimates."
+    )
+
+
+# --- paper/main.tex: only the figures that have artifacts from the 2026-07-28 runs ------------
+
+MAIN = os.path.join(ROOT, "paper", "main.tex")
+
+
+@pytest.fixture(scope="module")
+def main_tex():
+    if not os.path.exists(MAIN):
+        pytest.skip("paper/main.tex not present")
+    return open(MAIN).read()
+
+
+def test_main_sampler_validation_figures(main_tex):
+    d = load("sampler_validation.json")
+    for t in d["V1_fiber_tests"]:
+        assert str(t["fiber_size"]) in main_tex, f"missing enumerated fibre size {t['fiber_size']}"
+    rhats = [x["rhat"] for x in d["V2_gelman_rubin"]]
+    assert f"{min(rhats):.2f}" in main_tex and f"{max(rhats):.2f}" in main_tex
+
+
+def test_main_power_and_noise_floor_figures(main_tex):
+    ps = load("power_study.json")
+    assert f"{ps['KP1_min_rms_at_power_0.8']:.3f}" in main_tex
+    assert f"{ps['calibration_false_positive_rate']:.3f}" in main_tex, (
+        "the null-condition false-positive rate is quoted as evidence the test is calibrated; "
+        "it must match the run"
+    )
+    arc = load("noise_floor.json")["benchmarks"][0]
+    assert arc["bench"] == "arc"
+    for key in ("a_exact_fixed_fixed", "c_col_margin_only", "e_analytic_floor"):
+        v = f"{arc[key]['mean']:.4f}"
+        assert v in main_tex, f"missing noise-floor value {key}={v}"
+
+
+def test_main_quotes_the_corrected_arc_null(main_tex):
+    """The correction that motivated this file, asserted on the full paper too."""
+    assert "0.0389" not in main_tex
+    arc_chains = [x for r in load("sampler_validation.json")["V2_gelman_rubin"]
+                  if r["bench"] == "arc" for x in r["chain_means"]]
+    pooled = sum(arc_chains) / len(arc_chains)
+    assert f"{pooled:.4f}" in main_tex, (
+        f"main.tex should quote the ARC exact-null rms as {pooled:.4f}, the pooled mean of the "
+        "four dispersed chains"
     )
