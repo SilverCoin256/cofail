@@ -170,7 +170,7 @@
           "@type": "cr:Field",
           "@id": "outcomes/item_index",
           "name": "item_index",
-          "description": "Item identity is the ROW INDEX of the benchmark's evaluation file, not a stable upstream identifier -- upstream ids are not consistent across harness schema generations. Verified by src/audit_roworder.py: 149 of 149 readable models in a 150-model sample spanning 2023-07-18 to 2024-05-30 and both identity-column schema generations had byte-identical ordering, zero mismatches. Still a sample of ~1,400 models, not a proof; an undetected misalignment would bias correlation estimates toward zero.",
+          "description": "Item identity is the ROW INDEX of the benchmark's evaluation file, not a stable upstream identifier -- upstream ids are not consistent across harness schema generations. Verified by src/audit_roworder.py across all five benchmarks, ~330 models, zero mismatches (ARC 149/149, TruthfulQA 60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 20/20). Still a sample of ~1,400, not a proof, and only the ARC and HellaSwag samples span both identity-column schema generations. An undetected misalignment would bias correlation estimates toward zero.",
           "dataType": "sc:Integer",
           "source": {
             "fileSet": {
@@ -216,7 +216,7 @@
   ],
   "cr:knownLimitations": [
     "The population is NOT a sample of independent models. Removing models agreeing with a retained model above 0.95 discards 36-64% of each benchmark's population. A name-based family census attributes only ~35% of model ids to a named base family. Any analysis treating rows as exchangeable is partly measuring duplication.",
-    "Item alignment is verified on 149 of a 150-model sample with zero mismatches (see outcomes/item_index), but that remains a sample of ~1,400.",
+    "Item alignment is verified on ~330 models across all five benchmarks with zero mismatches (see outcomes/item_index), but that is a sample of ~1,400 and only two of the five samples span both schema generations.",
     "'Correct' is not one quantity across the five benchmarks (see outcomes/correct).",
     "Benchmark contamination is NOT measured, though it produces the same signature these matrices are used to study.",
     "The window July 2023 - June 2024 spans multiple lm-evaluation-harness versions and normalisation conventions; shared scoring artifacts can masquerade as shared model behaviour.",

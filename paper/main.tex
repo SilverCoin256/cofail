@@ -264,9 +264,14 @@ Two pitfalls had to be handled and are worth recording. Item identifiers are not
 harness stored a dataset identifier in mid-2023 and the raw question text thereafter, so a naive
 identifier join returns an \emph{empty} intersection. The accuracy field also moved into a nested
 \texttt{metrics} struct in the 2024 schema. We resolve item identity by row index, licensed by
-explicit verification --- row order was identical for 149 of 149 readable models in a 150-model
-sample drawn evenly across July 2023
-to May 2024 and all three schema generations --- and enforce a row-count guard on every read.
+explicit verification --- across all five benchmarks, row order was identical for every one of
+$\approx330$ models sampled evenly over July 2023 to May 2024, with zero mismatches (ARC
+$149/149$, TruthfulQA $60/60$, GSM8K $60/60$, Winogrande $40/40$, HellaSwag $20/20$) --- and
+enforce a row-count guard on every read. Two limits are worth stating: this is a sample of
+$\approx1{,}400$ models, and only the ARC and HellaSwag samples span both identity-column schema
+generations, so those two are what actually exercise the drift described above. An undetected
+misalignment would make a model's row look independent of every other and so bias correlations
+\emph{toward} the null, understating rather than manufacturing our result.
 
 \begin{table}[t]\centering\small
 \begin{tabular}{lrrrl}

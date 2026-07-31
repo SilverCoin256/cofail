@@ -75,9 +75,14 @@ This is licensed by a row-order verification (`src/audit_roworder.py`, artifact
 evenly across 2023-07-18 – 2024-05-30 had byte-identical item ordering, covering both
 identity-column schema generations (28 models where the identity field is `query`, 121 where it
 is `example`). One model was unreadable due to a transient network error. A row-count guard runs
-on every read. **The audit was initially run on ARC only**, although the item-identity claim
-covers all five benchmarks; the remaining four are being audited and their results appear in
-`results/audit_roworder_<bench>.json` as they complete.
+on every read. The audit covers **all five benchmarks**, ~330 models in total, with **zero
+mismatches**: ARC 149/149, TruthfulQA 60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 20/20.
+Artifacts: `results/audit_roworder_<bench>.json`.
+
+**Only ARC and HellaSwag sample both identity-column schema generations.** The other three
+samples drew entirely from the later generation, so they do not independently exercise the
+cross-generation drift that produced an empty intersection in Phase 0 — that specific hazard
+is tested by ARC and HellaSwag only.
 
 **This is a sample of ~1,400 models, not a proof.** A single undetected misalignment would bias
 every correlation estimate toward zero — i.e. toward the null, so this failure mode would
@@ -173,8 +178,9 @@ rather than an established process.
 
 Collected in one place deliberately.
 
-1. Item alignment is verified on 149 of a 150-model sample spanning both schema generations,
-   with zero mismatches — but that is still a sample of ~1,400 (§3).
+1. Item alignment is verified on ~330 models across all five benchmarks with zero mismatches,
+   but that is a sample of ~1,400, and only two of the five samples span both schema
+   generations (§3).
 2. ~1% label-error rate in the reconstructed ARC key, effect unquantified (§4).
 3. "Binary correctness" is not one quantity across the five benchmarks (§2).
 4. The population is 36–64% redundant and only ~35% lineage-attributable (§2).
