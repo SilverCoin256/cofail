@@ -264,7 +264,8 @@ Two pitfalls had to be handled and are worth recording. Item identifiers are not
 harness stored a dataset identifier in mid-2023 and the raw question text thereafter, so a naive
 identifier join returns an \emph{empty} intersection. The accuracy field also moved into a nested
 \texttt{metrics} struct in the 2024 schema. We resolve item identity by row index, licensed by
-explicit verification --- row order was identical for 14 of 14 sampled models spanning July 2023
+explicit verification --- row order was identical for 149 of 149 readable models in a 150-model
+sample drawn evenly across July 2023
 to May 2024 and all three schema generations --- and enforce a row-count guard on every read.
 
 \begin{table}[t]\centering\small

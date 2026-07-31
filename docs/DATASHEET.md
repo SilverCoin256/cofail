@@ -70,11 +70,18 @@ file for HellaSwag). No model was run and no inference was purchased; total comp
 
 **Item identity is the row index.** The archive's per-item identifiers are not stable across
 harness schema generations, so item `m` means "row `m` of the benchmark's evaluation file."
-This is licensed by a row-order verification — 14 sampled models identical across
-July 2023 – May 2024 and all three schema generations — plus a row-count guard on every read.
-**This is a 14-model spot check, not a proof**, and a single undetected misalignment would bias
-every correlation estimate toward zero. Flagged in the audit as a Critical artifact risk.
-**[TO VERIFY]** widen the audit sample substantially before release.
+This is licensed by a row-order verification (`src/audit_roworder.py`, artifact
+`results/audit_roworder_arc.json`): **149 of 149 readable models** in a 150-model sample drawn
+evenly across 2023-07-18 – 2024-05-30 had byte-identical item ordering, covering both
+identity-column schema generations (28 models where the identity field is `query`, 121 where it
+is `example`). One model was unreadable due to a transient network error. A row-count guard runs
+on every read.
+
+**This is a sample of ~1,400 models, not a proof.** A single undetected misalignment would bias
+every correlation estimate toward zero — i.e. toward the null, so this failure mode would
+understate the paper's result rather than manufacture it. The original release cited a 14-model
+spot check; that has been widened by an order of magnitude, and the remaining gap is stated here
+rather than closed.
 
 ## 4. Preprocessing
 
@@ -164,7 +171,8 @@ rather than an established process.
 
 Collected in one place deliberately.
 
-1. Item alignment rests on a 14-model spot check (§3).
+1. Item alignment is verified on 149 of a 150-model sample spanning both schema generations,
+   with zero mismatches — but that is still a sample of ~1,400 (§3).
 2. ~1% label-error rate in the reconstructed ARC key, effect unquantified (§4).
 3. "Binary correctness" is not one quantity across the five benchmarks (§2).
 4. The population is 36–64% redundant and only ~35% lineage-attributable (§2).

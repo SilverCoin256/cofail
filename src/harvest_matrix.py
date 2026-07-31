@@ -10,9 +10,13 @@ Robust to three harness schema generations observed in the archive:
   gen C (2024+)          : example = question text, no query,          `metrics` struct
 
 Item identity is the ROW INDEX. That is licensed by an explicit verification
-(src/audit_roworder.py): row order was identical for 14/14 sampled models spanning
-Jul 2023 - May 2024 and all three schema generations. Every read is additionally
-guarded on row count, and any model whose length deviates is rejected and logged.
+(src/audit_roworder.py, artifact results/audit_roworder_arc.json): row order was identical
+for 149 of 149 readable models out of a 150-model sample drawn evenly across
+2023-07-18 - 2024-05-30, covering both identity-column schema generations (28 gen-A,
+121 gen-B/C); one model was unreadable due to a transient network error. Every read is
+additionally guarded on row count, and any model whose length deviates is rejected and
+logged. This is a sample of ~1,400, so it raises confidence rather than proving alignment
+for every model.
 
 Usage:  python harvest_matrix.py [bench ...]     (default: all single-file benchmarks)
 """

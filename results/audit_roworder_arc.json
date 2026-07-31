@@ -1,0 +1,23 @@
+{
+ "benchmark": "arc",
+ "n_requested": 150,
+ "n_checked": 149,
+ "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
+ "reference_gen": "A(query)",
+ "n_items": 1172,
+ "schema_generations_seen": {
+  "A(query)": 28,
+  "B/C(example)": 121
+ },
+ "n_aligned": 149,
+ "n_mismatched": 0,
+ "alignment_rate": 1.0,
+ "mismatches": [],
+ "n_errors": 1,
+ "errors": [
+  {
+   "model": "open-llm-leaderboard-old/details_ABX-AI__Infinite-Laymons-9B",
+   "error": "RuntimeError: Cannot send a request, as the client has been closed."
+  }
+ ]
+}

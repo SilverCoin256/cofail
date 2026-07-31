@@ -16,7 +16,8 @@ or carried over from an earlier draft.
 
 Harvested from `open-llm-leaderboard-old` at **$0 compute cost** by reading only the metric
 column of each parquet (1.4 KB out of a 63 MB file for HellaSwag). Item identity is the row
-index, licensed by a row-order verification (14/14 sampled models identical across
+index, licensed by a row-order verification (149/149 readable models of a 150-model sample
+identical; see the 2026-07-28 audit section. Originally 14/14 sampled models identical across
 Jul 2023 – May 2024 and all three harness schema generations) plus a row-count guard on every
 read. Total rejected: ARC 0, GSM8K 0, Winogrande few, TruthfulQA 22.
 
@@ -590,3 +591,32 @@ established IRT implementation (R `mirt`, or `py-irt`) rather than hand-rolled g
 The earlier in-sample impression that 2–4 dimensions suffice is *suggestive only* and must not be
 cited until refitted. What survives from this line of work is the permutation-based rungs of the
 ladder (R0–R3), which involve no optimiser at all and are reported above under X5.
+
+## Row-order audit, widened (2026-07-28) — `src/audit_roworder.py`
+
+The single assumption the whole substrate rests on is that item identity is the row index. The
+release cited a 14-model spot check and pointed at `src/audit_roworder.py` as the evidence —
+**and that script was not in the repository**, so the claim was unverifiable from the release.
+The script now exists and the sample is an order of magnitude larger.
+
+Method: 150 ARC models sampled *evenly across the snapshot date range* (2023-07-18 – 2024-05-30)
+rather than alphabetically, because the failure mode being audited is schema drift over time.
+Item identity is normalised to a question-text hash — gen A reads `query`, gen B/C read `example`,
+since gen A's `example` holds a dataset id, which is exactly the mismatch that produced an empty
+intersection in Phase 0. A model is aligned iff its full hash sequence equals the reference's,
+position by position.
+
+| quantity | value |
+|---|---|
+| models checked | **149** of 150 (1 unreadable, transient network error) |
+| row-order identical to reference | **149 / 149 — zero mismatches** |
+| items | 1,172 |
+| schema generations covered | 28 gen-A (`query`), 121 gen-B/C (`example`) |
+| reference model | `details_AlekseyKorshuk__chatml-pyg-v1` (gen A) |
+
+Artifact: `results/audit_roworder_arc.json`.
+
+**This remains a sample of ~1,400 models, not a proof**, and every document that cites it now says
+so. Note the direction of the risk: an undetected misalignment makes a model's row look
+independent of every other, biasing correlation estimates *toward zero* — toward the null. So this
+failure mode would understate the paper's headline rather than manufacture it.

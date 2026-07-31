@@ -5,8 +5,14 @@
     "cr": "http://mlcommons.org/croissant/",
     "sc": "https://schema.org/",
     "dct": "http://purl.org/dc/terms/",
-    "data": { "@id": "cr:data", "@type": "@json" },
-    "dataType": { "@id": "cr:dataType", "@type": "@vocab" },
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
     "field": "cr:field",
     "fileObject": "cr:fileObject",
     "fileProperty": "cr:fileProperty",
@@ -37,32 +43,70 @@
     "email": "shauryaguptaa8@gmail.com"
   },
   "keywords": [
-    "model evaluation", "correlated failure", "ensemble diversity", "item response theory",
-    "null models", "algorithmic monoculture", "LLM evaluation"
+    "model evaluation",
+    "correlated failure",
+    "ensemble diversity",
+    "item response theory",
+    "null models",
+    "algorithmic monoculture",
+    "LLM evaluation"
   ],
-
   "license": "See distributionLicenseNotes. The CODE is MIT; the DATA is a derivative of upstream benchmarks with mixed and partly undeclared terms, and is NOT uniformly redistributable.",
   "cr:distributionLicenseNotes": {
     "verifiedOn": "2026-07-28",
     "method": "HuggingFace Hub API card metadata and tags, read programmatically. Not inferred from papers or secondary sources.",
     "perBenchmark": [
-      { "benchmark": "ARC-Challenge", "upstream": "allenai/ai2_arc", "license": "CC-BY-SA-4.0", "shareAlike": true, "verified": true,
-        "note": "SHARE-ALIKE. The ARC-derived matrices and the reconstructed answer key are derivatives of a CC-BY-SA-4.0 work and cannot ship under this repository's MIT terms. Any release must carry CC-BY-SA-4.0 with attribution to AI2." },
-      { "benchmark": "TruthfulQA", "upstream": "truthfulqa/truthful_qa", "license": "Apache-2.0", "shareAlike": false, "verified": true },
-      { "benchmark": "GSM8K", "upstream": "openai/gsm8k", "license": "MIT", "shareAlike": false, "verified": true },
-      { "benchmark": "HellaSwag", "upstream": "Rowan/hellaswag", "license": null, "shareAlike": null, "verified": false,
-        "note": "No license tag and no LICENSE file on the Hub. Absence of a declared license is not permission; redistribution rights for this derivative are UNESTABLISHED." },
-      { "benchmark": "Winogrande", "upstream": "allenai/winogrande", "license": null, "shareAlike": null, "verified": false,
-        "note": "As HellaSwag: no declared license. Redistribution rights UNESTABLISHED." },
-      { "benchmark": "leaderboard archive", "upstream": "open-llm-leaderboard-old/details_*", "license": null, "shareAlike": null, "verified": false,
-        "note": "The archive everything here derives from declares no license." }
+      {
+        "benchmark": "ARC-Challenge",
+        "upstream": "allenai/ai2_arc",
+        "license": "CC-BY-SA-4.0",
+        "shareAlike": true,
+        "verified": true,
+        "note": "SHARE-ALIKE. The ARC-derived matrices and the reconstructed answer key are derivatives of a CC-BY-SA-4.0 work and cannot ship under this repository's MIT terms. Any release must carry CC-BY-SA-4.0 with attribution to AI2."
+      },
+      {
+        "benchmark": "TruthfulQA",
+        "upstream": "truthfulqa/truthful_qa",
+        "license": "Apache-2.0",
+        "shareAlike": false,
+        "verified": true
+      },
+      {
+        "benchmark": "GSM8K",
+        "upstream": "openai/gsm8k",
+        "license": "MIT",
+        "shareAlike": false,
+        "verified": true
+      },
+      {
+        "benchmark": "HellaSwag",
+        "upstream": "Rowan/hellaswag",
+        "license": null,
+        "shareAlike": null,
+        "verified": false,
+        "note": "No license tag and no LICENSE file on the Hub. Absence of a declared license is not permission; redistribution rights for this derivative are UNESTABLISHED."
+      },
+      {
+        "benchmark": "Winogrande",
+        "upstream": "allenai/winogrande",
+        "license": null,
+        "shareAlike": null,
+        "verified": false,
+        "note": "As HellaSwag: no declared license. Redistribution rights UNESTABLISHED."
+      },
+      {
+        "benchmark": "leaderboard archive",
+        "upstream": "open-llm-leaderboard-old/details_*",
+        "license": null,
+        "shareAlike": null,
+        "verified": false,
+        "note": "The archive everything here derives from declares no license."
+      }
     ],
     "withheldFromRelease": "substrate/raw/arc_resp.npz embeds a reconstructed ARC answer key at 99.01% fidelity. It is withheld from public release on two grounds: it is a derivative of a share-alike work, and republishing a benchmark answer key is a training-contamination vector. The recovery CODE is released instead."
   },
-
   "isLiveDataset": false,
   "cr:liveDatasetNote": "The five correctness matrices are frozen for the paper. A separate monitor (.github/workflows/layer_c_monitor.yml) appends to results/timeseries.csv monthly; that time series is NOT part of this frozen distribution.",
-
   "distribution": [
     {
       "@type": "cr:FileObject",
@@ -78,12 +122,13 @@
       "@id": "correctness-matrices",
       "name": "correctness-matrices",
       "description": "One compressed NumPy archive per benchmark. Each holds 'prim' (models x items, 1 = correct), 'models' (HuggingFace repo ids) and 'dates' (leaderboard snapshot date).",
-      "containedIn": { "@id": "github-repository" },
+      "containedIn": {
+        "@id": "github-repository"
+      },
       "encodingFormat": "application/x-npz",
       "includes": "substrate/raw/*.npz"
     }
   ],
-
   "recordSet": [
     {
       "@type": "cr:RecordSet",
@@ -92,42 +137,86 @@
       "description": "One record per (model, item, benchmark) cell.",
       "field": [
         {
-          "@type": "cr:Field", "@id": "outcomes/benchmark", "name": "benchmark",
+          "@type": "cr:Field",
+          "@id": "outcomes/benchmark",
+          "name": "benchmark",
           "description": "One of arc, winogrande, truthfulqa, gsm8k, hellaswag.",
           "dataType": "sc:Text",
-          "source": { "fileSet": { "@id": "correctness-matrices" }, "extract": { "fileProperty": "filename" } }
+          "source": {
+            "fileSet": {
+              "@id": "correctness-matrices"
+            },
+            "extract": {
+              "fileProperty": "filename"
+            }
+          }
         },
         {
-          "@type": "cr:Field", "@id": "outcomes/model_id", "name": "model_id",
+          "@type": "cr:Field",
+          "@id": "outcomes/model_id",
+          "name": "model_id",
           "description": "HuggingFace repository id of the evaluated model, from the 'models' array.",
           "dataType": "sc:Text",
-          "source": { "fileSet": { "@id": "correctness-matrices" }, "extract": { "column": "models" } }
+          "source": {
+            "fileSet": {
+              "@id": "correctness-matrices"
+            },
+            "extract": {
+              "column": "models"
+            }
+          }
         },
         {
-          "@type": "cr:Field", "@id": "outcomes/item_index", "name": "item_index",
-          "description": "Item identity is the ROW INDEX of the benchmark's evaluation file, not a stable upstream identifier -- upstream ids are not consistent across harness schema generations. Licensed by a row-order check on 14 sampled models across three schema generations plus a row-count guard on every read. This is a spot check, not a proof: an undetected misalignment would bias correlation estimates toward zero.",
+          "@type": "cr:Field",
+          "@id": "outcomes/item_index",
+          "name": "item_index",
+          "description": "Item identity is the ROW INDEX of the benchmark's evaluation file, not a stable upstream identifier -- upstream ids are not consistent across harness schema generations. Verified by src/audit_roworder.py: 149 of 149 readable models in a 150-model sample spanning 2023-07-18 to 2024-05-30 and both identity-column schema generations had byte-identical ordering, zero mismatches. Still a sample of ~1,400 models, not a proof; an undetected misalignment would bias correlation estimates toward zero.",
           "dataType": "sc:Integer",
-          "source": { "fileSet": { "@id": "correctness-matrices" }, "extract": { "fileProperty": "lineNumbers" } }
+          "source": {
+            "fileSet": {
+              "@id": "correctness-matrices"
+            },
+            "extract": {
+              "fileProperty": "lineNumbers"
+            }
+          }
         },
         {
-          "@type": "cr:Field", "@id": "outcomes/correct", "name": "correct",
+          "@type": "cr:Field",
+          "@id": "outcomes/correct",
+          "name": "correct",
           "description": "1 if the model answered the item correctly. NOT one quantity across benchmarks: ARC/HellaSwag/Winogrande/TruthfulQA-mc1 correctness is length-normalised log-likelihood ranking over answer continuations; GSM8K is strict-match extraction from generated text. Pooling assumes a comparability that does not strictly hold.",
           "dataType": "sc:Boolean",
-          "source": { "fileSet": { "@id": "correctness-matrices" }, "extract": { "column": "prim" } }
+          "source": {
+            "fileSet": {
+              "@id": "correctness-matrices"
+            },
+            "extract": {
+              "column": "prim"
+            }
+          }
         },
         {
-          "@type": "cr:Field", "@id": "outcomes/snapshot_date", "name": "snapshot_date",
+          "@type": "cr:Field",
+          "@id": "outcomes/snapshot_date",
+          "name": "snapshot_date",
           "description": "Leaderboard snapshot date for this model's evaluation.",
           "dataType": "sc:Date",
-          "source": { "fileSet": { "@id": "correctness-matrices" }, "extract": { "column": "dates" } }
+          "source": {
+            "fileSet": {
+              "@id": "correctness-matrices"
+            },
+            "extract": {
+              "column": "dates"
+            }
+          }
         }
       ]
     }
   ],
-
   "cr:knownLimitations": [
     "The population is NOT a sample of independent models. Removing models agreeing with a retained model above 0.95 discards 36-64% of each benchmark's population. A name-based family census attributes only ~35% of model ids to a named base family. Any analysis treating rows as exchangeable is partly measuring duplication.",
-    "Item identity rests on a 14-model row-order spot check (see outcomes/item_index).",
+    "Item alignment is verified on 149 of a 150-model sample with zero mismatches (see outcomes/item_index), but that remains a sample of ~1,400.",
     "'Correct' is not one quantity across the five benchmarks (see outcomes/correct).",
     "Benchmark contamination is NOT measured, though it produces the same signature these matrices are used to study.",
     "The window July 2023 - June 2024 spans multiple lm-evaluation-harness versions and normalisation conventions; shared scoring artifacts can masquerade as shared model behaviour.",
