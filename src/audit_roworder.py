@@ -39,6 +39,7 @@ from ratelimit import LIMITER, is_429
 
 SUB = os.path.join(HERE, "..", "substrate")
 RES = os.path.join(HERE, "..", "results")
+MIN_CHECKED = 10        # below this the audit has not run; see the guard in main()
 fs = HfFileSystem()
 WS = re.compile(r"\s+")
 
@@ -99,6 +100,7 @@ def main(bench="arc", n_models=120):
         checked = len(aligned) + len(mismatched)
         json.dump({
             "benchmark": bench, "complete": done,
+            "audit_ran": (len(aligned) + len(mismatched)) >= MIN_CHECKED,
             "n_requested": len(entries), "n_checked": checked,
             "reference_model": ref_mid, "reference_gen": ref_gen,
             "n_items": len(ref_keys) if ref_keys else 0,
@@ -140,6 +142,18 @@ def main(bench="arc", n_models=120):
     snapshot(True)
     checked = len(aligned) + len(mismatched)
 
+    # An audit that read nothing is a FAILED audit, not a passed one. The first version printed
+    # "no mismatches: the assumption holds on every model checked" after checking zero models --
+    # true but catastrophically misleading, and exactly how a reader concludes an audit passed
+    # when it never ran. Report and exit non-zero instead.
+    if checked < MIN_CHECKED:
+        print(f"\n[{bench}] AUDIT FAILED TO RUN: only {checked} models readable of "
+              f"{len(entries)} attempted ({len(errors)} errors). This is NOT evidence that row "
+              f"order is consistent -- nothing was compared.")
+        for e in errors[:3]:
+            print(f"    {e['error'][:100]}")
+        return 1
+
     print(f"\n[{bench}] {len(aligned)}/{checked} models row-order identical to {ref_mid} "
           f"({len(ref_keys) if ref_keys else 0} items); {len(errors)} unreadable")
     print(f"  schema generations covered: {dict(gens)}")
@@ -147,10 +161,12 @@ def main(bench="arc", n_models=120):
         print(f"  !! {len(mismatched)} MISMATCHED -- the row-index assumption does NOT hold "
               f"universally; see results/audit_roworder_{bench}.json")
     else:
-        print("  no mismatches: the row-index assumption holds on every model checked")
+        print(f"  no mismatches across {checked} models: the row-index assumption holds on every "
+              f"model checked")
+    return 0
 
 
 if __name__ == "__main__":
     b = sys.argv[1] if len(sys.argv) > 1 else "arc"
     n = int(sys.argv[2]) if len(sys.argv) > 2 else 120
-    main(b, n)
+    sys.exit(main(b, n) or 0)

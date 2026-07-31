@@ -1,97 +1,19 @@
 {
  "benchmark": "winogrande",
  "complete": true,
- "n_requested": 60,
- "n_checked": 0,
- "reference_model": null,
- "reference_gen": null,
- "n_items": 0,
- "schema_generations_seen": {},
- "n_aligned": 0,
+ "audit_ran": true,
+ "n_requested": 12,
+ "n_checked": 12,
+ "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__pygmalion-6b-vicuna-chatml",
+ "reference_gen": "B/C(example)",
+ "n_items": 1267,
+ "schema_generations_seen": {
+  "B/C(example)": 12
+ },
+ "n_aligned": 12,
  "n_mismatched": 0,
- "alignment_rate": null,
+ "alignment_rate": 1.0,
  "mismatches": [],
- "n_errors": 60,
- "errors": [
-  {
-   "model": "open-llm-leaderboard-old/details_AlekseyKorshuk__pygmalion-6b-vicuna-chatml",
-   "error": "RuntimeError: Cannot send a request, as the client has been closed."
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_LinkSoul__Chinese-Llama-2-7b",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Austism__chronos-hermes-13b-v2",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_CobraMamba__mamba-gpt-3b",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Lajonbot__WizardLM-13B-V1.2-PL-lora_unload",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_MayaPH__FinOPT-Franklin",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_CHIH-HUNG__llama-2-13b-FINETUNE2_3w",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_KnutJaegersberg__RWKV-4-PilePlus-169M-20230520-done-ctx4096",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Doctor-Shotgun__CalliopeDS-v2-L2-13B",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_LTC-AI-Labs__L2-7b-Synthia-WVG-Test",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Lazycuber__pyg-instruct-wizardlm",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_01-ai__Yi-34B",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_CausalLM__7B-DPO-alpha",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_JosephusCheung__Yee-34B-200K-Chat",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_AA051610__A11P",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_BEE-spoke-data__Mixtral-GQA-400m-v2",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Azazelle__SlimMelodicMaid",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_BEE-spoke-data__zephyr-220m-sft-full",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Locutusque__Mistral-7B-SFT",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  },
-  {
-   "model": "open-llm-leaderboard-old/details_Kquant03__Medusa-7B-bf16",
-   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
-  }
- ]
+ "n_errors": 0,
+ "errors": []
 }
