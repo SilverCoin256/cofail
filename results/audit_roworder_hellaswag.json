@@ -2,16 +2,16 @@
  "benchmark": "hellaswag",
  "complete": true,
  "audit_ran": true,
- "n_requested": 15,
- "n_checked": 15,
+ "n_requested": 25,
+ "n_checked": 25,
  "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
  "reference_gen": "A(query)",
  "n_items": 10042,
  "schema_generations_seen": {
-  "A(query)": 3,
-  "B/C(example)": 12
+  "A(query)": 5,
+  "B/C(example)": 20
  },
- "n_aligned": 15,
+ "n_aligned": 25,
  "n_mismatched": 0,
  "alignment_rate": 1.0,
  "mismatches": [],

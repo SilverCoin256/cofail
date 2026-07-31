@@ -104,8 +104,8 @@ Two archive pitfalls are handled and worth knowing about if you build on this da
 identifiers are **not stable** — the harness stored a dataset id in mid-2023 and raw question
 text afterwards, so a naive id join returns an *empty* intersection. And the accuracy field moved
 into a nested `metrics` struct in 2024. Item identity here is the row index, verified stable for
-324 models across all five benchmarks with **zero mismatches** (ARC 149/149, TruthfulQA
-60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 15/15), with a row-count guard on every read
+334 models across all five benchmarks with **zero mismatches** (ARC 149/149, TruthfulQA
+60/60, GSM8K 60/60, Winogrande 40/40, HellaSwag 25/25), with a row-count guard on every read
 (`src/audit_roworder.py`). Still a sample of ~1,400, not a proof, and only the ARC and
 HellaSwag samples span both identity-column schema generations.
 
