@@ -665,11 +665,21 @@ folded silently into the mean-level finding.
 
 \section{Reproducibility and use of AI assistance}
 
-All code, the harmonised substrate, and every results artifact are released; each number traces
-to a JSON file emitted by an executed run, and the propositions are asserted as unit tests. The
-study was pre-registered before the confirmatory analysis, with two dated amendments recorded
-before any confirmatory statistic was computed; one pre-registered hypothesis was refuted by its
-own kill condition and is reported as refuted.
+All code, the harmonised substrate, and every results artifact are released with a datasheet
+(Gebru et al.\ schema) and Croissant~1.0 metadata; each number traces to a JSON file emitted by an
+executed run, and the propositions are asserted as unit tests. The study was pre-registered before
+the confirmatory analysis, with dated amendments recorded before any confirmatory statistic was
+computed; one pre-registered hypothesis was refuted by its own kill condition and is reported as
+refuted. Every kill condition in the later robustness work was likewise written before its
+experiment ran, and four of them fired --- including one that retired an estimate of latent
+dimensionality by multidimensional IRT after three parameterisations disagreed, which is why
+Section~\ref{sec:robust} reports dimensionality by parallel analysis instead.
+
+The upstream license chain is documented rather than assumed: ARC-Challenge is CC-BY-SA-4.0 and
+therefore share-alike, TruthfulQA is Apache-2.0 and GSM8K is MIT, while HellaSwag, Winogrande and
+the leaderboard archive itself declare no license. The reconstructed ARC answer key is withheld
+from the public release --- it is a derivative of a share-alike work and republishing a benchmark
+answer key is a contamination vector --- and the recovery code is released in its place.
 
 This work used a large language model (Claude, Anthropic) as a coding and analysis assistant: it
 wrote the harvesting, estimation and figure code and assisted in drafting and in the adversarial
