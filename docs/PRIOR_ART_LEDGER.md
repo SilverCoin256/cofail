@@ -225,3 +225,15 @@ Three of the six planned sweeps were never executed: LLM-judge/panel constructio
 (2026), the algorithmic-monoculture literature since mid-2026, and a systematic search of
 GitHub/PyPI for an existing package computing these statistics. **The novelty of the contribution
 statement is therefore still not fully verified**, and this ledger should not be cited as if it were.
+
+### Retry of the remaining sweeps — also blocked (2026-07-28, later)
+
+The three unrun sweeps (LLM-judge panels beyond Kohli; algorithmic monoculture since mid-2025;
+existing software and released model-by-item matrices) were re-attempted as a workflow. All four
+agents failed immediately on a **session** usage limit, distinct from the weekly limit that killed
+the first attempt. Zero results returned.
+
+**Status is therefore unchanged: three of six planned sweeps have never run.** The novelty of the
+contribution statement is checked only for the areas swept by hand and recorded above — IRT-based
+benchmark compression, fixed-fixed nulls outside ecology, the ensemble-diversity connection, and
+Kohli (2026). It should not be described as verified beyond those.
