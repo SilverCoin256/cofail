@@ -4,7 +4,8 @@ Following Gebru et al., *Datasheets for Datasets* (Commun. ACM 64(12):86–92, 2
 
 **Version:** 0.2 (2026-07-28). **Contact:** Shaurya Gupta, shauryaguptaa8@gmail.com.
 **Code license:** MIT (see `LICENSE`). **Data license:** see §6 — *this is the section to read
-before redistributing anything.*
+before redistributing anything.* **Machine-readable metadata:** `docs/croissant.json`
+(MLCommons Croissant 1.0), carrying the same per-benchmark license findings and limitations.
 
 > **Status of this document.** Written to close a Critical artifact objection raised in the
 > NeurIPS forensic audit (`docs/NEURIPS_BLUEPRINT.md`, F10). Items marked **[TO VERIFY]** are
