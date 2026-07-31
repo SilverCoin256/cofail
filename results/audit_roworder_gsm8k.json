@@ -1,0 +1,19 @@
+{
+ "benchmark": "gsm8k",
+ "complete": true,
+ "audit_ran": true,
+ "n_requested": 30,
+ "n_checked": 30,
+ "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
+ "reference_gen": "B/C(example)",
+ "n_items": 1319,
+ "schema_generations_seen": {
+  "B/C(example)": 30
+ },
+ "n_aligned": 30,
+ "n_mismatched": 0,
+ "alignment_rate": 1.0,
+ "mismatches": [],
+ "n_errors": 0,
+ "errors": []
+}

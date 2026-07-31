@@ -90,6 +90,10 @@ def main(bench="arc", n_models=120):
 
     ref_keys, ref_mid, ref_gen = None, None, None
     aligned, mismatched, errors, gens = [], [], [], Counter()
+    # Scale the checkpoint interval to the sample. A fixed interval of 20 meant a 15-model
+    # HellaSwag run never checkpointed at all and lost everything when the process was reaped --
+    # the same lost-work failure the checkpointing was added to prevent.
+    ckpt_every = max(1, min(20, len(entries) // 4))
     out_path = os.path.join(RES, f"audit_roworder_{bench}.json")
     os.makedirs(RES, exist_ok=True)
 
@@ -134,7 +138,7 @@ def main(bench="arc", n_models=120):
                                "first_differing_positions": bad[:10], "gen": gen})
         else:
             aligned.append(mid)
-        if (i + 1) % 20 == 0:
+        if (i + 1) % ckpt_every == 0:
             snapshot(False)
             print(f"  {i+1}/{len(entries)}  aligned={len(aligned)} "
                   f"mismatch={len(mismatched)} err={len(errors)}  [checkpointed]", flush=True)

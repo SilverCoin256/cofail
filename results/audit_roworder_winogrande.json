@@ -2,15 +2,15 @@
  "benchmark": "winogrande",
  "complete": true,
  "audit_ran": true,
- "n_requested": 12,
- "n_checked": 12,
+ "n_requested": 40,
+ "n_checked": 40,
  "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__pygmalion-6b-vicuna-chatml",
  "reference_gen": "B/C(example)",
  "n_items": 1267,
  "schema_generations_seen": {
-  "B/C(example)": 12
+  "B/C(example)": 40
  },
- "n_aligned": 12,
+ "n_aligned": 40,
  "n_mismatched": 0,
  "alignment_rate": 1.0,
  "mismatches": [],

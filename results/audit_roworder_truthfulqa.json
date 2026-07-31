@@ -1,0 +1,19 @@
+{
+ "benchmark": "truthfulqa",
+ "complete": true,
+ "audit_ran": true,
+ "n_requested": 60,
+ "n_checked": 60,
+ "reference_model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
+ "reference_gen": "B/C(example)",
+ "n_items": 817,
+ "schema_generations_seen": {
+  "B/C(example)": 60
+ },
+ "n_aligned": 60,
+ "n_mismatched": 0,
+ "alignment_rate": 1.0,
+ "mismatches": [],
+ "n_errors": 0,
+ "errors": []
+}
