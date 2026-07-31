@@ -632,7 +632,7 @@ benchmarks. Extended:
 | TruthfulQA | 60 | **60 / 60** | 817 | 60 gen-B/C |
 | GSM8K | 60 | **60 / 60** | 1,319 | 60 gen-B/C |
 | Winogrande | 40 | **40 / 40** | 1,267 | 40 gen-B/C |
-| HellaSwag | 12 | **12 / 12** | 10,042 | 5 gen-A, 7 gen-B/C |
+| HellaSwag | 15 | **15 / 15** | 10,042 | 3 gen-A, 12 gen-B/C |
 
 **Zero mismatches anywhere.** Artifacts: `results/audit_roworder_<bench>.json`.
 
@@ -641,14 +641,10 @@ benchmarks. Extended:
 2. **Only ARC and HellaSwag sample both identity-column schema generations.** The other three drew
    entirely from gen-B/C, so they do not independently exercise the cross-generation drift that
    produced an empty intersection in Phase 0 — that hazard is tested by ARC and HellaSwag only.
-3. The HellaSwag row reports **12**, not the larger samples, because 12 is what the committed
-   artifact contains. Two larger HellaSwag runs (15 and 20 models) did complete with zero
-   mismatches, but the environment terminated later attempts before their artifacts were
-   finalised, and a number whose only trace is a scrollback log does not meet this project's
-   own provenance rule. The 12-model artifact is `complete: false` (the run was cut at 12 of a
-   requested 15) but `audit_ran: true`, and it spans both schema generations. Reproduce with
-   `python src/audit_roworder.py hellaswag 15`; runs at N≥25 do not survive, since HellaSwag
-   reads 10,042 question texts per model.
+3. HellaSwag's sample is the smallest at 15, because it reads 10,042 question texts per model
+   and repeated attempts at N≥25 were terminated by the environment before completing. The
+   committed artifact is `complete: true, audit_ran: true` and spans both schema generations.
+   Reproduce with `python src/audit_roworder.py hellaswag 15`.
 
 Direction of the residual risk, unchanged: an undetected misalignment makes one model's row look
 independent of every other, biasing correlation estimates *toward zero*. This failure mode would

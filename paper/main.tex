@@ -265,8 +265,8 @@ harness stored a dataset identifier in mid-2023 and the raw question text therea
 identifier join returns an \emph{empty} intersection. The accuracy field also moved into a nested
 \texttt{metrics} struct in the 2024 schema. We resolve item identity by row index, licensed by
 explicit verification --- across all five benchmarks, row order was identical for every one of
-$\approx320$ models sampled evenly over July 2023 to May 2024, with zero mismatches (ARC
-$149/149$, TruthfulQA $60/60$, GSM8K $60/60$, Winogrande $40/40$, HellaSwag $12/12$) --- and
+$324$ models sampled evenly over July 2023 to May 2024, with zero mismatches (ARC
+$149/149$, TruthfulQA $60/60$, GSM8K $60/60$, Winogrande $40/40$, HellaSwag $15/15$) --- and
 enforce a row-count guard on every read. Two limits are worth stating: this is a sample of
 $\approx1{,}400$ models, and only the ARC and HellaSwag samples span both identity-column schema
 generations, so those two are what actually exercise the drift described above. An undetected
