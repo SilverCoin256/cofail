@@ -75,7 +75,9 @@ This is licensed by a row-order verification (`src/audit_roworder.py`, artifact
 evenly across 2023-07-18 – 2024-05-30 had byte-identical item ordering, covering both
 identity-column schema generations (28 models where the identity field is `query`, 121 where it
 is `example`). One model was unreadable due to a transient network error. A row-count guard runs
-on every read.
+on every read. **The audit was initially run on ARC only**, although the item-identity claim
+covers all five benchmarks; the remaining four are being audited and their results appear in
+`results/audit_roworder_<bench>.json` as they complete.
 
 **This is a sample of ~1,400 models, not a proof.** A single undetected misalignment would bias
 every correlation estimate toward zero — i.e. toward the null, so this failure mode would

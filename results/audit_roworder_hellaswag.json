@@ -1,0 +1,97 @@
+{
+ "benchmark": "hellaswag",
+ "complete": true,
+ "n_requested": 30,
+ "n_checked": 0,
+ "reference_model": null,
+ "reference_gen": null,
+ "n_items": 0,
+ "schema_generations_seen": {},
+ "n_aligned": 0,
+ "n_mismatched": 0,
+ "alignment_rate": null,
+ "mismatches": [],
+ "n_errors": 30,
+ "errors": [
+  {
+   "model": "open-llm-leaderboard-old/details_AlekseyKorshuk__chatml-pyg-v1",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_MBZUAI__lamini-cerebras-111m",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Aspik101__trurl-2-7b-pl-instruct_unload",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Danielbrdz__CodeBarcenas-7b",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_CHIH-HUNG__llama-2-13b-FINETUNE4_3.8w-r16-gate_up_down",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_CHIH-HUNG__llama-2-13b-FINETUNE5_4w-r16-q_k_v_o",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Danielbrdz__Barcenas-3b",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_AA051610__A11P",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Azazelle__smol_bruin-7b",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_AA051610__A0106",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Cartinoe5930__iDUS",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_AA051612__A0123",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Charlie911__vicuna-7b-v1.5-lora-mmlu-merged",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_LDCC__LDCC-SOLAR-10.7B",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_BFauber__lora_opt6.7b_10e5",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Changgil__k2s3_test_24001",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_AbacusResearch__haLLawa4-7b",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_CorticalStack__crown-clown-7b-slerp",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_AiMavenAi__Prometheus-1.3",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  },
+  {
+   "model": "open-llm-leaderboard-old/details_Abhaykoul__qwen1.5-vortex",
+   "error": "ConnectError: [Errno 8] nodename nor servname provided, or not known"
+  }
+ ]
+}
