@@ -565,3 +565,33 @@ searched (judge-panel construction beyond Kohli/Kim, monoculture literature sinc
 exhaustive GitHub/PyPI trawl) might still find — those queries returned only secondary context
 (other papers' related-work sections, leaderboard redundancy figures) that was not independently
 verified and is recorded as leads, not claims, in the ledger.
+
+## X7 correction — v2 access is gated, not just large (2026-08-07)
+
+The X7 feasibility check above measured **file size only** (via API metadata) and concluded the v2
+replication was a size/bandwidth problem. Attempting the actual harvest, after the user authorized
+the scoped ~2.8GB download, surfaced a second, more fundamental blocker that the size-only check
+never touched: **v2 `-details` datasets are gated** (`api.dataset_info(...).gated == "auto"`),
+returning `401 GatedRepoError` on every content request. v1 (`open-llm-leaderboard-old`) is
+`gated: False` and worked anonymously all session, which is why this was never surfaced before now.
+
+`gated: "auto"` typically means any authenticated HuggingFace account that accepts the dataset's
+terms gets automatic access — this is not a high-friction manual-review gate — but it still
+requires (a) an HF account, (b) accepting terms on the `open-llm-leaderboard` org's datasets, and
+(c) an access token supplied to the harvest environment. None of that was disclosed when the user
+approved the download, because the check that informed the ask never exercised real content
+access, only `list_repo_files`/size metadata (which apparently doesn't require the same auth).
+
+**Correction to the record, not just an update:** the "Consequences for the roadmap" section above
+is still right about scope (ARC-Challenge + GPQA, ~300 models, drop MMLU-Pro) but understated the
+blocker. This is now flagged as an open decision for the user rather than executed unprompted:
+supplying an HF access token is not equivalent to a password or financial credential, but it is a
+new requirement beyond what was approved, discovered only after the ask, so it goes back to the
+user rather than being assumed.
+
+`src/harvest_v2_arc.py` is written and ready (scoped to n_models, checkpointed every 10 models,
+same rate-limiter as the v1 harvesters) but has not run past the gating wall. Its field-name
+parsing for v2's `samples_leaderboard_arc_challenge_*.json` records (`acc`/`acc_norm` vs
+`predictions`/`target` fallback) is also **unverified against a real record** — the one real file
+this session touched (`01-ai__Yi-34B`) failed at the auth step before parsing could be tested, so
+that logic should be treated as untested until a real file is successfully read.
