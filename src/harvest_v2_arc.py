@@ -12,7 +12,10 @@ fields needed for a binary correctness matrix (predicted answer index, gold inde
 memory -- the raw JSON is not retained after parsing, only the parsed correctness bit per item.
 
 Run: ./.venv/bin/python src/harvest_v2_arc.py [n_models]
-  -> substrate/raw/arc_v2.npz, substrate/v2_arc_rejects.json, substrate/v2_arc_manifest.json
+Status as of 2026-08-07: blocked on HF auth (v2 details datasets are gated; see
+docs/NEURIPS_BLUEPRINT.md, "X7 correction"). Output paths are defined in main() below and do
+not exist yet -- do not add them as literal paths here until a run has actually produced them,
+per this project's own dangling-reference discipline (tests/test_no_dangling_refs.py).
 """
 import json, os, re, sys, time
 import numpy as np
