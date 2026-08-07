@@ -1,5 +1,22 @@
 # Target venue shortlist
 
+**Superseded as the sole strategy — 2026-08-07.** This document was written when the only target
+under consideration was a Q2 statistics journal. Since then the project ran a full adversarial
+NeurIPS-readiness audit (`docs/NEURIPS_BLUEPRINT.md`) and built a submittable 4-page workshop cut
+(`paper/workshop.tex`). **The two tracks do not conflict** — a NeurIPS workshop is non-archival, so
+submitting there does not block or compete with a journal submission — and the current plan runs
+both in parallel:
+
+1. **NeurIPS 2026 workshop, time-sensitive.** Suggested contribution deadline ~Aug 29, 2026 (AoE);
+   `paper/workshop.tex` is ready. This is the higher-priority, deadline-bound item right now.
+2. **The journal track below, not time-sensitive.** Everything in this document remains the
+   correct analysis for that track and has not been re-verified or invalidated by the pivot — it
+   just stopped being the *only* plan.
+
+The "before submitting" checklist at the bottom is now stale in one place: the tier-2 response
+analysis it lists as outstanding was run on 2026-07-26 (kill condition K7 fired; see
+`results/RESULTS_DIGEST.md`). Struck through below rather than deleted.
+
 **Provenance caveat.** The workflow agent tasked with verifying venues died on a session limit,
 so this rests on my own searches, and only the two ranked entries below were verified against a
 citable source. Everything marked *unverified* needs checking before submission. Scimago blocks
@@ -76,4 +93,10 @@ sold as a **bridge and a measurement**, not a discovery — which is how it is n
   author with no institutional agreement.
 - Check the journal's AI-disclosure policy against the statement in `paper/main.tex`; COPE
   guidance (AI cannot be an author, use must be disclosed) is already followed.
-- Run the tier-2 response analysis or cut its forward reference from the limitations section.
+- ~~Run the tier-2 response analysis or cut its forward reference from the limitations section.~~
+  **Done 2026-07-26** — K7 fired (the accuracy-agreement claim survives conditioning, reported as
+  robust); see `paper/main.tex` Section 6.8 and `results/RESULTS_DIGEST.md`.
+- The manuscript now also cites two 2026 papers found in a later novelty sweep (Kim 2026, Sha &
+  Zhao 2026 "BenchScope") that a journal reviewer in this space would very plausibly know; the
+  paper already positions against both (see `docs/PRIOR_ART_LEDGER.md`), so no action needed here
+  beyond being aware a reviewer may raise them independently.
