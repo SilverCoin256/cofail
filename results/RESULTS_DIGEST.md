@@ -671,3 +671,50 @@ cross-checked against the actual arXiv PDF):
 Both cited in `paper/main.tex` §6.2/§6.1 and `paper/workshop.tex` §1/§4. Full detail in
 `docs/PRIOR_ART_LEDGER.md`. Both papers recompile clean at 15pp/4pp, zero undefined citations,
 17 tests pass.
+
+## Full visual read-through: seven real defects found and fixed (2026-07-31/08-07)
+
+Given the directive to finish the paper properly, both compiled PDFs were read end-to-end as a
+reviewer would -- text extraction plus rendering every page to an image and inspecting it, not
+just grepping the source. pdftotext alone had already been shown this session to miss real
+defects (a hidden author block does not show up as missing text; it shows up as a blank region
+a text dump can't represent). Seven confirmed, real defects were found this way, none caught by
+the automated provenance tests because they are not about numbers:
+
+1. **workshop.tex had no author at all** (`\author{}`), inconsistent with the project's
+   throughout-disclosed-authorship posture and with `main.tex`. Fixed.
+2. **workshop.tex's author block was rendered invisible** by a `\vspace{-2.5em}` immediately
+   after `\maketitle` that pulled the abstract up over it. Caught only by rendering the page to
+   an image and looking -- pdftotext silently produced a plausible-looking (but wrong) dump.
+   Removed.
+3. **Table 1's HellaSwag mean accuracy (0.613) used the post-filter population** while the other
+   four benchmarks in the same table used pre-filter -- an apples-to-oranges error within the
+   paper's own table, not a mismatch with the digest. Fixed to 0.581 (pre-filter, matching the
+   other four); table caption narrowed to state precisely what is and isn't post-filter.
+4. **Section 6.3 "What survives: effective independence" had no prose** -- heading, then
+   straight to a table and figure, then straight into the next section's caveat. Added the
+   missing interpretive paragraph.
+5. **"Proposition 3" was cited four times with no Proposition ever defined** --
+   `\newtheorem{proposition}` was declared but never instantiated; the content it should have
+   pointed to existed only as unformalized prose (the Fleiss-agreement / composition-preserving-
+   null degeneracy result). Formalized as Lemma 3, matching the paper's own Lemma 1/Lemma 2
+   pattern exactly (statement, proof, then constructive numerical verification), and repointed
+   all four references. The unused `\newtheorem{proposition}` declaration was removed.
+6. **The Kim et al. (2025) bibliography entry was missing its author names** -- the citation
+   label `[Kim et al.(2025)]` was intact (so every in-text `\citet`/`\citeauthor` rendered fine)
+   but the reference-list body just started with the title. This is the paper's primary
+   empirical antecedent (the 349-model correlated-errors study). Authors verified independently
+   via WebFetch of the arXiv abstract page AND a separate WebSearch cross-check (Semantic
+   Scholar, OpenReview, a GitHub paper-notes issue) before writing them in: Elliot Kim, Avi Garg,
+   Kenny Peng, Nikhil Garg; ICML 2025.
+7. **Four bibliography entries were out of alphabetical order**, all self-inflicted this session
+   by inserting new `\bibitem` lines after a chosen anchor without checking full-list order
+   (Sha & Zhao wedged between Besag and Bommasani; Cheverud before Carstens; Kim(2026) after
+   Kohli; Kuder & Richardson after Kuncheva). Fixed by parsing and re-sorting the entire
+   35-entry block programmatically rather than by hand, to avoid a transcription error in the
+   rewrite; verified programmatically afterward (0 violations) and by rendering the bibliography
+   pages as images.
+
+All seven confirmed by direct inspection (source diff, recompiled PDF, or both) before being
+called fixed. Both papers recompile clean with zero LaTeX errors and zero undefined citations
+throughout: `main.tex` 16pp, `workshop.tex` 4pp. 17 tests pass.

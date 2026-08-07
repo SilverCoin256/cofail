@@ -11,7 +11,6 @@
 \usepackage{natbib}
 
 \newtheorem{lemma}{Lemma}
-\newtheorem{proposition}{Proposition}
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}
 
@@ -204,16 +203,32 @@ strictly positive whenever items differ in difficulty, including when every mode
 independently. The asymptotic statement is the de Finetti / beta-binomial identity, and
 \citet{yule1903} is the classical warning about association induced by mixing.
 
-For multi-category responses the analogous statistic --- the rate at which two models give the
-same wrong answer given both are wrong, as used by \citet{kim2025correlated} against a uniform
-$1/(K-1)$ baseline --- is Fleiss's observed agreement \citep{fleiss1971},
-$\sum_m\sum_k n_{mk}(n_{mk}-1)/\sum_m n_m(n_m-1)$, and depends on the per-item response
-composition alone. In a simulation where models err \emph{conditionally independently} given the
-item, drawing from a shared per-item distractor-attractiveness distribution, we observe agreement
-$0.5567$ against a uniform baseline of $0.3333$ --- an apparent excess of $+0.2233$ --- while the
-excess over the composition-preserving null is $-1.1\times10^{-16}$. This is the founding premise
-of answer-copying detection \citep{wollack1997,vanderlinden2006}, and we restate it rather than
-claim it.
+For multi-category responses the analogous statistic is Fleiss's observed agreement
+\citep{fleiss1971}, the rate at which two models give the same wrong answer given both are wrong
+--- the statistic \citet{kim2025correlated} compare against a uniform $1/(K-1)$ baseline.
+
+\begin{lemma}[Agreement-given-both-wrong depends only on per-item response composition]
+\label{lem:fleiss}
+Let $n_{mk}$ be the number of models choosing option $k$ on item $m$ and $n_m=\sum_k n_{mk}$ the
+number of models observed on that item. Then the mean pairwise same-answer rate is
+\[
+A \;=\; \frac{\sum_m\sum_k n_{mk}(n_{mk}-1)}{\sum_m n_m(n_m-1)},
+\]
+a function of the per-item response composition $\{n_{mk}\}_k$ alone; consequently any
+randomisation that preserves each item's response composition --- permuting which model gave
+which recorded answer, item by item --- leaves $A$ exactly invariant, with zero variance.
+\end{lemma}
+
+\noindent The proof is the multi-category analogue of Lemma~\ref{lem:mean}: $A$ is a
+sum-of-squares statistic over the $\{n_{mk}\}$ counts alone, so it is a deterministic function of
+those counts and invariant under any relabelling that preserves them. We verify this
+constructively rather than restating it abstractly: in a simulation where models err
+\emph{conditionally independently} given the item, drawing from a shared per-item
+distractor-attractiveness distribution, restricted to the subset where both models are wrong we
+observe agreement $0.5567$ against a uniform baseline of $0.3333$ --- an apparent excess of
+$+0.2233$ --- while the excess over the composition-preserving null implied by
+Lemma~\ref{lem:fleiss} is $-1.1\times10^{-16}$. This is the founding premise of answer-copying
+detection \citep{wollack1997,vanderlinden2006}, and we restate it rather than claim it.
 
 \paragraph{Why restate known results.} Because the model-evaluation literature cites none of
 them, and because the three statements are the same theorem in three notations. Making the
@@ -293,10 +308,11 @@ ARC-Challenge & 1362 & 1165 & 0.527 & 2023-07 -- 2024-06 \\
 Winogrande & 1361 & 1267 & 0.734 & 2023-09 -- 2024-06 \\
 TruthfulQA (mc1) & 1334 & 786 & 0.368 & 2023-07 -- 2024-06 \\
 GSM8K & 1228 & 1319 & 0.348 & 2023-09 -- 2024-06 \\
-HellaSwag & 1362 & 9404 & 0.613 & 2023-07 -- 2024-06 \\
+HellaSwag & 1362 & 9404 & 0.581 & 2023-07 -- 2024-06 \\
 \bottomrule
 \end{tabular}
-\caption{Substrate after removing degenerate rows and columns. For comparison,
+\caption{Model and item counts after removing degenerate rows and columns; mean accuracy is
+over the full pre-filter matrix. For comparison,
 \citet{jo2026subjectivity} analyse 451 models, \citet{kim2025correlated} 349.}
 \label{tab:data}
 \end{table}
@@ -346,6 +362,18 @@ HellaSwag & $5.098\times10^{-3}$ & $5.085\times10^{-3}$ & $+10.6$ & $1.002$ \\
 \end{table}
 
 \subsection{What survives: effective independence}
+\label{sec:survives}
+
+Conditioning on the margins removes everything Lemma~\ref{lem:mean} and Lemma~\ref{lem:alpha}
+describe, yet the residual spectrum of $D$ is far from flat. Table~\ref{tab:neff} reports the
+participation ratio of that spectrum against its exact-margin null on all five benchmarks: the
+observed value sits at $2.8$--$21.4\%$ of the null, a gap of the same order everywhere despite the
+benchmarks spanning a $12\times$ range in item count. The last column shows why this comparison
+must be calibrated rather than read off directly --- the raw, unconditioned participation ratio
+is $1.5$--$3.6$ on every benchmark, a number driven almost entirely by the single shared
+item-difficulty eigenvalue that conditioning is designed to remove. Only once that eigenvalue is
+subtracted out does the residual gap become visible at all. What that gap means --- and what it
+does not license claiming --- is the subject of the rest of this section.
 
 \begin{table}[t]\centering\small
 \begin{tabular}{lrrrrr}
@@ -577,10 +605,10 @@ on column-shuffled real data $-1.33$.
 \subsection{Real responses: the accuracy--agreement claim survives conditioning}
 \label{sec:h4}
 
-Everything above concerns \emph{correctness} (binary failure). Section~\ref{sec:degeneracy}'s
-Proposition 3 concerns \emph{which wrong answer} two models give, and predicted --- and, in
-simulation, demonstrated --- that this can look like ``more correlated errors'' purely from
-per-item distractor attractiveness, with no shared behaviour at all. We pre-registered a direct
+Everything above concerns \emph{correctness} (binary failure). Lemma~\ref{lem:fleiss}
+(Section~\ref{sec:degeneracy}) concerns \emph{which wrong answer} two models give, and predicted
+--- and, in simulation, demonstrated --- that this can look like ``more correlated errors''
+purely from per-item distractor attractiveness, with no shared behaviour at all. We pre-registered a direct
 test of whether that critique undermines \citet{kim2025correlated}'s specific empirical claim,
 with a kill condition (K7) stated in advance: if the accuracy--agreement slope survives margin
 conditioning with confidence interval excluding zero, our critique does not apply here, and we
@@ -599,7 +627,7 @@ per the pre-registration.
 
 Two things are true at once, and both matter. The mean-level excess vanishes:
 $0.7332$ observed versus $0.7324$ expected under conditional independence
-($+0.00085$), essentially zero, echoing Proposition 3's degeneracy result. But the
+($+0.00085$), essentially zero, echoing Lemma~\ref{lem:fleiss}'s degeneracy result. But the
 \emph{relationship between accuracy and agreement} is not a mean-level statistic, and it is not
 absorbed by the same conditioning. Composition-based conditioning and accuracy-slope
 conditioning are different operations; only the latter bears on \citeauthor{kim2025correlated}'s
@@ -680,12 +708,12 @@ against a $40\%$ threshold, with $315$ of $1{,}362$ model repositories no longer
 so the lineage decomposition is dropped rather than estimated on a biased subset.
 
 Section~\ref{sec:h4}'s real-response result is a limitation on the paper's own critique, stated
-plainly: Proposition 3 shows composition alone \emph{can} manufacture apparent agreement, but on
-real ARC responses the specific published claim it was aimed at does not turn out to be an
-instance of that artifact. The two findings do not contradict --- they concern different
-statistics, mean-level agreement versus the accuracy--agreement slope --- but a reader taking
-only the abstract's mention of Proposition 3 could reasonably expect more debunking than the
-data supports, which is why the full result is reported in Section~\ref{sec:h4} rather than
+plainly: Lemma~\ref{lem:fleiss} shows composition alone \emph{can} manufacture apparent
+agreement, but on real ARC responses the specific published claim it was aimed at does not turn
+out to be an instance of that artifact. The two findings do not contradict --- they concern
+different statistics, mean-level agreement versus the accuracy--agreement slope --- but a reader
+taking only the abstract's mention of this degeneracy could reasonably expect more debunking than
+the data supports, which is why the full result is reported in Section~\ref{sec:h4} rather than
 folded silently into the mean-level finding.
 
 \section{Reproducibility and use of AI assistance}
@@ -718,10 +746,9 @@ with COPE guidance that AI tools cannot be authors.
 \small
 \bibitem[Andersen(1973)]{andersen1973} E.~B. Andersen. A goodness of fit test for the Rasch model. \emph{Psychometrika}, 38:123--140, 1973.
 \bibitem[Besag \& Clifford(1989)]{besag1989} J.~Besag and P.~Clifford. Generalized Monte Carlo significance tests. \emph{Biometrika}, 76:633--642, 1989.
-\bibitem[Sha \& Zhao(2026)]{benchscope2026} T.~Sha and S.~Zhao. BenchScope: How many independent signals does your benchmark provide? \emph{arXiv:2603.29357}, 2026.
 \bibitem[Bommasani et al.(2022)]{bommasani2022homogenization} R.~Bommasani, K.~A. Creel, A.~Kumar, D.~Jurafsky, and P.~Liang. Picking on the same person: Does algorithmic monoculture homogenize outcomes? \emph{NeurIPS}, 2022.
-\bibitem[Cheverud(2001)]{cheverud2001} J.~M. Cheverud. A simple correction for multiple comparisons in interval mapping genome scans. \emph{Heredity}, 87:52--58, 2001.
 \bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015. Erratum: \emph{Phys.\ Rev.\ E} 94:039902, 2016.
+\bibitem[Cheverud(2001)]{cheverud2001} J.~M. Cheverud. A simple correction for multiple comparisons in interval mapping genome scans. \emph{Heredity}, 87:52--58, 2001.
 \bibitem[Colwell \& Winkler(1984)]{colwell1984} R.~K. Colwell and D.~W. Winkler. A null model for null models in biogeography. In \emph{Ecological Communities: Conceptual Issues and the Evidence}, pages 344--359. Princeton University Press, 1984.
 \bibitem[Connor \& Simberloff(1979)]{connor1979} E.~F. Connor and D.~Simberloff. The assembly of species communities: chance or competition? \emph{Ecology}, 60:1132--1140, 1979.
 \bibitem[Cronbach(1951)]{cronbach1951} L.~J. Cronbach. Coefficient alpha and the internal structure of tests. \emph{Psychometrika}, 16:297--334, 1951.
@@ -729,12 +756,12 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Gotelli(2000)]{gotelli2000} N.~J. Gotelli. Null model analysis of species co-occurrence patterns. \emph{Ecology}, 81(9):2606--2621, 2000.
 \bibitem[Gotelli \& Ulrich(2012)]{gotelliulrich2012} N.~J. Gotelli and W.~Ulrich. Statistical challenges in null model analysis. \emph{Oikos}, 121:171--180, 2012.
 \bibitem[Jo et al.(2026)]{jo2026subjectivity} N.~Jo, N.~Garg, and M.~Raghavan. The subjectivity of monoculture. \emph{arXiv:2602.24086}, 2026.
-\bibitem[Kim et al.(2025)]{kim2025correlated} Correlated errors in large language models. \emph{arXiv:2506.07962}, 2025.
+\bibitem[Kim et al.(2025)]{kim2025correlated} E.~Kim, A.~Garg, K.~Peng, and N.~Garg. Correlated errors in large language models. \emph{ICML}, 2025.
+\bibitem[Kim(2026)]{kim2026diversity} D.~Kim. Are diversity metrics measuring diversity? A capability-controlled audit of majority-vote gain in LLM ensembles. \emph{arXiv:2607.20768}, 2026.
 \bibitem[Kleinberg \& Raghavan(2021)]{kleinberg2021monoculture} J.~Kleinberg and M.~Raghavan. Algorithmic monoculture and social welfare. \emph{PNAS}, 118(22), 2021.
 \bibitem[Kohli(2026)]{kohli2026nine} G.~Kohli. Nine judges, two effective votes: Correlated errors undermine LLM evaluation panels. \emph{arXiv:2605.29800}, 2026.
-\bibitem[Kim(2026)]{kim2026diversity} D.~Kim. Are diversity metrics measuring diversity? A capability-controlled audit of majority-vote gain in LLM ensembles. \emph{arXiv:2607.20768}, 2026.
-\bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Kuder \& Richardson(1937)]{kuder1937} G.~F. Kuder and M.~W. Richardson. The theory of the estimation of test reliability. \emph{Psychometrika}, 2:151--160, 1937.
+\bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Laloux et al.(1999)]{laloux1999} L.~Laloux, P.~Cizeau, J.-P. Bouchaud, and M.~Potters. Noise dressing of financial correlation matrices. \emph{Physical Review Letters}, 83:1467, 1999.
 \bibitem[Li \& Ji(2005)]{liji2005} J.~Li and L.~Ji. Adjusting multiple testing in multilocus analyses using the eigenvalues of a correlation matrix. \emph{Heredity}, 95:221--227, 2005.
 \bibitem[Linacre(1998)]{linacre1998} J.~M. Linacre. Structure in Rasch residuals: why principal components analysis? \emph{Rasch Measurement Transactions}, 12:636, 1998.
@@ -746,6 +773,7 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Ponocny(2001)]{ponocny2001} I.~Ponocny. Nonparametric goodness-of-fit tests for the Rasch model. \emph{Psychometrika}, 66:437--460, 2001.
 \bibitem[Rasch(1960)]{rasch1960} G.~Rasch. \emph{Probabilistic Models for Some Intelligence and Attainment Tests}. Danmarks P\ae dagogiske Institut, 1960.
 \bibitem[Schluter(1984)]{schluter1984} D.~Schluter. A variance test for detecting species associations, with some example applications. \emph{Ecology}, 65:998--1005, 1984.
+\bibitem[Sha \& Zhao(2026)]{benchscope2026} T.~Sha and S.~Zhao. BenchScope: How many independent signals does your benchmark provide? \emph{arXiv:2603.29357}, 2026.
 \bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
 \bibitem[van der Linden \& Sotaridona(2006)]{vanderlinden2006} W.~J. van der Linden and L.~Sotaridona. Detecting answer copying when the regular response process follows a known response model. \emph{Journal of Educational and Behavioral Statistics}, 31:283--304, 2006.
 \bibitem[Verhelst(2008)]{verhelst2008} N.~D. Verhelst. An efficient MCMC algorithm to sample binary matrices with fixed marginals. \emph{Psychometrika}, 73:705--728, 2008.
