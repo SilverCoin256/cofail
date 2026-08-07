@@ -14,11 +14,11 @@ there is no metadata form to fill in and no zip file to build or upload by hand.
    — no new password to create).
 2. Under your account → **GitHub**, find `SilverCoin256/cofail` in the repository list and flip
    its toggle **on**.
-3. Back in GitHub, cut a release: `gh release create v1.0.0 --title "v1.0.0" --notes "First
-   archived release: paper, substrate, code, pre-registration."` (or use the GitHub web UI —
-   Releases → Draft a new release). **This is a public, visible action — confirm you want to do
-   it before running the command; I have not run it.**
-4. Zenodo detects the release, archives the repo automatically, mints a DOI, and reads
+3. A **draft** release, `v1.0.0`, is already prepared and waiting at
+   https://github.com/SilverCoin256/cofail/releases — draft releases are private (visible only
+   to repo collaborators, not the public, and don't trigger Zenodo) until you click **Publish
+   release**. Review it, then publish when ready — that's the only remaining action here.
+4. Zenodo detects the (now-published) release, archives the repo automatically, mints a DOI, and reads
    `.zenodo.json` for the deposit metadata. Takes a minute or two.
 5. Add the resulting DOI badge to `README.md` (a one-line edit I can make once you have the DOI).
 

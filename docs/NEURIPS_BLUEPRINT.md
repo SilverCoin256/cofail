@@ -595,3 +595,24 @@ parsing for v2's `samples_leaderboard_arc_challenge_*.json` records (`acc`/`acc_
 `predictions`/`target` fallback) is also **unverified against a real record** — the one real file
 this session touched (`01-ai__Yi-34B`) failed at the auth step before parsing could be tested, so
 that logic should be treated as untested until a real file is successfully read.
+
+## v2 ungated-mirror check — negative result, recorded (2026-08-07)
+
+Before accepting the HF-auth blocker as final, checked whether any ungated mirror of v2 per-item
+data exists. Two candidates found and inspected directly (both genuinely `gated: False`):
+`open-llm-leaderboard/results` (per-model `results_*.json`, ~120 KB each) and
+`open-llm-leaderboard/contents` (single parquet, 4,576 rows). **Both are aggregate-only** — the
+`contents` parquet's columns are per-benchmark summary scores (IFEval, BBH, MATH Lvl 5, GPQA,
+MUSR, MMLU-PRO), and each `results_*.json`'s `results` key holds aggregate metric dicts, not
+per-item correctness. Neither contains the per-item detail the co-failure analysis needs; that
+lives only in the gated `<model>-details` repos' `samples_*.json` files. The HF-auth blocker
+stands; there is no ungated workaround.
+
+## GitHub release prepared as a draft, not published (2026-08-07)
+
+`gh release create v1.0.0 --draft` run to reduce the Zenodo-activation step to one click. Verified
+`isDraft: true` via `gh release view`: draft releases are private to repo collaborators, are not
+included in the public releases feed, and do not trigger Zenodo's release webhook, so nothing was
+published or made publicly visible. The user's remaining action is exactly one click ("Publish
+release") once they've toggled the repo on at zenodo.org — everything else that can be prepared
+without their account credentials now is.
