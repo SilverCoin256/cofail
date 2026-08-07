@@ -1,0 +1,6 @@
+# Exclude the reconstructed ARC answer key from archival snapshots (Zenodo, git-archive).
+# It stays in the working tree and in normal git history/clones; this only affects
+# `git archive` and Zenodo's GitHub auto-archival, which uses git archive under the hood.
+# Recovery code (src/harvest_responses.py, src/responses_analysis.py) is unaffected and
+# lets anyone regenerate this file themselves. See docs/DATASHEET.md section 6.
+substrate/raw/arc_resp.npz export-ignore
