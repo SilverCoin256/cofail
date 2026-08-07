@@ -10,7 +10,8 @@ name: Layer C monitor
 #
 # Manual runs (workflow_dispatch) are for on-demand refreshes; the schedule is the actual
 # "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show, including
-# the large-backlog gradual-catchup behaviour introduced after the first scheduled run failed.
+# the large-backlog gradual-catchup behaviour introduced after the first scheduled run failed,
+# and the 2026-08-07 postmortem on push-race handling below.
 
 on:
   schedule:
@@ -42,6 +43,28 @@ jobs:
         run: |
           git config user.name "layer-c-bot"
           git config user.email "actions@users.noreply.github.com"
+          # 2026-08-07 postmortem: a 30-minute ARC harvest step (800 new models, 0 rejects,
+          # fully successful) was lost in its entirety because `git push` was rejected --
+          # main had moved (an unrelated same-day commit landed on main while this job was
+          # mid-flight) and the step had no retry logic, so the job failed and the runner
+          # tore down with the harvested delta committed only locally. This function wraps
+          # every push in this workflow: on rejection, fetch + rebase onto the new tip and
+          # retry. Safe here because each step's own changes touch only its own paths
+          # (substrate/<bench>.npz, or results/+figures/+CHANGELOG.md in the final step),
+          # so a concurrent push touching other files rebases cleanly with no real conflict.
+          cat > /tmp/push_with_retry.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -e
+          for i in 1 2 3 4 5; do
+            if git push; then exit 0; fi
+            echo "push rejected (attempt $i/5), fetching and rebasing onto the new tip"
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "push still rejected after 5 attempts" >&2
+          exit 1
+          EOF
+          chmod +x /tmp/push_with_retry.sh
 
       - name: Refresh model list (discover new models since last run)
         run: MM_REFRESH_MODELS=1 python src/harvest_manifest.py
@@ -64,12 +87,14 @@ jobs:
       # its share of the job's time budget; a large backlog then drains gradually across
       # several scheduled runs. Each benchmark is committed immediately after its own harvest
       # step, so a timeout on a later benchmark can no longer erase progress on an earlier one.
+      # Push goes through /tmp/push_with_retry.sh (see 2026-08-07 postmortem above) so a
+      # same-day push to main from elsewhere can no longer erase a completed harvest either.
       - name: Harvest and commit ARC
         run: |
           python src/harvest_matrix.py arc
           git add substrate/
           git diff --cached --quiet && echo "arc: nothing new" || git commit -m "Layer C: ARC harvest delta $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh
         env:
           MM_WORKERS: "6"
           MM_MAX_NEW: "800"
@@ -79,7 +104,7 @@ jobs:
           python src/harvest_matrix.py winogrande
           git add substrate/
           git diff --cached --quiet && echo "winogrande: nothing new" || git commit -m "Layer C: Winogrande harvest delta $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh
         env:
           MM_WORKERS: "6"
           MM_MAX_NEW: "800"
@@ -89,7 +114,7 @@ jobs:
           python src/harvest_matrix.py truthfulqa
           git add substrate/
           git diff --cached --quiet && echo "truthfulqa: nothing new" || git commit -m "Layer C: TruthfulQA harvest delta $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh
         env:
           MM_WORKERS: "6"
           MM_MAX_NEW: "800"
@@ -99,7 +124,7 @@ jobs:
           python src/harvest_matrix.py gsm8k
           git add substrate/
           git diff --cached --quiet && echo "gsm8k: nothing new" || git commit -m "Layer C: GSM8K harvest delta $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh
         env:
           MM_WORKERS: "6"
           MM_MAX_NEW: "800"
@@ -109,7 +134,7 @@ jobs:
           python src/harvest_matrix.py hellaswag
           git add substrate/
           git diff --cached --quiet && echo "hellaswag: nothing new" || git commit -m "Layer C: HellaSwag harvest delta $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh
         env:
           MM_WORKERS: "6"
           MM_MAX_NEW: "800"
@@ -125,4 +150,4 @@ jobs:
           git add results/ figures/ CHANGELOG.md
           git diff --cached --quiet && echo "nothing new this cycle" && exit 0
           git commit -m "Layer C monthly refresh: $(date -u +%Y-%m-%d)"
-          git push
+          /tmp/push_with_retry.sh

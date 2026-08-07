@@ -87,6 +87,26 @@ month as the backlog is worked down — this is gradual catch-up on a known back
 population growth in the underlying archive at that rate, and should be read as such if this
 document is being consulted from a future point.
 
+## Incident: the second scheduled run (2026-08-07) lost a fully successful ARC harvest to a push race
+
+Run 31183256418, launched to verify the fix above, worked exactly as designed through the ARC
+harvest itself: 30 minutes, 800 new models, 0 rejects, committed locally as `Layer C: ARC harvest
+delta 2026-08-07`. It then failed at `git push` — `! [rejected] main -> main (fetch first)` —
+because an unrelated commit (a documentation fix, made from outside the workflow while the job was
+mid-flight) had landed on `main` in the interim. The step had no retry logic, so the job failed,
+every later benchmark step showed `skipped`, and the completed 800-model ARC delta — which existed
+only in the runner's local commit — was gone the moment the runner tore down. Mechanically the same
+failure mode as the 2026-08-03 incident (real, checkpointed work not reaching the repository), with
+a different trigger: not a timeout this time, but a same-day push from elsewhere.
+
+**Fix (2026-08-07).** Every `git push` in `.github/workflows/layer_c_monitor.yml` now goes through
+a small retry helper (written to `/tmp/push_with_retry.sh` in the "Configure git identity" step):
+on rejection, `git fetch origin main && git rebase origin/main`, then retry, up to 5 attempts. This
+is safe here specifically because each step's changes are confined to its own paths (one
+`substrate/<bench>.npz` per harvest step, or `results/` + `figures/` + `CHANGELOG.md` in the final
+step) — a concurrent push touching unrelated files rebases with no real conflict. The workflow was
+re-triggered manually to redo the lost ARC delta under the fixed logic.
+
 ```bash
 python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 ```
