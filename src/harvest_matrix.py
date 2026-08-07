@@ -87,6 +87,23 @@ def harvest(bench, manifest):
         print(f"[{bench}] resuming, {len(have)} cached", flush=True)
     todo = [(m, v[bench]) for m, v in manifest.items() if bench in v and m not in have]
 
+    # Bound a single invocation's work. Added after Layer C's first real scheduled run
+    # (2026-08-03): the archive had grown from ~1,362 to 7,038 candidate models since the
+    # original harvest, discovering ~5,600 new-to-us models in one go. At the realized
+    # throughput under GitHub Actions' rate limits (~0.3 models/s, far below this project's
+    # interactive-session throughput), that backlog does not fit in a single run at any
+    # timeout GitHub allows (360 min hard cap for hosted runners) -- the run was cancelled
+    # 2,300 models into ARC alone, and because the workflow only committed once at the very
+    # end, all of that progress was lost, not just delayed. Capping the per-run delta and
+    # committing after every benchmark (see .github/workflows/layer_c_monitor.yml) means a
+    # large backlog drains gradually across several scheduled runs instead of requiring one
+    # run to finish everything atomically or lose everything.
+    max_new = int(os.environ.get("MM_MAX_NEW", "0") or "0")
+    if max_new and len(todo) > max_new:
+        print(f"[{bench}] {len(todo)} new models discovered, capping this run to {max_new} "
+              f"(MM_MAX_NEW); remainder will be picked up on the next scheduled run", flush=True)
+        todo = todo[:max_new]
+
     # canonical row count = mode over a 40-model probe (never hardcoded)
     ncan = None
     rej = []

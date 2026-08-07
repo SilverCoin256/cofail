@@ -2,13 +2,15 @@ name: Layer C monitor
 
 # The longitudinal evidence engine. Runs independently of any one contributor's machine or any
 # one chat session: it re-checks the open-model archive for models added since the last run,
-# harvests only the delta (the existing harvesters cache/resume, so this costs nothing extra for
-# models already seen), recomputes the calibrated residual-concentration statistics, and commits
-# one dated row to results/timeseries.csv plus one CHANGELOG.md entry. This is what keeps
-# producing evidence after the paper is published, without a second research program.
+# harvests the delta in per-benchmark, size-capped, individually-committed steps (see the
+# 2026-08-03 postmortem inline below), recomputes the calibrated residual-concentration
+# statistics, and commits one dated row to results/timeseries.csv plus one CHANGELOG.md entry.
+# This is what keeps producing evidence after the paper is published, without a second research
+# program.
 #
 # Manual runs (workflow_dispatch) are for on-demand refreshes; the schedule is the actual
-# "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show.
+# "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show, including
+# the large-backlog gradual-catchup behaviour introduced after the first scheduled run failed.
 
 on:
   schedule:
@@ -25,7 +27,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 350   # GitHub's hard cap for hosted runners is 360; leave a small margin
     steps:
       - uses: actions/checkout@v4
 
@@ -36,15 +38,81 @@ jobs:
       - name: Install
         run: pip install -e ".[harvest]"
 
+      - name: Configure git identity for incremental commits
+        run: |
+          git config user.name "layer-c-bot"
+          git config user.email "actions@users.noreply.github.com"
+
       - name: Refresh model list (discover new models since last run)
         run: MM_REFRESH_MODELS=1 python src/harvest_manifest.py
         env:
           MM_WORKERS: "6"
 
-      - name: Harvest delta (existing .npz files cache; only new models are fetched)
-        run: python src/harvest_matrix.py arc winogrande truthfulqa gsm8k hellaswag
+      # Harvest and commit ONE BENCHMARK AT A TIME, not all five then commit once at the end.
+      #
+      # 2026-08-03 postmortem: the archive had grown from ~1,362 to 7,038 candidate models
+      # since the original harvest -- ~5,600 newly discovered in one run. At the throughput
+      # realized under GitHub Actions' rate limits (~0.3 models/s, far below this project's
+      # interactive-session throughput), that backlog does not fit in a single run at any
+      # timeout GitHub allows. The run was cancelled 2,300 models into ARC alone, and because
+      # the old workflow committed only once at the very end, all of that harvested progress
+      # was lost rather than merely delayed -- despite src/harvest_matrix.py itself already
+      # checkpointing to local disk every 100 models, that local checkpoint never reached git
+      # before the runner was torn down.
+      #
+      # MM_MAX_NEW bounds a single benchmark's per-run harvest so it reliably finishes inside
+      # its share of the job's time budget; a large backlog then drains gradually across
+      # several scheduled runs. Each benchmark is committed immediately after its own harvest
+      # step, so a timeout on a later benchmark can no longer erase progress on an earlier one.
+      - name: Harvest and commit ARC
+        run: |
+          python src/harvest_matrix.py arc
+          git add substrate/
+          git diff --cached --quiet && echo "arc: nothing new" || git commit -m "Layer C: ARC harvest delta $(date -u +%Y-%m-%d)"
+          git push
         env:
           MM_WORKERS: "6"
+          MM_MAX_NEW: "800"
+
+      - name: Harvest and commit Winogrande
+        run: |
+          python src/harvest_matrix.py winogrande
+          git add substrate/
+          git diff --cached --quiet && echo "winogrande: nothing new" || git commit -m "Layer C: Winogrande harvest delta $(date -u +%Y-%m-%d)"
+          git push
+        env:
+          MM_WORKERS: "6"
+          MM_MAX_NEW: "800"
+
+      - name: Harvest and commit TruthfulQA
+        run: |
+          python src/harvest_matrix.py truthfulqa
+          git add substrate/
+          git diff --cached --quiet && echo "truthfulqa: nothing new" || git commit -m "Layer C: TruthfulQA harvest delta $(date -u +%Y-%m-%d)"
+          git push
+        env:
+          MM_WORKERS: "6"
+          MM_MAX_NEW: "800"
+
+      - name: Harvest and commit GSM8K
+        run: |
+          python src/harvest_matrix.py gsm8k
+          git add substrate/
+          git diff --cached --quiet && echo "gsm8k: nothing new" || git commit -m "Layer C: GSM8K harvest delta $(date -u +%Y-%m-%d)"
+          git push
+        env:
+          MM_WORKERS: "6"
+          MM_MAX_NEW: "800"
+
+      - name: Harvest and commit HellaSwag
+        run: |
+          python src/harvest_matrix.py hellaswag
+          git add substrate/
+          git diff --cached --quiet && echo "hellaswag: nothing new" || git commit -m "Layer C: HellaSwag harvest delta $(date -u +%Y-%m-%d)"
+          git push
+        env:
+          MM_WORKERS: "6"
+          MM_MAX_NEW: "800"
 
       - name: Run the monitor (recompute calibrated statistics, append timeseries + changelog)
         run: python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
@@ -52,11 +120,9 @@ jobs:
       - name: Regenerate the cohort figure
         run: python src/figures.py
 
-      - name: Commit results
+      - name: Commit timeseries, changelog, and figures
         run: |
-          git config user.name "layer-c-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add results/ substrate/ figures/ CHANGELOG.md
+          git add results/ figures/ CHANGELOG.md
           git diff --cached --quiet && echo "nothing new this cycle" && exit 0
           git commit -m "Layer C monthly refresh: $(date -u +%Y-%m-%d)"
           git push

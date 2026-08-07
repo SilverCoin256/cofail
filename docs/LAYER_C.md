@@ -52,10 +52,43 @@ same pre-registration discipline as the original paper (a dated, appended amendm
 - `CHANGELOG.md` — the same data, human-readable, in commit history.
 - `figures/fig9_cohort.pdf` — regenerated each run from the accumulated cohort data.
 
-## Running it manually
+## Incident: the first scheduled run (2026-08-03) was cancelled and lost its progress
+
+Layer C's very first real scheduled execution fired on schedule, ran for the full 180-minute
+timeout then in effect, and was cancelled by GitHub before it finished harvesting even one
+benchmark. **Nothing was committed** — `results/timeseries.csv` and `CHANGELOG.md` stayed frozen
+at their 2026-07-26 seed values, silently, with no alert. This was found on 2026-08-07 by
+checking `gh run list` directly, not by any monitoring this repository had in place.
+
+**Root cause.** The manifest refresh discovered the archive had grown from ~1,362 to **7,038**
+candidate models since the original harvest — roughly 5,600 newly seen at once. At the throughput
+realized under GitHub Actions' rate limits (~0.3 models/s, well below this project's interactive-
+session throughput), that backlog cannot be harvested in one run at any timeout GitHub allows (360
+minutes is the hard cap for hosted runners). The job was cancelled 2,300 models into the ARC
+harvest. `src/harvest_matrix.py` already checkpoints to local disk every 100 models — but the
+workflow committed to git only once, at the very end, after all five benchmarks and `monitor.py`
+were meant to finish. So three hours of real, completed harvest work existed only in the runner's
+ephemeral filesystem when it was torn down, and none of it reached the repository.
+
+**Fix (2026-08-07).** Two changes, both in this repository now:
+1. `src/harvest_matrix.py` gained an `MM_MAX_NEW` cap on how many newly discovered models a
+   single invocation processes for one benchmark, so a run finishes reliably within its time
+   budget instead of attempting the whole backlog at once.
+2. `.github/workflows/layer_c_monitor.yml` now harvests and **commits after every individual
+   benchmark**, not once at the end, and raised its timeout to 350 minutes (GitHub's practical
+   maximum). A large backlog now drains gradually, a few hundred models per benchmark per month,
+   and a timeout on a later benchmark can no longer erase progress already made and committed on
+   an earlier one.
+
+**Consequence, stated plainly.** At 800 new models per benchmark per scheduled run, absorbing the
+current ~5,600-model backlog will take roughly seven monthly cycles per benchmark in the worst
+case. During that window, `n_models` in `results/timeseries.csv` will visibly grow month over
+month as the backlog is worked down — this is gradual catch-up on a known backlog, not new
+population growth in the underlying archive at that rate, and should be read as such if this
+document is being consulted from a future point.
 
 ```bash
-python src/monitor.py arc winogrande truthfulqa gsm8k
+python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 ```
 
 Or trigger the GitHub Actions workflow directly from the repository's Actions tab
