@@ -50,7 +50,7 @@ refuted.
 
 What survives is second-order and large. On ARC, conditioning on the margins leaves residual
 correlation with root-mean-square $0.2483$ against $0.0449$ under the exact null --- a $5.5$-fold
-excess --- and five eigenvalues above the null spectral edge; across the five benchmarks the
+excess --- and six eigenvalues above the null spectral edge; across the five benchmarks the
 excess ranges from $2.9\times$ (GSM8K) to $11.9\times$ (HellaSwag). The effect is not an artifact
 of near-duplicate models: removing every model that agrees with a retained model above $0.95$
 discards $36$--$64\%$ of each population and moves these ratios by at most $1.14\times$. We deliberately do \emph{not} report this as an
@@ -419,7 +419,7 @@ license a count of independent models.
 The diagnostics that can tell them apart give a clear answer on ARC:
 $\lambda_1^2/\sum\lambda_k^2 = 0.540$ (one-factor $\approx0.99$, clone blocks $\approx0.10$);
 deflating the leading eigenvector raises PR only from $16.0$ to $46.8$, not to $\approx N$; and
-five observed eigenvalues exceed the null's maximum eigenvalue of $28.7$. We therefore report
+six observed eigenvalues exceed the null's maximum eigenvalue of $27.9$. We therefore report
 the primitive quantity, $\mathrm{rms}\,|R_{ij}| = 0.2483$ against $0.0449$ under the null, and
 the count of dimensions above the null spectral edge. The null value is the pooled mean of four
 dispersed curveball chains ($25$ draws each, $\hat R = 0.988$; Section~\ref{sec:robust}), and
@@ -451,7 +451,7 @@ Generating process & PR / PR$_{\text{null}}$ & rms $|R_{ij}|$ & $\lambda_1^2/\su
 two ability dimensions & $0.230$ & $0.162$ & $0.457$ & 3 \\
 20 exact clone clusters & $0.112$ & $0.234$ & $0.102$ & 19 \\
 \midrule
-\textbf{real ARC} & $\mathbf{0.052}$ & $\mathbf{0.248}$ & $\mathbf{0.540}$ & \textbf{5} \\
+\textbf{real ARC} & $\mathbf{0.052}$ & $\mathbf{0.248}$ & $\mathbf{0.540}$ & \textbf{6} \\
 \bottomrule
 \end{tabular}
 \caption{Discrimination heterogeneity alone cannot produce the observed effect. A
@@ -475,7 +475,7 @@ small number of extra ability dimensions is a substantial one, and the observed
 $\lambda_1^2/\sum\lambda^2 = 0.540$ sits near the two-dimensional case ($0.457$) and far from
 the clone case ($0.102$). We therefore state the finding as: after conditioning on item
 difficulty and unidimensional ability, open-model failure retains correlated structure of
-roughly five dimensions and a $5.5$-fold excess rms correlation on ARC ($2.9$--$11.9\times$ across
+roughly six dimensions and a $5.5$-fold excess rms correlation on ARC ($2.9$--$11.9\times$ across
 the five benchmarks), whose signature is that of additional latent ability dimensions rather than
 of duplicated models.
 
