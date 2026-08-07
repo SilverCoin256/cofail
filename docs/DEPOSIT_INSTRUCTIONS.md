@@ -22,13 +22,11 @@ there is no metadata form to fill in and no zip file to build or upload by hand.
    `.zenodo.json` for the deposit metadata. Takes a minute or two.
 5. Add the resulting DOI badge to `README.md` (a one-line edit I can make once you have the DOI).
 
-**Known limitation, already documented in `docs/DATASHEET.md`:** this archives the whole repo,
-including `substrate/`. The datasheet already states that ARC-Challenge is CC-BY-SA-4.0
-(share-alike) and that `substrate/raw/arc_resp.npz` (the reconstructed answer key) should not be
-publicly redistributed. **Before cutting the release, either confirm you're comfortable archiving
-`substrate/` as-is under the documented license caveats, or tell me and I'll add a
-`.gitattributes`/export-ignore rule to exclude `arc_resp.npz` from the archived snapshot** — the
-recovery code stays, only the reconstructed key is dropped.
+**Already handled:** the archived snapshot includes `substrate/`, and `docs/DATASHEET.md`
+documents that ARC-Challenge is CC-BY-SA-4.0 (share-alike). Per your decision, `.gitattributes`
+now excludes `substrate/raw/arc_resp.npz` (the reconstructed answer key) from the archive via
+`export-ignore` — the recovery code ships, the reconstructed key doesn't. Nothing further to
+decide here before publishing.
 
 ## OSF — pre-registration timestamp
 
