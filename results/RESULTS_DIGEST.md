@@ -178,7 +178,7 @@ the primitive quantities, which do discriminate (ARC):
 | rms \|R_ij\| | **0.2483** | 0.0389 | 6.4× excess residual correlation |
 | λ₁²/Σλ² | **0.540** | — | one-factor ≈0.99, clone blocks ≈0.10 |
 | PR after deflating λ₁ | **46.8** | — | one-factor would give ≈N=1362 |
-| eigenvalues > null edge (28.7) | **5** | — | five real residual dimensions |
+| eigenvalues > null edge (27.9) | **6** | — | six real residual dimensions |
 
 ## C3. Misspecification controls — what else produces the effect
 
@@ -191,7 +191,7 @@ Each row is a simulated population with **no clusters, no clones, no shared line
 | 2PL, sd(log a)=0.60 | 0.862 | 0.076 | 0.167 | 1 |
 | two ability dimensions | 0.230 | 0.162 | 0.457 | 3 |
 | 20 exact clone clusters | 0.112 | 0.234 | 0.102 | 19 |
-| **real ARC** | **0.052** | **0.248** | **0.540** | **5** |
+| **real ARC** | **0.052** | **0.248** | **0.540** | **6** |
 
 - Discrimination heterogeneity **cannot** explain the observation (rms ≤0.076 vs 0.248).
 - A low-dimensional multi-ability structure explains much of it.
