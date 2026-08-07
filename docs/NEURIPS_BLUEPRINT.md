@@ -525,3 +525,43 @@ roughly **369 GB**, against the ~1.4 KB per model per benchmark that v1 cost.
 
 This is recorded because the cheapest way to lose a month is to plan around a harvest method that
 does not transfer, and the check took ten minutes.
+
+## Novelty sweep — closed (2026-07-31)
+
+Every prior attempt at the three remaining sweeps (`judge-panels`, `monoculture-2026`,
+`tools-packages`) went through the Workflow/Agent subagent path and failed three separate times on
+three separate quota mechanisms: weekly limit, then session limit, then session limit again. **The
+fix was not to keep retrying that path — it was to use WebSearch/WebFetch directly from the main
+agent, which was available the entire time and does not share the subagent quota.** Two searches
+and two full-PDF reads later, the gap is closed. Full detail in
+`docs/PRIOR_ART_LEDGER.md` §"Novelty sweep, completed by direct search"; summary here.
+
+**Two verified hits, both read from the primary PDF** (not a fetched summary — a WebFetch summary
+of the Kohli paper earlier in this project fabricated details on inspection, so this discipline was
+non-negotiable):
+
+1. **Kim, D. (2026), arXiv:2607.20768, "Are Diversity Metrics Measuring Diversity?"** — posted six
+   days before this project's active work. Independently finds diversity measures (including
+   double-fault, the same statistic our Lemma 1 covers) are rank-deficient with mean accuracy and
+   contribute only a modest residual to LLM-ensemble majority-vote gain, using an exact algebraic
+   identity and partial-correlation capability controls — no margin-preserving null. **Narrows
+   Claim 6** (our incremental-validity finding) to "independently corroborated by different
+   machinery," not novel. Does not touch Claims 1–5, 7, 8.
+2. **Sha & Zhao (2026), arXiv:2603.29357, "BenchScope"** — counts effective independent
+   *benchmarks* (not models) using the same participation-ratio statistic we withdraw as a model
+   count, and reaches the identical caution ("screening statistic, not a literal factor count")
+   independently. Orthogonal axis, no exact null. Corroborates rather than threatens §6.1.
+
+Both are now cited in `paper/main.tex` and `paper/workshop.tex`, with the incremental-validity and
+participation-ratio passages reworded to present the overlap explicitly rather than let a reviewer
+find it unaided. Both papers recompile clean, zero undefined citations.
+
+**Revised assessment.** The blueprint's §14 contribution statement survives this sweep intact:
+nothing found kills Claims 1–5, 7, or 8, and the two genuine overlaps (6, and the PR-caution framing
+around 7) were already the paper's most hedged claims — being independently corroborated rather
+than solitary is a strengthening, not a weakening, provided the paper cites the overlap honestly,
+which it now does. The residual novelty risk is what a *further* sweep of the areas actually
+searched (judge-panel construction beyond Kohli/Kim, monoculture literature since mid-2026, an
+exhaustive GitHub/PyPI trawl) might still find — those queries returned only secondary context
+(other papers' related-work sections, leaderboard redundancy figures) that was not independently
+verified and is recorded as leads, not claims, in the ledger.

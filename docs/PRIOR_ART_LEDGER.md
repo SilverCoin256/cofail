@@ -237,3 +237,82 @@ the first attempt. Zero results returned.
 contribution statement is checked only for the areas swept by hand and recorded above — IRT-based
 benchmark compression, fixed-fixed nulls outside ecology, the ensemble-diversity connection, and
 Kohli (2026). It should not be described as verified beyond those.
+
+## Novelty sweep, completed by direct search (2026-07-31)
+
+Subagent-based sweeps failed three times on quota/session limits (weekly, then session, then
+session again). Run directly with WebSearch/WebFetch instead — no subagent needed for this.
+**Two substantive verified hits, both read from the primary PDF, not a fetched summary** (a prior
+WebFetch summary of the Kohli paper earlier in this project fabricated details on inspection, so
+every claim below was checked against the actual arXiv PDF before being used).
+
+### Kim, D. (2026), "Are Diversity Metrics Measuring Diversity?" — arXiv:2607.20768, 22 Jul 2026
+
+Posted six days before this project's active work period. Donghwan Kim, Aidentyx Inc.
+
+**What it does.** Audits five diversity-related measures (strict diversity, disagreement,
+double-fault, mean pairwise Jaccard, focal diversity) as predictors of realised majority-vote
+GAIN OVER THE BEST MEMBER, across 31,900 subsets of 30 LLMs on MMLU-Pro (27,811 subsets of 29
+models on TruthfulQA), under six linear rank-space capability-control specifications. No
+margin-preserving or item-difficulty-conditioned null of any kind — controls are partial Spearman
+correlation on rank-transformed covariates, not a randomisation test.
+
+**Central result.** Derives two EXACT algebraic identities: `strict = disagreement + double-fault`
+(trivial set algebra) and `1 - mean_accuracy = double-fault + (1/2)*disagreement` (exact, holds at
+the observed data point, not a null-distribution statement). Consequently double-fault and
+disagreement are rank-deficient once mean accuracy is controlled for in raw space
+(`ρ ≈ +0.99` between strict diversity and `1 - mean accuracy`). After capability control, only a
+"modest" residual pairwise co-failure association survives, robust in direction, "configuration-
+dependent" in magnitude. Majority vote beats the best member in only 9.98% of size-3 subsets
+despite oracle gain being positive in 100%.
+
+**Effect on our claims.** **Narrows Claim 6** (our incremental-validity finding that diversity
+metrics add negligible ΔR² over member accuracy for panel/ensemble accuracy). Same qualitative
+conclusion, reached independently, by different machinery: an algebraic rank-space identity plus
+partial correlation on gain-over-best-member (theirs) vs. nested nonlinear-nulled OLS R² on raw
+ensemble accuracy computed on a margin-conditioned residual-correlation measure (ours). Neither
+subsumes the other. **Does not touch Claims 1-5, 7, 8** — no margin-preserving null, no Rasch
+sufficiency, no curveball, no exact conditional test anywhere in the paper. Cited in both papers
+(`main.tex` §6.2, `workshop.tex` §1) as independent corroboration, not claimed as our own finding.
+
+### Sha, T. & Zhao, S. (2026), "BenchScope" — arXiv:2603.29357, 31 Mar 2026
+
+**What it does.** Introduces "Effective Dimensionality" (ED) — the participation ratio of a
+*benchmark-score* spectrum — as a screening diagnostic for redundancy across TASKS/BENCHMARKS
+within an evaluation suite (e.g. is BBH redundant with MMLU-Pro), applied at per-instance
+granularity across 22 benchmarks, 8 domains, >8,400 model evaluations. **This is the orthogonal
+axis to our work**: they count independent benchmarks; we count independent models (or rather,
+show that count is ill-posed and report primitive diagnostics instead).
+
+**The overlap that matters.** ED is literally the same statistic as our withdrawn "effective
+number of independent models" — participation ratio of a correlation-derived spectrum. They
+independently reach the identical epistemic caution we reach in §6.1 (`sec:notneff`): "binary
+spectra overestimate absolute latent dimensionality," so they treat ED as "a screening statistic
+rather than a literal factor count," never as a literal count of independent axes. This is
+corroborating evidence for our withdrawal of the PR-based headline claim, applied to a different
+object, using the same underlying algebraic fact (PR is a monotone function of mean squared
+correlation, so it cannot separate a weak global factor from tight clusters) without stating it as
+an explicit identity the way we do.
+
+**Effect on our claims.** Does not kill or narrow anything — different axis, no exact conditional
+null, no curveball, no margin-preserving randomisation. Strengthens the framing of §6.1 and the
+Claim-7 Kish-design-effect critique: a second independent 2026 paper, on a different object,
+using the same statistic, reaches the same "don't over-read this as a count" conclusion we do.
+Cited in both papers alongside the Kohli (2026) critique.
+
+### What remains unresolved
+
+The `judge-panels` and `monoculture-2026` sweep prompts also surfaced background context (adaptive
+judge weighting, quality-matched pools, co-failure ceilings — Cohen 2026, Chen 2026, Ali 2026,
+Turkmen 2026 — cited *inside* the Kim 2026 paper's related work, not independently verified here)
+and confirmed Open LLM Leaderboard v2's own redundancy (ED=1.66 across its six benchmarks,
+BBH/MMLU-Pro ρ=0.96) as separate, already-known context for the §7 v2-feasibility discussion. None
+of these were read from primary sources and none are cited; they are recorded here as leads, not
+claims. The `tools-packages` sweep confirmed RaschSampler, py-irt and RaschPy exist as general
+Rasch-model software (already implicitly covered by the Ponocny/Verhelst citations) and found
+nothing purpose-built for model-by-item evaluation matrices specifically.
+
+**This closes the novelty-sweep gap that was open since the blueprint's first draft** (three of
+six original sweeps never ran under three separate subagent-quota failures). It was closed with
+direct WebSearch/WebFetch calls from the main agent, which do not share the subagent quota — the
+simpler route, available the entire time.

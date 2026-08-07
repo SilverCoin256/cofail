@@ -648,3 +648,26 @@ benchmarks. Extended:
 Direction of the residual risk, unchanged: an undetected misalignment makes one model's row look
 independent of every other, biasing correlation estimates *toward zero*. This failure mode would
 understate the paper's headline, not manufacture it.
+
+## Novelty sweep closed via direct WebSearch/WebFetch (2026-07-31)
+
+The three sweeps that failed three times on subagent quota (weekly, session, session) were closed
+by using WebSearch/WebFetch directly instead of the Workflow/Agent path — those tools are on the
+main agent, not subject to the subagent quota, and were available throughout.
+
+Two verified hits (both read from the primary PDF after a prior WebFetch summary of a different
+paper, Kohli 2026, was found to have fabricated details on inspection — every claim here was
+cross-checked against the actual arXiv PDF):
+
+- **Kim (2026), arXiv:2607.20768** — narrows the incremental-validity finding (Claim 6 / KI1) to
+  "independently corroborated," not novel: a different-machinery, independently-posted (6 days
+  prior) result reaching the same qualitative conclusion about diversity-metric collinearity with
+  capability, on LLM ensembles specifically. Does not touch the margin-preserving-null claims.
+- **Sha & Zhao (2026), arXiv:2603.29357, "BenchScope"** — same participation-ratio statistic we
+  withdraw as a model-count, applied to counting independent benchmarks instead; independently
+  reaches the same "screening statistic, not a literal count" caution. Corroborates rather than
+  threatens the withdrawal.
+
+Both cited in `paper/main.tex` §6.2/§6.1 and `paper/workshop.tex` §1/§4. Full detail in
+`docs/PRIOR_ART_LEDGER.md`. Both papers recompile clean at 15pp/4pp, zero undefined citations,
+17 tests pass.

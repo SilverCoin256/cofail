@@ -72,7 +72,12 @@ and panel size alone explain $R^2=0.9928$ of majority-vote accuracy, and the sta
 coefficients on member accuracy and double-fault diverge to $+316$ and $+275$ --- the signature of
 the collinearity Lemma~\ref{lem:mean} predicts. Adding both classical diversity measures gains
 $\Delta R^2=0.0017$; adding a difficulty-conditioned measure gains $0.0002$, with the wrong sign.
-\textbf{Diversity metrics, corrected or not, do not help panel construction at this scale.}
+\textbf{Diversity metrics, corrected or not, do not help panel construction at this scale.} This
+converges with independent, contemporaneous work: \citet{kim2026diversity} audits five diversity
+measures against realised majority-vote gain over $31{,}900$ LLM-ensemble subsets and shows the
+same statistics are algebraically rank-deficient once mean accuracy is controlled, by a different
+route (no margin-preserving null, gain-over-best-member as target) --- we flag the overlap rather
+than claim the finding as ours alone.
 
 The degeneracy has been proved independently in three literatures --- as Schluter's V-ratio in
 ecology, Kuder--Richardson/Cronbach's $\alpha$ in psychometrics, and Fleiss's observed agreement
@@ -173,7 +178,10 @@ algebraically $N/(1+(N-1)\overline{R_{ij}^2})$, a monotone function of the mean 
 correlation, so it cannot distinguish one weak global factor from many tight clusters. The same
 objection applies to the Kish design effect $k/(1+(k-1)\bar\phi)$ used as the headline statistic in
 recent LLM-judge panel work \citep{kohli2026nine}, differing only in using the mean rather than
-the mean square.
+the mean square. \citet{benchscope2026} apply the identical participation-ratio statistic on the
+orthogonal axis --- counting effective independent \emph{benchmarks} rather than models --- and
+reach the same conclusion by a different argument, explicitly treating it as a screening
+diagnostic rather than a literal factor count.
 
 The central limitation is identification: our conditioning family is unidimensional, and we cannot
 separate genuine behavioural concentration from the Rasch family being too small. A pre-registered
@@ -194,10 +202,12 @@ cannot be authors.
 \begin{thebibliography}{9}
 \bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015. Erratum: 94:039902, 2016.
 \bibitem[Colwell \& Winkler(1984)]{colwell1984} R.~K. Colwell and D.~W. Winkler. A null model for null models in biogeography. In \emph{Ecological Communities: Conceptual Issues and the Evidence}, 344--359. Princeton University Press, 1984.
+\bibitem[Kim(2026)]{kim2026diversity} D.~Kim. Are diversity metrics measuring diversity? A capability-controlled audit of majority-vote gain in LLM ensembles. \emph{arXiv:2607.20768}, 2026.
 \bibitem[Kohli(2026)]{kohli2026nine} G.~Kohli. Nine judges, two effective votes: Correlated errors undermine LLM evaluation panels. \emph{arXiv:2605.29800}, 2026.
 \bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Polo et al.(2024)]{polo2024tiny} F.~M. Polo, L.~Weber, L.~Choshen, Y.~Sun, G.~Xu, and M.~Yurochkin. tinyBenchmarks: evaluating LLMs with fewer examples. \emph{arXiv:2402.14992}, 2024.
 \bibitem[Ponocny(2001)]{ponocny2001} I.~Ponocny. Nonparametric goodness-of-fit tests for the Rasch model. \emph{Psychometrika}, 66:437--460, 2001.
+\bibitem[Sha \& Zhao(2026)]{benchscope2026} T.~Sha and S.~Zhao. BenchScope: How many independent signals does your benchmark provide? \emph{arXiv:2603.29357}, 2026.
 \bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
 \bibitem[Verhelst(2008)]{verhelst2008} N.~D. Verhelst. An efficient MCMC algorithm to sample binary matrices with fixed marginals. \emph{Psychometrika}, 73:705--728, 2008.
 \end{thebibliography}

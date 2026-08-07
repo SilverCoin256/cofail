@@ -166,7 +166,18 @@ effect is visible in the canonical diversity-regression design of that literatur
 sampled panels drawn from our ARC response data, mean member accuracy and panel size alone explain
 $R^2=0.9928$ of majority-vote accuracy, and the standardised regression coefficients on member
 accuracy and double-fault diverge to $+316$ and $+275$ --- the signature of the near-perfect
-collinearity Lemma~\ref{lem:mean} predicts.
+collinearity Lemma~\ref{lem:mean} predicts. We deliberately do \emph{not} present this as a novel
+discovery: \citet{kim2026diversity}, posted days before this analysis, independently audits five
+diversity-related measures --- including double-fault and disagreement --- as predictors of
+realised majority-vote gain over $31{,}900$ subsets of $30$ LLMs on MMLU-Pro, and derives the
+exact algebraic identity $\mathrm{strict\ diversity} = \mathrm{disagreement} + \mathrm{double\
+\text{-}fault}$ together with $1-\overline{\mathrm{Acc}} = \mathrm{double\text{-}fault} +
+\tfrac12\mathrm{disagreement}$, showing these three classical statistics are rank-deficient once
+mean accuracy is controlled for. That analysis uses no margin-preserving null and a different
+target (gain over the best member rather than raw ensemble accuracy), so it is independent
+corroboration by different machinery rather than a restatement of Lemma~\ref{lem:mean}; we cite it
+because a reader evaluating whether diversity metrics predict LLM panel accuracy should have both
+results in view.
 
 \paragraph{This is not new, in three separate fields.} In ecology it is the degeneracy of
 Schluter's V-ratio \citep{schluter1984}. \citet{gotelli2000} states plainly that ``the V ratio
@@ -385,6 +396,14 @@ the primitive quantity, $\mathrm{rms}\,|R_{ij}| = 0.2483$ against $0.0449$ under
 the count of dimensions above the null spectral edge. The null value is the pooled mean of four
 dispersed curveball chains ($25$ draws each, $\hat R = 0.988$; Section~\ref{sec:robust}), and
 agrees with three independent estimates of it to within $0.0004$.
+
+Independent 2026 work reaches the same caution about this exact statistic from a different
+direction. \citet{benchscope2026} apply the participation ratio of a benchmark-score spectrum
+to count effective independent \emph{benchmarks} within an evaluation suite (BBH vs.\ MMLU-Pro,
+$\rho=0.96$) and explicitly warn that ``binary spectra overestimate absolute latent
+dimensionality,'' treating their statistic as a screening diagnostic rather than a literal factor
+count --- the same epistemic move we make here, on the orthogonal axis (benchmarks rather than
+models) and without an exact conditional null.
 
 \subsection{Misspecification controls: what else could produce this}
 
@@ -699,6 +718,7 @@ with COPE guidance that AI tools cannot be authors.
 \small
 \bibitem[Andersen(1973)]{andersen1973} E.~B. Andersen. A goodness of fit test for the Rasch model. \emph{Psychometrika}, 38:123--140, 1973.
 \bibitem[Besag \& Clifford(1989)]{besag1989} J.~Besag and P.~Clifford. Generalized Monte Carlo significance tests. \emph{Biometrika}, 76:633--642, 1989.
+\bibitem[Sha \& Zhao(2026)]{benchscope2026} T.~Sha and S.~Zhao. BenchScope: How many independent signals does your benchmark provide? \emph{arXiv:2603.29357}, 2026.
 \bibitem[Bommasani et al.(2022)]{bommasani2022homogenization} R.~Bommasani, K.~A. Creel, A.~Kumar, D.~Jurafsky, and P.~Liang. Picking on the same person: Does algorithmic monoculture homogenize outcomes? \emph{NeurIPS}, 2022.
 \bibitem[Cheverud(2001)]{cheverud2001} J.~M. Cheverud. A simple correction for multiple comparisons in interval mapping genome scans. \emph{Heredity}, 87:52--58, 2001.
 \bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015. Erratum: \emph{Phys.\ Rev.\ E} 94:039902, 2016.
@@ -712,6 +732,7 @@ with COPE guidance that AI tools cannot be authors.
 \bibitem[Kim et al.(2025)]{kim2025correlated} Correlated errors in large language models. \emph{arXiv:2506.07962}, 2025.
 \bibitem[Kleinberg \& Raghavan(2021)]{kleinberg2021monoculture} J.~Kleinberg and M.~Raghavan. Algorithmic monoculture and social welfare. \emph{PNAS}, 118(22), 2021.
 \bibitem[Kohli(2026)]{kohli2026nine} G.~Kohli. Nine judges, two effective votes: Correlated errors undermine LLM evaluation panels. \emph{arXiv:2605.29800}, 2026.
+\bibitem[Kim(2026)]{kim2026diversity} D.~Kim. Are diversity metrics measuring diversity? A capability-controlled audit of majority-vote gain in LLM ensembles. \emph{arXiv:2607.20768}, 2026.
 \bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
 \bibitem[Kuder \& Richardson(1937)]{kuder1937} G.~F. Kuder and M.~W. Richardson. The theory of the estimation of test reliability. \emph{Psychometrika}, 2:151--160, 1937.
 \bibitem[Laloux et al.(1999)]{laloux1999} L.~Laloux, P.~Cizeau, J.-P. Bouchaud, and M.~Potters. Noise dressing of financial correlation matrices. \emph{Physical Review Letters}, 83:1467, 1999.
