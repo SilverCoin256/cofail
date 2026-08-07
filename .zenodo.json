@@ -1,0 +1,33 @@
+{
+  "title": "cofail: correlated failure between open language models, at the exact conditional null",
+  "description": "<p>Code, harvested substrate, results artifacts, pre-registration, and paper for a study of correlated failure between open language models using the exact conditional null implied by Rasch sufficiency (margin-preserving randomisation / curveball). Covers 1,228-1,373 models per benchmark across five Open LLM Leaderboard v1 benchmarks (ARC-Challenge, Winogrande, TruthfulQA, GSM8K, HellaSwag), harvested at zero compute cost by column-selective parquet reads.</p><p>Mean pairwise co-failure -- the double-fault diversity measure of the classifier-ensemble literature -- is shown to be a deterministic function of item margins and therefore uninformative by construction. The exact fit-free conditional null this implies is validated (uniformity not rejected by chi-square against complete fibre enumeration; Gelman-Rubin diagnostics), power-characterised against planted alternatives including an explicit blind spot (zero power against a shared item-difficulty alternative, by construction), and applied at scale. Findings include: residual correlation surviving conditioning that is not a near-duplicate artifact (dedup-robust on 14 of 15 statistic-benchmark pairs); a negative result that diversity metrics -- classical or margin-conditioned -- add negligible incremental predictive value for panel/ensemble accuracy over member accuracy alone; and a withdrawal of the paper's own original headline claim (the participation ratio does not count 'effective independent models') after adversarial review.</p><p>Released under MIT (code) with a documented, verified upstream license chain for the derived data (see DATASHEET.md) -- ARC-Challenge is CC-BY-SA-4.0 and the corresponding derived matrices are share-alike, not MIT.</p>",
+  "creators": [
+    {
+      "name": "Gupta, Shaurya",
+      "affiliation": ""
+    }
+  ],
+  "access_right": "open",
+  "license": "MIT",
+  "upload_type": "software",
+  "keywords": [
+    "large language models",
+    "model evaluation",
+    "correlated failure",
+    "ensemble diversity",
+    "null models",
+    "item response theory",
+    "algorithmic monoculture",
+    "Rasch model",
+    "reproducibility"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://silvercoin256.github.io/cofail/",
+      "relation": "isSupplementTo",
+      "resource_type": "publication-preprint"
+    }
+  ],
+  "notes": "Data license note: the code in this repository (src/, cofail/, tests/, configs/) is MIT. The derived matrices under substrate/ are governed by upstream terms documented in DATASHEET.md -- ARC-Challenge specifically is CC-BY-SA-4.0 (share-alike) and is NOT covered by the MIT grant. See DATASHEET.md before reuse.",
+  "communities": []
+}
