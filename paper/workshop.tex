@@ -165,7 +165,8 @@ collapses under the same deduplication on three of five benchmarks.
 \textbf{Dimensionality.} Counting eigenvalues above the null spectral edge is Horn's parallel
 analysis with a stronger reference than Horn's own --- the exact margin-preserving null already
 carries the observed ability and difficulty profiles. Retained counts are $4$--$6$ ($12$ on
-HellaSwag), stable to within one across deduplication thresholds on four of five benchmarks. These
+HellaSwag), stable to within one across deduplication thresholds on three of five benchmarks
+(Winogrande, TruthfulQA, GSM8K); ARC itself ranges $4$--$6$. These
 are upper bounds; eigenvalue-counting rules over-retain. This bears directly on IRT-based
 benchmark compression \citep{polo2024tiny}, which fits latent-ability models to matrices of this
 kind --- using $319$ models, roughly a quarter of the population here --- and rests on an assumed
