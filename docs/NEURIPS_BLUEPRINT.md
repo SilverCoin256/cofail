@@ -608,6 +608,15 @@ per-item correctness. Neither contains the per-item detail the co-failure analys
 lives only in the gated `<model>-details` repos' `samples_*.json` files. The HF-auth blocker
 stands; there is no ungated workaround.
 
+**Follow-up check (2026-08-08).** Two more candidate bypasses tested directly, both closed. (1)
+Sampled 100 datasets under the `open-llm-leaderboard` author via the HF API (`gated=auto` on every
+single `*-details` repo checked, no exceptions found in the sample) — "auto" gating still requires
+an authenticated account that has accepted the gate, it does not mean ungated. (2)
+`datasets-server.huggingface.co`, HF's public dataset-viewer backend, tested directly against a
+`-details` repo: `HTTP 401`, `"not accessible without authentication (private or gated)"` — the
+gate is enforced at that layer too, not just on direct file access. This closes the search; an
+actual HF account token is the only remaining path to v2 per-item data.
+
 ## GitHub release prepared as a draft, not published (2026-08-07)
 
 `gh release create v1.0.0 --draft` run to reduce the Zenodo-activation step to one click. Verified
