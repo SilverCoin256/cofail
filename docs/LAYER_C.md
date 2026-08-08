@@ -129,10 +129,22 @@ usage or retry cadence on the account/repo — genuinely unconfirmed.
 
 **Mitigation attempted, not verified (2026-08-08).** `MM_WORKERS` dropped from 6 to 3 across every
 step as a hedge against a network-concurrency trigger, and the next retry was deliberately spaced
-out rather than fired immediately, in case rapid retries themselves are implicated. If this recurs
-under `MM_WORKERS=3` with adequate spacing, the concurrency hypothesis is likely wrong and the next
-thing to check is whether GitHub sent any account-level notice (usage-limit or abuse-detection
-email) around 2026-08-07–08 — that is not visible to anything running inside the repository.
+out (~50 minutes) rather than fired immediately, in case rapid retries themselves are implicated.
+
+**Both hypotheses ruled out (2026-08-08).** The spaced-out retry under `MM_WORKERS=3` (run
+31262853552, launched 14:48 UTC) was cancelled the same way a fourth time — 2m14s after the ARC
+harvest step began, same bare "The operation was canceled", no cause visible via `gh api`. That
+rules out both per-run concurrency (dropping workers 6→3 changed nothing) and retry cadence
+(spacing the retry ~50 minutes apart from the previous one changed nothing). Checked
+githubstatus.com for a live incident: Actions shows "Operational", with only an unrelated resolved
+incident from 2026-08-07 about self-hosted Actions Runner Controller pods (this workflow uses
+`runs-on: ubuntu-latest`, GitHub-hosted, not self-hosted — not applicable). No further diagnosis is
+possible from inside the repository or via the tools available here: the GitHub REST API does not
+expose who or what cancels a run, and an account-level notice (usage-limit warning, abuse-detection
+flag) would only be visible to the account owner directly, e.g. via email or the Actions run page's
+web UI, which sometimes annotates a cancellation with "Cancelled by @user" where the API does not.
+This needs the repository owner to check their GitHub account directly — not another automated
+retry from this workflow.
 
 ```bash
 python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
