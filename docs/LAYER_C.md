@@ -107,6 +107,33 @@ is safe here specifically because each step's changes are confined to its own pa
 step) — a concurrent push touching unrelated files rebases with no real conflict. The workflow was
 re-triggered manually to redo the lost ARC delta under the fixed logic.
 
+## Unresolved: two runs (2026-08-08) externally cancelled within ~2 minutes, cause unconfirmed
+
+That re-run (still 2026-08-07) succeeded on ARC, Winogrande, TruthfulQA, and GSM8K — all four
+landed as independent commits, confirming the fix above. HellaSwag itself was then cut off by a
+GitHub-side "runner has received a shutdown signal" message about three hours into the job — not a
+timeout (the job had used under 3 of its 350-minute budget) and not anything in this repository's
+control. Three separate attempts to harvest HellaSwag directly from a local machine instead (as a
+workaround) were each killed (SIGKILL / exit 137) within roughly a minute regardless of method
+(background nohup, tracked background execution, plain foreground) — a local sandbox constraint,
+unrelated to the workflow.
+
+Re-triggering the workflow the next day (2026-08-08) to finish HellaSwag produced two more
+cancellations in a row, both around 1m43s–1m44s after the ARC harvest step began making real HTTP
+requests, both with a bare "The operation was canceled" and no cause visible via `gh api` (checked
+`triggering_actor`, repo Actions permissions, rate limits — nothing conclusive; the REST API does
+not expose who or what issued the cancellation). This happened with the exact same `MM_WORKERS=6`,
+`MM_MAX_NEW=800` configuration that had run cleanly for 32 minutes one day earlier, which argues
+against per-run concurrency alone being the cause and toward something reacting to cumulative
+usage or retry cadence on the account/repo — genuinely unconfirmed.
+
+**Mitigation attempted, not verified (2026-08-08).** `MM_WORKERS` dropped from 6 to 3 across every
+step as a hedge against a network-concurrency trigger, and the next retry was deliberately spaced
+out rather than fired immediately, in case rapid retries themselves are implicated. If this recurs
+under `MM_WORKERS=3` with adequate spacing, the concurrency hypothesis is likely wrong and the next
+thing to check is whether GitHub sent any account-level notice (usage-limit or abuse-detection
+email) around 2026-08-07–08 — that is not visible to anything running inside the repository.
+
 ```bash
 python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 ```

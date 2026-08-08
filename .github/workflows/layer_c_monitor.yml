@@ -11,7 +11,9 @@ name: Layer C monitor
 # Manual runs (workflow_dispatch) are for on-demand refreshes; the schedule is the actual
 # "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show, including
 # the large-backlog gradual-catchup behaviour introduced after the first scheduled run failed,
-# and the 2026-08-07 postmortem on push-race handling below.
+# the 2026-08-07 postmortem on push-race handling below, and the 2026-08-08 note on MM_WORKERS=3
+# (dropped from 6 as a hedge after two back-to-back runs were externally cancelled ~1-2 minutes
+# into ARC harvest, cause unconfirmed -- see docs/LAYER_C.md).
 
 on:
   schedule:
@@ -69,7 +71,7 @@ jobs:
       - name: Refresh model list (discover new models since last run)
         run: MM_REFRESH_MODELS=1 python src/harvest_manifest.py
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
 
       # Harvest and commit ONE BENCHMARK AT A TIME, not all five then commit once at the end.
       #
@@ -96,7 +98,7 @@ jobs:
           git diff --cached --quiet && echo "arc: nothing new" || git commit -m "Layer C: ARC harvest delta $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
           MM_MAX_NEW: "800"
 
       - name: Harvest and commit Winogrande
@@ -106,7 +108,7 @@ jobs:
           git diff --cached --quiet && echo "winogrande: nothing new" || git commit -m "Layer C: Winogrande harvest delta $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
           MM_MAX_NEW: "800"
 
       - name: Harvest and commit TruthfulQA
@@ -116,7 +118,7 @@ jobs:
           git diff --cached --quiet && echo "truthfulqa: nothing new" || git commit -m "Layer C: TruthfulQA harvest delta $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
           MM_MAX_NEW: "800"
 
       - name: Harvest and commit GSM8K
@@ -126,7 +128,7 @@ jobs:
           git diff --cached --quiet && echo "gsm8k: nothing new" || git commit -m "Layer C: GSM8K harvest delta $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
           MM_MAX_NEW: "800"
 
       - name: Harvest and commit HellaSwag
@@ -136,7 +138,7 @@ jobs:
           git diff --cached --quiet && echo "hellaswag: nothing new" || git commit -m "Layer C: HellaSwag harvest delta $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
         env:
-          MM_WORKERS: "6"
+          MM_WORKERS: "3"
           MM_MAX_NEW: "800"
 
       - name: Run the monitor (recompute calibrated statistics, append timeseries + changelog)
