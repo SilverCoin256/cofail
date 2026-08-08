@@ -49,8 +49,9 @@ the Kish design effect used in recent LLM-judge work \citep{kohli2026nine}.
 
 \section{The degenerate statistic}
 
-Let $F\in\{0,1\}^{N\times M}$ with $F_{im}=1$ iff model $i$ fails item $m$; write $c_m=\sum_i F_{im}$
-and $O=\frac{1}{MN(N-1)}\sum_{i\neq j}\sum_m F_{im}F_{jm}$ for mean pairwise co-failure.
+Let $F\in\{0,1\}^{N\times M}$ with $F_{im}=1$ iff model $i$ fails item $m$. Write $c_m=\sum_i F_{im}$
+for item difficulty and $O=\frac{1}{MN(N-1)}\sum_{i\neq j}\sum_m F_{im}F_{jm}$ for mean pairwise
+co-failure.
 
 \begin{lemma}\label{lem:mean}
 $\displaystyle O=\frac{1}{MN(N-1)}\sum_m\bigl(c_m^2-c_m\bigr)$.
