@@ -146,9 +146,20 @@ web UI, which sometimes annotates a cancellation with "Cancelled by @user" where
 This needs the repository owner to check their GitHub account directly — not another automated
 retry from this workflow.
 
+**Decision (2026-08-08): manual `workflow_dispatch` retriggering is abandoned for now.** Four
+manual triggers in one day produced one real success (4/5 benchmarks) and three fast, unexplained
+cancellations, per the owner's explicit instruction after the fourth. No more manual retriggers
+until the cause is understood. The system does not need them to make progress: HellaSwag is
+`MM_MAX_NEW=800` short of complete, and the existing monthly `schedule` trigger
+(`cron: "17 6 3 * *"`, next fire 2026-09-03 06:17 UTC) will attempt it again on its own, the same
+way it drains the rest of the ~5,600-model backlog on every other benchmark. If scheduled runs also
+get cancelled the same way, that is itself informative (rules out something specific to
+`workflow_dispatch` as the trigger) and should be added as a new dated entry above, not chased with
+more manual dispatches.
+
 ```bash
 python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 ```
 
-Or trigger the GitHub Actions workflow directly from the repository's Actions tab
-(`workflow_dispatch`) without waiting for the scheduled date.
+Manual triggering via the Actions tab (`workflow_dispatch`) remains available in principle, but see
+the decision above before using it while the 2026-08-08 cancellations are unexplained.
