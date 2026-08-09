@@ -39,7 +39,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install
-        run: pip install -e ".[harvest]"
+        # [figures] too, not just [harvest]: the 2026-08-09 run harvested all five benchmarks and
+        # ran the monitor successfully, then died on `import matplotlib` in the figure step --
+        # which, because the commit step ran after it, discarded five freshly computed timeseries
+        # rows and the CHANGELOG entry along with it.
+        run: pip install -e ".[harvest,figures]"
 
       - name: Configure git identity for incremental commits
         run: |
@@ -144,12 +148,28 @@ jobs:
       - name: Run the monitor (recompute calibrated statistics, append timeseries + changelog)
         run: python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 
+      # Commit the monitor's output BEFORE regenerating figures, and regenerate figures in a step
+      # that cannot fail the job. 2026-08-09 postmortem: the monitor completed and emitted five
+      # timeseries rows plus a CHANGELOG entry, then `python src/figures.py` raised
+      # ModuleNotFoundError, the commit step was skipped as a consequence, and all of that
+      # computed output was torn down with the runner. This is the same failure shape as the
+      # 2026-08-03 and 2026-08-07 incidents: real, finished work destroyed by a later, unrelated
+      # step. The ordering below makes the cheap, regenerable artifact (a PDF) the only thing at
+      # risk, never the measurement.
+      - name: Commit timeseries and changelog
+        run: |
+          git add results/ CHANGELOG.md
+          git diff --cached --quiet && echo "nothing new this cycle" || git commit -m "Layer C monthly refresh: $(date -u +%Y-%m-%d)"
+          /tmp/push_with_retry.sh
+
       - name: Regenerate the cohort figure
+        continue-on-error: true
         run: python src/figures.py
 
-      - name: Commit timeseries, changelog, and figures
+      - name: Commit the regenerated figure
+        continue-on-error: true
         run: |
-          git add results/ figures/ CHANGELOG.md
-          git diff --cached --quiet && echo "nothing new this cycle" && exit 0
-          git commit -m "Layer C monthly refresh: $(date -u +%Y-%m-%d)"
+          git add figures/
+          git diff --cached --quiet && echo "figures unchanged" && exit 0
+          git commit -m "Layer C: regenerate cohort figure $(date -u +%Y-%m-%d)"
           /tmp/push_with_retry.sh
