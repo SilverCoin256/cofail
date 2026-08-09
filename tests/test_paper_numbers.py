@@ -138,3 +138,21 @@ def test_main_quotes_the_corrected_arc_null(main_tex):
         f"main.tex should quote the ARC exact-null rms as {pooled:.4f}, the pooled mean of the "
         "four dispersed chains"
     )
+
+
+def test_item_margin_only_gap_is_stated_as_the_max_not_a_smaller_number(main_tex, tex):
+    """Both papers claim item-margin-only conditioning reproduces the both-margin null
+    'to within X%'. X must bound the WORST benchmark, not a convenient one.
+
+    This exists because the papers said 6% while HellaSwag's actual gap is 8.3% and GSM8K's
+    is 6.05% -- a claim that was false on two of five benchmarks, found by checking the
+    per-benchmark ratios rather than the ARC row the sentence quotes.
+    """
+    ratios = [b["ratio_exact_over_colonly"] for b in load("noise_floor.json")["benchmarks"]]
+    worst_pct = (max(ratios) - 1.0) * 100.0
+    stated = f"{worst_pct:.1f}\\%"
+    for name, body in (("main.tex", main_tex), ("workshop.tex", tex)):
+        assert stated in body, (
+            f"{name} must bound the item-margin-only gap by the worst benchmark "
+            f"({stated}); a smaller figure understates it"
+        )
