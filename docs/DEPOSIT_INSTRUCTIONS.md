@@ -1,65 +1,64 @@
-# Deposit instructions — reduced to the minimum that requires your credentials
+# Deposits — DONE (2026-08-09)
 
-Both remaining items (Zenodo DOI, OSF pre-registration timestamp) are blocked on account creation,
-which is not something this assistant can or should do on your behalf. Everything that could be
-prepared without an account has been. What's below should take under ten minutes total.
+Both deposits are live. This file previously held step-by-step instructions for completing them;
+that is now history, kept below only as a record of what was decided and why.
 
-## Zenodo — GitHub auto-archival, no manual upload
+| deposit | identifier | status |
+|---|---|---|
+| Zenodo (concept, all versions) | [10.5281/zenodo.21860005](https://doi.org/10.5281/zenodo.21860005) | live |
+| Zenodo (this paper's snapshot) | 10.5281/zenodo.21860006 (`v1.0.0`) | live, 18.1 MB |
+| OSF pre-registration | [osf.io/cmh7q](https://osf.io/cmh7q) | live, public |
+| OSF project (wiki holds the full pre-registration) | [osf.io/sknu9](https://osf.io/sknu9) | live |
 
-`.zenodo.json` is committed at the repo root with the title, description, license note, and
-keywords already written. Zenodo reads this automatically when it archives a GitHub release, so
-there is no metadata form to fill in and no zip file to build or upload by hand.
+Both are cited in `README.md` (badges) and in the reproducibility sections of `paper/main.tex`
+and `paper/workshop.tex`.
 
-1. Go to **zenodo.org**, sign in with **"Log in with GitHub"** (uses your existing GitHub account
-   — no new password to create).
-2. Under your account → **GitHub**, find `SilverCoin256/cofail` in the repository list and flip
-   its toggle **on**.
-3. A **draft** release, `v1.0.0`, is already prepared and waiting at
-   https://github.com/SilverCoin256/cofail/releases — draft releases are private (visible only
-   to repo collaborators, not the public, and don't trigger Zenodo) until you click **Publish
-   release**. Review it, then publish when ready — that's the only remaining action here.
-4. Zenodo detects the (now-published) release, archives the repo automatically, mints a DOI, and reads
-   `.zenodo.json` for the deposit metadata. Takes a minute or two.
-5. Add the resulting DOI badge to `README.md` (a one-line edit I can make once you have the DOI).
+## Decisions made at deposit time, recorded because they are not reversible
 
-**Already handled:** the archived snapshot includes `substrate/`, and `docs/DATASHEET.md`
-documents that ARC-Challenge is CC-BY-SA-4.0 (share-alike). Per your decision, `.gitattributes`
-now excludes `substrate/raw/arc_resp.npz` (the reconstructed answer key) from the archive via
-`export-ignore` — the recovery code ships, the reconstructed key doesn't. Nothing further to
-decide here before publishing.
+**OSF: Open-Ended Registration, not the OSF Preregistration template.** The deposit is dated
+2026-08-09, after the confirmatory analyses. Filing it under the prospective-preregistration
+template would have implied a pre-commitment date the deposit cannot establish. The registration's
+description and narrative summary both state explicitly that the ordering of the original plan and
+Amendments 1–2 (2026-07-26) is evidenced by the dated commit history of `PREREGISTRATION.md`, not
+by the deposit date, and that Amendment 3 (2026-07-28) is post-hoc and earns no pre-registration
+credit. This is weaker than a genuine prospective registration would have been, and saying so is
+the point: a reviewer who checks the dates finds the paper already conceded them.
 
-## OSF — pre-registration timestamp
+**OSF: public, not embargoed.** OSF offers embargo for authors submitting to venues requiring
+blind review. It would have bought nothing here — the repository and the Zenodo record are already
+public under the author's name, and the paper itself cites both — while defeating the independent
+verifiability the deposit exists to provide.
 
-The pre-registration content already exists in full at `PREREGISTRATION.md` (hypotheses, kill
-conditions, two dated amendments). OSF's job here is just to put an independently-verifiable
-timestamp on it — the content itself needs no further preparation.
+**Zenodo: `.gitattributes` `export-ignore` verified to hold.** `substrate/raw/arc_resp.npz`, the
+reconstructed ARC answer key, is confirmed absent from the published archive. The
+`substrate/raw/arc_resp_sample.json` that *is* included was checked and contains only the 600
+model identifiers of the response subsample — no gold labels.
 
-1. Go to **osf.io**, create an account (email or your existing GitHub/ORCID/Google login).
-2. New project → **Registrations** → choose a basic template (OSF's generic "Open-Ended
-   Registration" template is the right fit; no need for a domain-specific one).
-3. **Title:** `Excess co-failure and effective model count in the open-model ecosystem`
-4. **Description** (paste as-is):
-   > Pre-registered hypotheses, kill conditions, and analysis plan for a study of correlated
-   > failure between open language models at the exact conditional null implied by Rasch
-   > sufficiency. Registered before confirmatory analysis; two dated amendments were made before
-   > any confirmatory statistic was computed. Full content, code, and results at
-   > https://github.com/SilverCoin256/cofail.
-5. Upload `PREREGISTRATION.md` as the registration's file (or paste its sections into the
-   template's matching fields, if you prefer the structured form over a file upload).
-6. Submit for registration. OSF timestamps it immediately; no review wait for a basic
-   registration.
-7. Add the resulting OSF link to `README.md` and `paper/main.tex`'s reproducibility section (a
-   one-line edit I can make once you have it) — this is what upgrades "self-hosted git
-   timestamps, author-controlled" (a reviewer objection recorded in `docs/NEURIPS_BLUEPRINT.md`)
-   to an independently verifiable date.
+## Errors caught in the deposit process, kept as a warning
 
-## What's already done, so neither step involves original work
+Three things were wrong at the moment of deposit and would have been permanent had they not been
+checked first. A DOI record and an OSF registration cannot be edited afterwards.
 
-- Zenodo metadata: written (`.zenodo.json`).
-- OSF title/description: written above.
-- Pre-registration content: already complete and dated (`PREREGISTRATION.md`).
-- Datasheet, Croissant metadata, verified license chain: already complete
-  (`docs/DATASHEET.md`, `docs/croissant.json`).
+1. **The Zenodo description and the draft release notes both still carried the retired
+   "1,228–1,373" model count.** That figure traces to no artifact (see
+   `results/RESULTS_DIGEST.md`); the true post-filter range is 1,228–1,362. Corrected in
+   `.zenodo.json` and in the release body before publishing.
+2. **The release tag had to be checked against `main`.** The draft was staged a day earlier. Had
+   its target resolved to that older commit, Zenodo would have permanently archived the version of
+   the papers still containing all eight defects fixed on 2026-08-08–09. `target_commitish` was
+   confirmed to be `main` before publishing.
+3. **The OSF wiki editor silently corrupted the pasted content twice** — auto-close-brackets
+   appended a stray `)))))])`, and 4-space-indented formula lines opened a markdown code block
+   that swallowed the second half of the document into raw monospace. Both were caught by reading
+   the rendered page rather than trusting the editor, and fixed by moving formulas to inline code.
 
-Neither step requires deciding anything or writing anything new — just logging in and clicking
-through what's already prepared.
+The general lesson, which is the same one `tests/test_rendered_pdfs.py` encodes for the papers:
+check the artifact a reader will actually see, not the source you submitted.
+
+## Still outstanding (not a deposit)
+
+The Hugging Face v2 leaderboard replication remains blocked on an account token. It is a bonus
+robustness check, explicitly out of scope for the paper's argument — see
+`docs/NEURIPS_BLUEPRINT.md`, "X7 correction" and the 2026-08-08 parser audit. The harvester is
+ready and its parser has been corrected and unit-tested against the harness's real record schema,
+so the harvest can start the moment a token is available.

@@ -646,3 +646,19 @@ included in the public releases feed, and do not trigger Zenodo's release webhoo
 published or made publicly visible. The user's remaining action is exactly one click ("Publish
 release") once they've toggled the repo on at zenodo.org — everything else that can be prepared
 without their account credentials now is.
+
+**Superseded 2026-08-09: both deposits are live.** The repo was toggled on at Zenodo (via GitHub
+OAuth on an existing session — no password), the release published, and the DOI minted:
+[10.5281/zenodo.21860005](https://doi.org/10.5281/zenodo.21860005) concept,
+10.5281/zenodo.21860006 for the `v1.0.0` snapshot. The OSF pre-registration is deposited at
+[osf.io/cmh7q](https://osf.io/cmh7q), public, with the full document in the wiki of
+[osf.io/sknu9](https://osf.io/sknu9). Both are cited in the README and in both papers.
+
+This closes the reviewer objection recorded earlier in this document that the pre-registration
+rested on "self-hosted git timestamps, author-controlled" — but only partly, and the paper says so
+rather than overclaiming. The OSF deposit is dated 2026-08-09, after the confirmatory analyses, so
+it independently establishes the document's *content* but not the *date of pre-commitment*, which
+still rests on the repository's commit history. It was filed as an Open-Ended Registration rather
+than under the prospective-preregistration template precisely so it does not imply otherwise. See
+`docs/DEPOSIT_INSTRUCTIONS.md` for that reasoning and for three errors caught in the deposit
+process that would otherwise have been frozen into permanent records.
