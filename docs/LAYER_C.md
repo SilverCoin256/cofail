@@ -157,9 +157,52 @@ get cancelled the same way, that is itself informative (rules out something spec
 `workflow_dispatch` as the trigger) and should be added as a new dated entry above, not chased with
 more manual dispatches.
 
+## Resolved: the cause was ours, not GitHub's (2026-08-09)
+
+**The diagnosis above was wrong, and is left in place rather than deleted because being wrong in a
+specific, recorded way is part of the evidence.** The runs were not being cancelled by GitHub, by
+an abuse heuristic, or by anything on the account. They were running out of memory, and the OOM
+killer was taking the process — which surfaces as a bare cancellation with no useful message,
+which is exactly why it read as external.
+
+**Root cause.** `harvest()` in `src/harvest_matrix.py` resumed from the cached `.npz` with a loop
+of the form `for k, m in enumerate(models): P[m] = z["prim"][k]`. Indexing a member of a
+`np.load`-ed compressed archive re-decompresses that entire array, every time. Resuming a
+1,362-model ARC cache therefore decompressed the whole `prim` array 1,362 times, plus `sec` and
+`dates` again per iteration: on the order of 49 GB of decompression churn to read a 965 KB file,
+with the peak allocation killing the runner. The cost is quadratic in the cache size, which is why
+this was invisible in early runs and became fatal exactly as the substrate grew — and why it hit
+the local sandbox too, at every worker count and batch size, which had been misread as a separate
+environmental limit.
+
+**Fix (commit `abca8be`).** Decompress each array once, outside the loop, then index the in-memory
+result. Verified: the resume path went from 68.33 s to 0.04 s, byte-identical output, and a local
+HellaSwag harvest that had never completed ran to the end.
+
+**Outcome.** The next run (31314217028) harvested all five benchmarks for the first time, including
+HellaSwag, which had never once succeeded. The population roughly doubled — ARC 1,362 to 2,962
+models — and the paper's headline ratios replicated on that larger population (ARC PR ratio 0.047
+against the paper's 0.052; Winogrande 0.036 vs 0.041; TruthfulQA 0.053 vs 0.056; GSM8K 0.200 vs
+0.214; HellaSwag 0.021 vs 0.028). That is the first genuine Layer C measurement, and it is the
+result this instrument was built to produce.
+
+That run then failed at the figure step (`ModuleNotFoundError: matplotlib`, because the install
+step requested `.[harvest]` but not `.[figures]`) and, because the commit step ran after it,
+discarded the five timeseries rows the monitor had just computed. Commit `ed843df` fixes the
+install and reorders the job so the measurement is committed **before** figures are regenerated,
+with both figure steps `continue-on-error`. Those numbers above were independently reproduced by
+running `src/monitor.py` on the committed substrate, which is how they are quoted here despite the
+run that first computed them not having committed anything.
+
+**Standing lesson, now three incidents deep.** Every Layer C failure so far has destroyed real,
+completed work through the same mechanism: a later step failing after an earlier one succeeded, in
+a job that committed too late. Timeout (2026-08-03), push race (2026-08-07), missing dependency
+(2026-08-09). The fix each time has been to commit earlier and isolate the failure, not to make the
+failing step more reliable.
+
 ```bash
 python src/monitor.py arc winogrande truthfulqa gsm8k hellaswag
 ```
 
-Manual triggering via the Actions tab (`workflow_dispatch`) remains available in principle, but see
-the decision above before using it while the 2026-08-08 cancellations are unexplained.
+Manual triggering via the Actions tab (`workflow_dispatch`) is fine again; the 2026-08-08 concern
+that prompted the moratorium was a misdiagnosis of the OOM described above.

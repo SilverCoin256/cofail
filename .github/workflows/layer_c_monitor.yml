@@ -11,9 +11,10 @@ name: Layer C monitor
 # Manual runs (workflow_dispatch) are for on-demand refreshes; the schedule is the actual
 # "living statistic" mechanism. See docs/LAYER_C.md for what this can and cannot show, including
 # the large-backlog gradual-catchup behaviour introduced after the first scheduled run failed,
-# the 2026-08-07 postmortem on push-race handling below, and the 2026-08-08 note on MM_WORKERS=3
-# (dropped from 6 as a hedge after two back-to-back runs were externally cancelled ~1-2 minutes
-# into ARC harvest, cause unconfirmed -- see docs/LAYER_C.md).
+# the 2026-08-07 postmortem on push-race handling below, and the 2026-08-09 resolution of what
+# looked like external cancellations but was an OOM in the harvester's resume path (fixed in
+# abca8be; see docs/LAYER_C.md). MM_WORKERS stays at 3: it was dropped from 6 as a hedge against
+# that misdiagnosis, and there is no reason to raise it while throughput is rate-limit bound.
 
 on:
   schedule:
