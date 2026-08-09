@@ -53,7 +53,7 @@ correlation with root-mean-square $0.2483$ against $0.0449$ under the exact null
 excess --- and six eigenvalues above the null spectral edge; across the five benchmarks the
 excess ranges from $2.8\times$ (GSM8K) to $11.8\times$ (HellaSwag). The effect is not an artifact
 of near-duplicate models: removing every model that agrees with a retained model above $0.95$
-discards $36$--$64\%$ of each population and moves these ratios by at most $1.14\times$. We deliberately do \emph{not} report this as an
+discards $21$--$64\%$ of each population and moves these ratios by at most $1.14\times$. We deliberately do \emph{not} report this as an
 ``effective number of independent models'': we show that the participation ratio is
 algebraically $N/(1+(N-1)\overline{R_{ij}^2})$, so it cannot distinguish one weak global factor
 from many tight clusters, and we give the diagnostics that can. Misspecification controls show
@@ -559,7 +559,7 @@ load-bearing here.
 populations deduplicated at agreement thresholds $0.99$ through $0.90$, refitting the Rasch model
 and redrawing the null each time, $14$ of $15$ statistic--benchmark pairs move by less than
 $1.5\times$ between the full population and the $0.95$-deduplicated one, which discards
-$36$--$64\%$ of models. The exception is HellaSwag's participation ratio ($2.44\times$). At that
+$21$--$64\%$ of models. The exception is HellaSwag's participation ratio ($2.44\times$). At that
 same $0.95$ threshold, the eigenvalue count above the null edge matches the full-population count
 on three of five benchmarks (ARC, Winogrande, GSM8K); it is off by one on TruthfulQA and by four
 on HellaSwag.

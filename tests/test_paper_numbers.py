@@ -197,3 +197,22 @@ def test_cross_benchmark_ratio_range_is_rounded_correctly(main_tex, tex):
         assert lo in body and hi in body, (
             f"{name} must state the cross-benchmark excess range as {lo}-{hi}x"
         )
+
+
+def test_dedup_discard_range_matches_the_sweep(main_tex, tex):
+    """The '0.95-dedup discards X-Y% of each population' range must bound all five benchmarks.
+
+    Both papers said 36-64%. The sweep says GSM8K drops 20.8% and Winogrande 34.3%, so the low
+    end was wrong on two of five -- and workshop.tex's own table already printed 21% for GSM8K,
+    contradicting its abstract two pages earlier.
+    """
+    fracs = []
+    for b in load("dedup_sensitivity.json")["benchmarks"]:
+        full = [s for s in b["sweep"] if s["threshold"] == 1.01][0]
+        d95 = [s for s in b["sweep"] if s["threshold"] == 0.95][0]
+        fracs.append(d95["n_removed"] / full["N"] * 100.0)
+    lo, hi = f"{min(fracs):.0f}", f"{max(fracs):.0f}"
+    for name, body in (("main.tex", main_tex), ("workshop.tex", tex)):
+        assert f"${lo}$--${hi}\\%$" in body, (
+            f"{name} must state the 0.95-dedup discard range as {lo}-{hi}%"
+        )
