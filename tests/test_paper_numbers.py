@@ -239,3 +239,28 @@ def test_model_count_range_traces_to_the_runs(main_tex, tex):
         # "1,228--1,373" outside math mode and survived the first fix), and the bare digits
         for bad in ("1{,}373", "1,373", "1373"):
             assert bad not in body, f"{name} still contains the untraceable count 1,373 as {bad!r}"
+
+
+def test_substrate_is_strictly_binary():
+    """Outcome matrices must contain only 0/1. A non-binary cell means the harvest read the
+    wrong column or a metric that is not accuracy, and every downstream statistic -- co-failure,
+    the Rasch fit, the residual spectrum -- silently assumes binarity.
+
+    Cheap to check, and it is the integrity property that the v2 parser's falsy-`or` bug would
+    NOT have violated: that bug produced valid 0/1 values that were simply the wrong ones. So
+    this test is a floor, not a proof of correctness.
+    """
+    np = pytest.importorskip("numpy")
+    raw = os.path.join(ROOT, "substrate", "raw")
+    if not os.path.isdir(raw):
+        pytest.skip("substrate not present")
+    checked = 0
+    for bench in ("arc", "winogrande", "truthfulqa", "gsm8k", "hellaswag"):
+        p = os.path.join(raw, f"{bench}.npz")
+        if not os.path.exists(p):
+            continue
+        prim = np.load(p, allow_pickle=True)["prim"]
+        bad = np.unique(prim[~np.isin(prim, (0, 1))])
+        assert bad.size == 0, f"{bench}.npz has non-binary values: {bad[:5]}"
+        checked += 1
+    assert checked, "no substrate matrices found to check"

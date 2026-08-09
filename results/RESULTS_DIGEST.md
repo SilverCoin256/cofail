@@ -718,3 +718,40 @@ the automated provenance tests because they are not about numbers:
 All seven confirmed by direct inspection (source diff, recompiled PDF, or both) before being
 called fixed. Both papers recompile clean with zero LaTeX errors and zero undefined citations
 throughout: `main.tex` 16pp, `workshop.tex` 4pp. 17 tests pass.
+
+## Where the retired "1,373" came from, and a v1-vs-v2 parser audit (2026-08-08)
+
+The abstract's population range read "1,228–1,373 models per benchmark" and traced to no artifact;
+no JSON in `results/` contains 1,373 as a value. Recovering the paper-era substrate from git
+(`git cat-file -p <commit>:substrate/raw/<bench>.npz`) explains it exactly:
+
+| bench | pre-filter models | post-filter models | Table 1 |
+|---|---|---|---|
+| ARC-Challenge | 1362 | 1362 | 1362 |
+| Winogrande | 1361 | 1361 | 1361 |
+| TruthfulQA | 1340 | 1334 | 1334 |
+| GSM8K | **1373** | **1228** | 1228 |
+| HellaSwag | 1362 | 1362 | 1362 |
+
+Both endpoints of the old range were GSM8K's: 1,228 is its count *after* removing degenerate rows
+and columns, 1,373 is its count *before*. So the abstract advertised a range across two filtering
+conventions on a single benchmark as though it were a range across five. Table 1's own caption
+fixes the convention ("after removing degenerate rows and columns"), under which the true range is
+**1,228–1,362**. Same failure mode as the HellaSwag mean-accuracy defect found earlier in this
+session: one cell computed pre-filter while its neighbours were post-filter.
+
+**Substrate integrity, checked while the paper-era matrices were open.** All five are strictly
+binary, and all five mean accuracies match Table 1 to the digit under the pre-filter convention the
+caption states (ARC 0.5272/0.527, Winogrande 0.7340/0.734, TruthfulQA 0.3685/0.368, GSM8K
+0.3478/0.348, HellaSwag 0.5815/0.581). Now guarded by
+`tests/test_paper_numbers.py::test_substrate_is_strictly_binary`.
+
+**Does v1 share the v2 parser's falsy-`or` bug? No — checked, not assumed.** The severe defect
+found in `src/harvest_v2_arc.py` (`r.get("acc") or r.get("acc_norm")` silently substituting
+`acc_norm` whenever `acc` was a legitimate `0.0`) would, if present in v1, have corrupted the
+paper's own data. It is not: `src/harvest_matrix.py::read_one` reads the metric by direct indexing
+(`r[prim]`, or `tb.column(prim)`), raising `KeyError` rather than falling back; the metric is fixed
+once per benchmark by the module-level `METRIC` table rather than chosen per record, so `acc` and
+`acc_norm` cannot mix within one matrix; and any non-0/1 primary is rejected outright
+(`non-binary-primary`). A repo-wide grep for the pattern found only three `... or ...` fallbacks,
+all on environment-variable strings, none on a numeric metric. The paper's data is unaffected.
