@@ -617,6 +617,27 @@ an authenticated account that has accepted the gate, it does not mean ungated. (
 gate is enforced at that layer too, not just on direct file access. This closes the search; an
 actual HF account token is the only remaining path to v2 per-item data.
 
+**The harvester is now genuinely ready for that token (2026-08-08).** Being blocked on auth was
+being used as a reason not to look at `src/harvest_v2_arc.py` at all, and the parser inside it had
+been written by guessing field names against a file nobody could download. Checked it instead
+against lm-evaluation-harness's own record construction (`lm_eval/evaluator.py`, which builds each
+logged sample then calls `example.update(metrics)`, putting `acc`/`acc_norm` at top level). Three
+real defects, one of which would have quietly corrupted the replication:
+
+- `r.get("acc") or r.get("acc_norm")` — `acc` is `0.0` exactly when the model got the item wrong,
+  and `0.0` is falsy, so the expression returned `acc_norm` instead. Every item failed under `acc`
+  but passed under `acc_norm` would have been scored **correct**, inflating accuracy and deflating
+  co-failure — biasing the v2 replication toward agreeing with the v1 headline. A replication whose
+  parser errs toward confirming the original is worse than no replication.
+- Filters are looped *outside* the document loop, so k filters emit k records per document; file
+  order gave k interleaved copies of every item. Now collapsed on `doc_id`.
+- The metric was picked per record, so `acc` on one model and `acc_norm` on the next could land in
+  one matrix. Now fixed once per file, with mismatched models rejected.
+
+`tests/test_v2_parser.py` pins all three with 11 tests built on the harness's real schema, so they
+run with no token and no network. When the token arrives the harvest can start immediately rather
+than failing on first contact.
+
 ## GitHub release prepared as a draft, not published (2026-08-07)
 
 `gh release create v1.0.0 --draft` run to reduce the Zenodo-activation step to one click. Verified
