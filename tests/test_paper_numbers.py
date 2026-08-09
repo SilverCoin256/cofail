@@ -182,3 +182,18 @@ def test_main_spectral_diagnostics_trace_to_an_artifact(main_tex):
         "the paper's algebraic claim is that PR = N/(1+(N-1)*mean R^2) exactly; "
         "the run says otherwise"
     )
+
+
+def test_cross_benchmark_ratio_range_is_rounded_correctly(main_tex, tex):
+    """The headline cross-benchmark excess range must round the artifact correctly.
+
+    Both papers said '2.9-11.9x'; the artifact says 2.848 and 11.842, which round to 2.8 and
+    11.8. Rounding a headline range outward in both directions overstates the finding at both
+    ends, so this pins it to the run.
+    """
+    ratios = [b["sweep"][0]["rms_ratio"] for b in load("dedup_sensitivity.json")["benchmarks"]]
+    lo, hi = f"{min(ratios):.1f}", f"{max(ratios):.1f}"
+    for name, body in (("main.tex", main_tex), ("workshop.tex", tex)):
+        assert lo in body and hi in body, (
+            f"{name} must state the cross-benchmark excess range as {lo}-{hi}x"
+        )
