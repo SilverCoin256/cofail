@@ -18,17 +18,18 @@ not exist yet -- do not add them as literal paths here until a run has actually 
 per this project's own dangling-reference discipline (tests/test_no_dangling_refs.py).
 """
 import json, os, re, sys, time
-import numpy as np
-from huggingface_hub import HfApi, hf_hub_download
-from huggingface_hub.utils import EntryNotFoundError, HfHubHTTPError
 
+# huggingface_hub, numpy and the rate limiter are imported lazily inside the functions that
+# actually reach the network. extract_correctness() is pure JSON parsing, and keeping it
+# importable without the "harvest" extra is what lets tests/test_v2_parser.py exercise it on any
+# interpreter -- which matters here more than usual, because the v2 datasets are gated and this
+# parser has never seen a real file. Its unit tests are the only thing standing between a
+# field-name mistake and a silently corrupted matrix.
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from ratelimit import LIMITER, is_429
 
 SUB = os.path.join(HERE, "..", "substrate")
 RAW = os.path.join(SUB, "raw")
-os.makedirs(RAW, exist_ok=True)
 
 SAMPLE_RE = re.compile(r"^(?P<model>.+)/samples_leaderboard_arc_challenge_(?P<ts>[\d\-T.]+)\.json$")
 
@@ -36,6 +37,7 @@ SAMPLE_RE = re.compile(r"^(?P<model>.+)/samples_leaderboard_arc_challenge_(?P<ts
 def list_models(n_models, cache_hours=24):
     """Discover model ids with an ARC-Challenge v2 details dataset. Cached, since listing all
     4,500 dataset names is itself a non-trivial number of API calls."""
+    from huggingface_hub import HfApi
     cache_path = os.path.join(SUB, "v2_model_list_cache.json")
     if os.path.exists(cache_path) and (time.time() - os.path.getmtime(cache_path)) < cache_hours * 3600:
         ids = json.load(open(cache_path))
@@ -49,6 +51,7 @@ def list_models(n_models, cache_hours=24):
 
 def latest_arc_sample_file(model_id):
     """Return the repo-relative path of the most recent ARC-Challenge samples file, or None."""
+    from huggingface_hub import HfApi
     api = HfApi()
     files = api.list_repo_files(model_id, repo_type="dataset")
     hits = []
@@ -66,34 +69,107 @@ def latest_arc_sample_file(model_id):
     return hits[-1][1]
 
 
-def extract_correctness(path):
-    """Parse a v2 samples_* file into a per-item (predicted_correct: bool) list, in file order."""
-    data = json.load(open(path))
-    rows = data if isinstance(data, list) else data.get("samples") or list(data.values())
-    out = []
+class SampleParseError(ValueError):
+    """A v2 samples file could not be parsed unambiguously. Reject the model, never guess."""
+
+
+def extract_correctness(path, metric_preference=("acc", "acc_norm")):
+    """Parse a v2 samples_* file into (correctness list ordered by doc_id, metric name used).
+
+    Written against the actual record schema emitted by lm-evaluation-harness, which builds each
+    logged sample as::
+
+        example = {"doc_id":..., "doc":..., "target":..., "arguments":..., "resps":...,
+                   "filtered_resps":..., "filter":..., "metrics": [...], ...}
+        example.update(metrics)          # <- acc / acc_norm land at TOP LEVEL, as floats
+
+    Three properties of that schema drive this implementation, and an earlier version of this
+    function got all three wrong. None of them could have been caught by reading the file we
+    could not download; all three are visible in the harness source.
+
+    1. `metrics` is a LIST OF METRIC NAMES, not a mapping of values. The values are top-level.
+
+    2. Metric lookup must use `is not None`, never `or`. `acc` is a float that is legitimately
+       0.0 when the model got the item wrong, and `0.0 or <acc_norm>` silently returns acc_norm
+       -- so every item a model failed on `acc` but passed on `acc_norm` would have been recorded
+       as CORRECT. That single bug would have inflated measured accuracy and, worse, deflated
+       measured co-failure, biasing the headline result toward "more independent than they are".
+       The same bug applied to `target`, where answer index 0 is a valid gold label.
+
+    3. The harness loops `for filter_key in ...` OUTSIDE the document loop, so a task with k
+       filters emits k records per document. Concatenating them in file order yields k copies of
+       every item, interleaved by filter. Item identity therefore comes from `doc_id`, and a
+       single filter must be chosen deterministically. This is strictly better than v1's
+       position-based identity, which needed a 334-model audit (src/audit_roworder.py) to license.
+
+    The metric is chosen ONCE PER FILE from `metric_preference`, not per record: mixing `acc` on
+    one model with `acc_norm` on another would make the co-failure matrix incoherent, since the
+    two disagree on a substantial fraction of ARC items.
+
+    Raises SampleParseError rather than returning a partially-guessed vector.
+    """
+    with open(path) as fh:
+        data = json.load(fh)
+
+    if isinstance(data, list):
+        rows = data
+    elif isinstance(data, dict):
+        rows = data.get("samples")
+        if rows is None:
+            rows = [v for v in data.values() if isinstance(v, dict)]
+    else:
+        raise SampleParseError(f"unexpected top-level type {type(data).__name__}")
+    if not rows:
+        raise SampleParseError("no sample records found")
+
+    # one metric for the whole file, present on every record
+    metric = next((m for m in metric_preference
+                   if all(r.get(m) is not None for r in rows)), None)
+    if metric is None:
+        have = sorted({k for r in rows[:5] for k in r})
+        raise SampleParseError(
+            f"no metric in {metric_preference} present on every record; keys seen: {have[:12]}")
+
+    # collapse to one record per doc_id, keeping a single deterministic filter
+    filters = sorted({str(r.get("filter", "")) for r in rows})
+    chosen = filters[0]
+    by_doc = {}
     for r in rows:
-        # v2 sample records carry the model's argmax prediction and the gold index/label under
-        # varying key names across harness point releases; try the common ones in order.
-        pred = r.get("predictions") or r.get("pred") or r.get("filtered_resps")
-        gold = r.get("target") or r.get("gold") or r.get("doc", {}).get("answerKey")
-        acc = r.get("acc") or r.get("acc_norm")
-        if acc is not None:
-            out.append(bool(round(float(acc))))
-        elif pred is not None and gold is not None:
-            p = pred[0] if isinstance(pred, list) else pred
-            out.append(str(p) == str(gold))
-        else:
-            out.append(None)
-    return out
+        if str(r.get("filter", "")) != chosen:
+            continue
+        doc_id = r.get("doc_id")
+        if doc_id is None:
+            raise SampleParseError("record has no doc_id; item identity is not recoverable")
+        if doc_id in by_doc:
+            raise SampleParseError(
+                f"duplicate doc_id {doc_id} within filter {chosen!r}; cannot order items")
+        by_doc[doc_id] = r
+
+    if not by_doc:
+        raise SampleParseError(f"no records for chosen filter {chosen!r}")
+
+    order = sorted(by_doc)
+    if order != list(range(len(order))):
+        raise SampleParseError(
+            f"doc_id set is not 0..n-1 (min={order[0]}, max={order[-1]}, n={len(order)}); "
+            "items may be missing")
+
+    return [bool(round(float(by_doc[d][metric]))) for d in order], metric
 
 
 def main(n_models=300):
+    import numpy as np
+    from huggingface_hub import hf_hub_download
+    from huggingface_hub.utils import EntryNotFoundError, HfHubHTTPError
+    from ratelimit import LIMITER, is_429
+
+    os.makedirs(RAW, exist_ok=True)
     models = list_models(n_models)
     print(f"[v2-arc] targeting {len(models)} models (scoped, user-authorized 2026-08-07)",
           flush=True)
 
     rows, kept_models, rejects = [], [], []
-    n_items_ref = None
+    n_items_ref = metric_ref = None
     t0 = time.time()
     total_bytes = 0
 
@@ -106,15 +182,23 @@ def main(n_models=300):
                 continue
             local = hf_hub_download(mid, rel, repo_type="dataset")
             total_bytes += os.path.getsize(local)
-            correctness = extract_correctness(local)
+            correctness, metric = extract_correctness(local)
             if n_items_ref is None:
-                n_items_ref = len(correctness)
-            if len(correctness) != n_items_ref or any(c is None for c in correctness):
-                rejects.append({"model": mid, "reason": "length/parse mismatch",
+                n_items_ref, metric_ref = len(correctness), metric
+            if len(correctness) != n_items_ref:
+                rejects.append({"model": mid, "reason": "length mismatch",
                                 "n": len(correctness), "expected": n_items_ref})
+                continue
+            # a model scored on a different metric is not comparable to the rest of the
+            # population; keeping it would silently mix acc and acc_norm within one matrix
+            if metric != metric_ref:
+                rejects.append({"model": mid, "reason": "metric mismatch",
+                                "metric": metric, "expected": metric_ref})
                 continue
             rows.append(correctness)
             kept_models.append(mid)
+        except SampleParseError as e:
+            rejects.append({"model": mid, "reason": f"parse: {str(e)[:120]}"})
         except (EntryNotFoundError, HfHubHTTPError) as e:
             if is_429(e):
                 LIMITER.penalise()
