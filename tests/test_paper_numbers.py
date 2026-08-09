@@ -235,4 +235,7 @@ def test_model_count_range_traces_to_the_runs(main_tex, tex):
         assert f"${lo}$--${hi}$" in body, (
             f"{name} must state the population range as {lo}-{hi}"
         )
-        assert "1{,}373" not in body, f"{name} still contains the untraceable count 1,373"
+        # reject every spelling: the math form, the plain-text form (a section heading used
+        # "1,228--1,373" outside math mode and survived the first fix), and the bare digits
+        for bad in ("1{,}373", "1,373", "1373"):
+            assert bad not in body, f"{name} still contains the untraceable count 1,373 as {bad!r}"
