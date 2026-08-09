@@ -2,6 +2,7 @@
 
 [![Layer C monitor](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml/badge.svg)](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21860005.svg)](https://doi.org/10.5281/zenodo.21860005)
+[![OSF](https://img.shields.io/badge/OSF-preregistration-blue)](https://osf.io/cmh7q/)
 
 **[Project page](https://silvercoin256.github.io/cofail/)** · **[Paper (PDF)](docs/paper.pdf)** ·
 **[Short version, 4pp](docs/workshop.pdf)** · **[One-page brief](docs/brief/brief.pdf)** ·
