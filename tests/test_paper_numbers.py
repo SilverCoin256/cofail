@@ -156,3 +156,29 @@ def test_item_margin_only_gap_is_stated_as_the_max_not_a_smaller_number(main_tex
             f"{name} must bound the item-margin-only gap by the worst benchmark "
             f"({stated}); a smaller figure understates it"
         )
+
+
+def test_main_spectral_diagnostics_trace_to_an_artifact(main_tex):
+    """The discriminating spectral diagnostics must trace to JSON, not only to the digest.
+
+    lambda_1^2/sum(lambda^2), the deflated participation ratio, and the positive-mass fraction
+    are the statistics the paper offers *in place of* the withdrawn 'effective number of models'
+    claim, so they carry real weight. They were quoted in main.tex and recorded in
+    RESULTS_DIGEST.md but emitted by no run; src/spectral_diagnostics.py now emits them and this
+    asserts the paper matches. Recomputed on the paper-era 1,362-model matrix, not the live
+    substrate, which Layer C keeps growing.
+    """
+    d = load("spectral_diagnostics.json")["arc"]
+    assert d["N"] == 1362 and d["M"] == 1165, (
+        "spectral_diagnostics.json must be computed on the paper-era ARC snapshot; "
+        f"got N={d['N']}, M={d['M']}"
+    )
+    assert f"{d['lambda1_sq_over_sum_sq']:.3f}" in main_tex
+    assert f"{d['pr_deflated_leading']:.1f}" in main_tex
+    assert f"{d['frac_spectral_mass_positive'] * 100:.2f}" in main_tex
+    assert f"{d['pr_clipped']:.1f}" in main_tex
+    assert f"{d['pr_absolute']:.1f}" in main_tex
+    assert d["pr_identity_matches_raw"], (
+        "the paper's algebraic claim is that PR = N/(1+(N-1)*mean R^2) exactly; "
+        "the run says otherwise"
+    )
