@@ -216,3 +216,23 @@ def test_dedup_discard_range_matches_the_sweep(main_tex, tex):
         assert f"${lo}$--${hi}\\%$" in body, (
             f"{name} must state the 0.95-dedup discard range as {lo}-{hi}%"
         )
+
+
+def test_model_count_range_traces_to_the_runs(main_tex, tex):
+    """The headline population range must equal the actual per-benchmark N values.
+
+    Both papers advertised '1,228-1,373 models per benchmark' in their abstracts. No artifact
+    contains 1,373 as a value at all -- the true maximum is ARC/HellaSwag at 1,362. This is the
+    same failure mode as the 0.0389 null: a headline number that traced to nothing.
+    """
+    import glob
+    ns = []
+    for f in sorted(glob.glob(os.path.join(RES, "*_results.json"))):
+        ns.append(json.load(open(f))["N"])
+    lo = f"{min(ns):,}".replace(",", "{,}")
+    hi = f"{max(ns):,}".replace(",", "{,}")
+    for name, body in (("main.tex", main_tex), ("workshop.tex", tex)):
+        assert f"${lo}$--${hi}$" in body, (
+            f"{name} must state the population range as {lo}-{hi}"
+        )
+        assert "1{,}373" not in body, f"{name} still contains the untraceable count 1,373"
