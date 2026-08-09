@@ -78,11 +78,26 @@ def harvest(bench, manifest):
     if os.path.exists(out):
         z = np.load(out, allow_pickle=True)
         ms = list(z["models"])
+        # Decompress each array ONCE, outside the loop. Indexing `z["prim"]` inside the loop
+        # re-decompresses the whole array on every iteration -- NpzFile is lazy and caches
+        # nothing -- so the old form cost n full decompressions of an n-row array. That is
+        # quadratic in the model count, and it is what killed Layer C.
+        #
+        # 2026-08-09 postmortem: with ARC at 2,162 models this loop decompressed ~49 GB to read
+        # a 965 KB file, and the transient allocation was enough for the OOM killer to take the
+        # process (exit 137). It was survivable at the original 1,362 models and started failing
+        # only after Layer C's own harvest grew the file -- so the system broke itself by
+        # succeeding. The same signature appeared on GitHub Actions runners and on a laptop, and
+        # three earlier runs that GitHub reported merely as "cancelled" were almost certainly
+        # this too. HellaSwag, 8x wider, would have churned ~400 GB and never stood a chance.
+        prim_all = z["prim"]
+        dates_all = z["dates"]
+        sec_all = z["sec"] if ("sec" in z.files and z["sec"].size) else None
         for k, m in enumerate(ms):
-            P[m] = z["prim"][k]
-            if "sec" in z.files and z["sec"].size:
-                S[m] = z["sec"][k]
-            D[m] = str(z["dates"][k])
+            P[m] = prim_all[k]
+            if sec_all is not None:
+                S[m] = sec_all[k]
+            D[m] = str(dates_all[k])
         have = set(ms)
         print(f"[{bench}] resuming, {len(have)} cached", flush=True)
     todo = [(m, v[bench]) for m, v in manifest.items() if bench in v and m not in have]
