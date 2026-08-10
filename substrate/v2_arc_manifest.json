@@ -1,8 +1,10 @@
 {
- "n_requested": 300,
- "n_kept": 0,
- "n_rejected": 300,
- "n_items": null,
- "total_bytes_downloaded": 161330498,
- "seconds_elapsed": 50.218910455703735
+ "n_target": 300,
+ "n_scanned": 4500,
+ "n_candidates": 4500,
+ "n_kept": 212,
+ "n_rejected": 4288,
+ "n_items": 1172,
+ "total_bytes_downloaded": 1466598703,
+ "seconds_elapsed": 3025.9642407894135
 }
