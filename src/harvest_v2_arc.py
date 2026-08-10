@@ -201,7 +201,7 @@ def main(n_models=300):
             rejects.append({"model": mid, "reason": f"parse: {str(e)[:120]}"})
         except (EntryNotFoundError, HfHubHTTPError) as e:
             if is_429(e):
-                LIMITER.penalise()
+                LIMITER.hit_429(e)
             rejects.append({"model": mid, "reason": f"{type(e).__name__}: {str(e)[:100]}"})
         except Exception as e:
             rejects.append({"model": mid, "reason": f"{type(e).__name__}: {str(e)[:100]}"})
