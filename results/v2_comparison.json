@@ -1,0 +1,32 @@
+{
+ "question": "does the residual-correlation finding replicate on v2's newer harness",
+ "v1_arc_full_population": {
+  "N": 1362,
+  "M": 1165,
+  "rms_obs": 0.2482666165101478,
+  "rms_null": 0.044493727256450157,
+  "rms_ratio": 5.5798116233149955,
+  "PR_obs": 23.564839822734434,
+  "PR_null": 453.1531082595997,
+  "PR_ratio": 0.05200193796140695,
+  "null_spectral_edge": 27.943380954806468,
+  "n_eigen_above_edge": 6,
+  "threshold": 1.01,
+  "n_removed": 0
+ },
+ "v2_arc": {
+  "N": 212,
+  "M": 1128,
+  "rms_obs": 0.18323379161695397,
+  "rms_null": 0.04488775518968474,
+  "rms_ratio": 4.0820439971358,
+  "PR_obs": 40.06636392067893,
+  "PR_null": 161.71142547111103,
+  "PR_ratio": 0.24776458313909672,
+  "null_spectral_edge": 4.873629225125417,
+  "n_eigen_above_edge": 4
+ },
+ "v2_n_kept_of_targeted": 212,
+ "rms_ratio_agree_direction": true,
+ "PR_ratio_agree_direction": true
+}

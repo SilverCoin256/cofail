@@ -704,6 +704,20 @@ single additional point, not a trend, and it tests robustness to enlarging this 
 than to substituting a different one --- the objection \citeauthor{jo2026subjectivity} raise is
 not answered by more of the same population.
 
+A related but distinct objection is that the finding is an artifact of the specific,
+now-dated (2023--2024) evaluation harness rather than a property of the ecosystem. We give one
+directional check rather than an assurance here too: harvesting ARC-Challenge from the newer,
+independently-implemented Open LLM Leaderboard v2 harness and applying the identical estimator to
+the $212$ models it evaluated on that task yields rms excess $4.08\times$ its null and a
+participation-ratio ratio of $0.248$, against $5.58\times$ and $0.052$ on v1. Both statistics agree
+in \emph{direction} with the v1 finding; neither matches it in \emph{magnitude}, and we do not
+read more into the comparison than that. The $212$-model v2 population is $6.4\times$ smaller,
+which alone inflates a finite-sample participation-ratio toward $1$, and it is not a random draw
+from the v2 archive but the subset that happened to be evaluated on ARC-Challenge under a newer
+benchmark suite that most v2 submissions do not run at all --- a selection this check does not
+characterise. We report this as evidence against harness-artifact as the sole explanation, not as
+a second confirmatory measurement at the scale of Table~\ref{tab:neff}.
+
 The central limitation is identification. Our conditioning model is unidimensional, and
 Table~\ref{tab:misspec} shows that additional latent ability dimensions reproduce much of the
 observed effect with no shared lineage whatsoever. We can rule out discrimination heterogeneity

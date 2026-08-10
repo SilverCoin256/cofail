@@ -755,3 +755,54 @@ once per benchmark by the module-level `METRIC` table rather than chosen per rec
 `acc_norm` cannot mix within one matrix; and any non-0/1 primary is rejected outright
 (`non-binary-primary`). A repo-wide grep for the pattern found only three `... or ...` fallbacks,
 all on environment-variable strings, none on a numeric metric. The paper's data is unaffected.
+
+## The recency objection: does the finding replicate on v2's newer harness? (2026-08-10)
+
+F8 in `docs/NEURIPS_BLUEPRINT.md` records a real, anticipated reviewer objection: v1's harness
+snapshots run 2023-07 to 2024-06, so a reviewer could reasonably ask whether the residual-
+correlation finding is an artifact of that specific, now-dated evaluation harness rather than a
+property of the open-model ecosystem. `src/harvest_v2_arc.py` harvests ARC-Challenge from the
+Open LLM Leaderboard v2 archive, which runs a materially different, newer harness. Scoped to
+~300 models / ~2.8 GB, user-authorized 2026-08-07, run via a one-off GitHub Actions workflow
+(`.github/workflows/harvest_v2_arc.yml`) rather than locally, matching Layer C's pattern, since
+bulk harvest workloads have reliably exceeded local sandbox limits in this project.
+
+**Harvest yield.** Of 4,500 v2 dataset candidates scanned, 212 had an ARC-Challenge samples file
+at all (4.7%) — most v2-evaluated models were run on the newer BBH/GPQA/IFEval/MATH/MMLU-Pro/MUSR
+suite instead. This is a real fact about the archive, not a bug (see commit `0b5155b`): the
+harvester now scans until it has kept its target rather than treating the target as an attempt
+budget, and stayed within the authorized ~2.8 GB (1.47 GB downloaded, since a no-file rejection
+costs a metadata call, not a download).
+
+Two real defects were found and fixed only by parsing an actual v2 file for the first time
+(commits `9c1cf53`, `0b5155b`): `LIMITER.penalise()` didn't exist (crashed the run on its first
+rejection instead of logging and continuing); the account had a valid token but had not accepted
+the dataset's gate terms (a token alone does not do this); the sample files are JSON Lines despite
+the `.json` extension, not single JSON documents. All three are now regression-tested against the
+real schema.
+
+**Result, computed identically to the v1 figure.** `src/v2_comparison.py` reuses
+`dedup_sensitivity.stats_for()` unchanged — same Rasch fit, same curveball null (50N burn-in, 5N
+between draws, 6 replicates) — so the two numbers below are not just two things that happened to
+be computed somehow:
+
+| | N | rms obs/null | ratio | PR obs/null | ratio | eig > edge |
+|---|---|---|---|---|---|---|
+| v1 ARC (paper) | 1362 | 0.2483 / 0.0445 | **5.58×** | 23.6 / 453.2 | **0.052** | 6 |
+| v2 ARC | 212 | 0.1832 / 0.0449 | **4.08×** | 40.1 / 161.7 | **0.248** | 4 |
+
+**Honest reading.** Both statistics agree in *direction*: residual correlation sits well above its
+null (4–6×) and the participation ratio sits well below its null on both harnesses. That is a real
+piece of evidence against the objection that the finding is an artifact of the specific 2023–2024
+harness. It is not a clean magnitude replication — the v2 ratio is smaller, and the PR ratio in
+particular is far less extreme (0.248 vs 0.052) — and the honest reasons why are on the table
+rather than explained away: N is 6.4× smaller, which alone inflates finite-sample PR ratios toward
+1; the 212 kept models are not a random draw from the v2 population but the subset that happened
+to be evaluated on ARC-Challenge under the newer suite, a selection this analysis does not
+characterise; and a single benchmark, single snapshot cannot carry the weight the five-benchmark,
+multi-cohort v1 analysis does. This is reported as a directional replication with a materially
+smaller and differently-selected population, not folded into the main results as if it were
+equivalent evidence.
+
+Artifact: `results/v2_comparison.json`. Not added to the abstract or headline claims — this
+answers one specific, anticipated reviewer objection and is reported in Limitations at that scope.

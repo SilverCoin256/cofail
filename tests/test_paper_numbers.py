@@ -283,3 +283,14 @@ def test_layer_c_replication_matches_the_timeseries(main_tex):
     for r in rows:
         v = f"{float(r['PR_ratio']):.3f}"
         assert v in main_tex, f"{r['bench']} Layer C ratio {v} missing from main.tex"
+
+
+def test_v2_recency_check_matches_its_artifact(main_tex):
+    """The v1-vs-v2 recency-objection comparison in Limitations must match results/v2_comparison.json."""
+    d = load("v2_comparison.json")
+    v1, v2 = d["v1_arc_full_population"], d["v2_arc"]
+    assert str(v2["N"]) in main_tex, "v2 model count missing"
+    assert f"{v2['rms_ratio']:.2f}" in main_tex
+    assert f"{v2['PR_ratio']:.3f}" in main_tex
+    assert f"{v1['rms_ratio']:.2f}" in main_tex
+    assert f"{v1['PR_ratio']:.3f}" in main_tex
