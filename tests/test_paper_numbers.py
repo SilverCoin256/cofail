@@ -264,3 +264,22 @@ def test_substrate_is_strictly_binary():
         assert bad.size == 0, f"{bench}.npz has non-binary values: {bad[:5]}"
         checked += 1
     assert checked, "no substrate matrices found to check"
+
+
+def test_layer_c_replication_matches_the_timeseries(main_tex):
+    """The Layer C replication quoted in Limitations must match results/timeseries.csv.
+
+    These are the first numbers in the paper that come from the scheduled monitor rather than
+    the frozen study run, so they are the easiest to let drift as Layer C keeps appending rows.
+    Pinned to the 2026-08-09 pass, the one the paper actually cites.
+    """
+    import csv
+    path = os.path.join(RES, "timeseries.csv")
+    rows = [r for r in csv.DictReader(open(path)) if r["run_date"] == "2026-08-09"]
+    assert len(rows) == 5, f"expected the 5 benchmarks of the cited pass, got {len(rows)}"
+    ns = sorted(int(r["n_models"]) for r in rows)
+    assert f"{ns[0]:,}".replace(",", "{,}") in main_tex, "low end of the population range"
+    assert f"{ns[-1]:,}".replace(",", "{,}") in main_tex, "high end of the population range"
+    for r in rows:
+        v = f"{float(r['PR_ratio']):.3f}"
+        assert v in main_tex, f"{r['bench']} Layer C ratio {v} missing from main.tex"

@@ -692,7 +692,17 @@ Claims cover the evaluated open-model ecosystem on multiple-choice-style benchma
 proprietary systems; the societal framing is motivation, not a measured outcome, and we make no
 claim about real-world screening decisions. The models are a self-selected population of
 leaderboard submissions, and \citet{jo2026subjectivity} show explicitly that such inferences are
-population-dependent --- a different peer set can change them.
+population-dependent --- a different peer set can change them. We have one piece of direct
+evidence on that sensitivity rather than an assurance. A scheduled process re-runs the identical
+estimator on the archive as it grows and appends a dated row to a public time series; its
+2026-08-09 pass covered $2{,}972$--$3{,}762$ models per benchmark, roughly $2.8\times$ the
+population analysed here, and returned participation-ratio ratios of $0.045$ (ARC), $0.034$
+(Winogrande), $0.051$ (TruthfulQA), $0.191$ (GSM8K) and $0.018$ (HellaSwag), against the
+$0.052$, $0.041$, $0.056$, $0.214$ and $0.028$ reported in Table~\ref{tab:neff}. Every ratio moves
+slightly \emph{down} as the population grows, and none moves by more than $0.010$. That is a
+single additional point, not a trend, and it tests robustness to enlarging this peer set rather
+than to substituting a different one --- the objection \citeauthor{jo2026subjectivity} raise is
+not answered by more of the same population.
 
 The central limitation is identification. Our conditioning model is unidimensional, and
 Table~\ref{tab:misspec} shows that additional latent ability dimensions reproduce much of the
