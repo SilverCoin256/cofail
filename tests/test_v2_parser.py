@@ -148,3 +148,39 @@ def test_samples_key_wrapper_is_accepted(tmp_path):
 def test_empty_file_raises(tmp_path):
     with pytest.raises(SampleParseError):
         extract_correctness(write(tmp_path, []))
+
+
+def write_jsonl(tmp_path, rows, name="samples.json"):
+    """Real archive files use this format despite the .json extension -- see below."""
+    p = tmp_path / name
+    p.write_text("\n".join(json.dumps(r) for r in rows))
+    return str(p)
+
+
+def test_jsonl_despite_json_extension_is_parsed(tmp_path):
+    """The real archive schema, found only once a real file could be downloaded (2026-08-10):
+    every sample file is JSON Lines -- one JSON object per line -- despite ending in `.json`,
+    not the single JSON array/object every test above (and the original implementation) assumed.
+    Confirmed directly on a 1,172-line real ARC-Challenge file; json.load() on the whole file
+    raises 'Extra data' at the start of line 2, which crashed 22/300 models before this fix, with
+    the other 278 rejected for lacking an ARC-Challenge file at all (a real, separate fact about
+    the archive -- see list_models()'s docstring)."""
+    rows = [record(0, acc=1.0), record(1, acc=0.0), record(2, acc=1.0)]
+    got, metric = extract_correctness(write_jsonl(tmp_path, rows))
+    assert metric == "acc"
+    assert got == [True, False, True]
+
+
+def test_single_json_document_still_works_alongside_jsonl(tmp_path):
+    """The fix tries a single json.load() first and only falls back to JSON Lines on failure --
+    confirming it doesn't regress the format every other test in this file uses."""
+    rows = [record(0, acc=1.0), record(1, acc=0.0)]
+    got, _ = extract_correctness(write(tmp_path, rows))
+    assert got == [True, False]
+
+
+def test_genuinely_malformed_file_raises_not_silently_empty(tmp_path):
+    p = tmp_path / "bad.json"
+    p.write_text("{not json at all")
+    with pytest.raises(SampleParseError, match="neither a single JSON document nor JSON Lines"):
+        extract_correctness(str(p))

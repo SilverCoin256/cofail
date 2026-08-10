@@ -11,11 +11,17 @@ For each model, only the LATEST snapshot's ARC-Challenge sample file is fetched,
 fields needed for a binary correctness matrix (predicted answer index, gold index) are kept in
 memory -- the raw JSON is not retained after parsing, only the parsed correctness bit per item.
 
-Run: ./.venv/bin/python src/harvest_v2_arc.py [n_models]
-Status as of 2026-08-07: blocked on HF auth (v2 details datasets are gated; see
-docs/NEURIPS_BLUEPRINT.md, "X7 correction"). Output paths are defined in main() below and do
-not exist yet -- do not add them as literal paths here until a run has actually produced them,
-per this project's own dangling-reference discipline (tests/test_no_dangling_refs.py).
+Run: ./.venv/bin/python src/harvest_v2_arc.py [n_models_to_keep]
+(n_models is a target KEPT count, not an attempt budget -- see main()'s docstring.)
+
+Status as of 2026-08-10: unblocked. The HF auth blocker (v2 details datasets are gated) was
+resolved by accepting the account-level gate on the open-llm-leaderboard collection, which
+propagates across all ~4,500 repos in it -- confirmed directly, not assumed (curl 200 on three
+unrelated repos plus an actual file download, before the first real run). That first real run
+then found two further bugs no amount of reading could have, since v2 had never been fetched
+before: a rejection-handler typo that crashed the whole run on its first reject, and every
+sample file being JSON Lines despite its `.json` extension. Both are fixed and documented at
+their call sites; see docs/NEURIPS_BLUEPRINT.md for the full sequence.
 """
 import json, os, re, sys, time
 
@@ -34,19 +40,27 @@ RAW = os.path.join(SUB, "raw")
 SAMPLE_RE = re.compile(r"^(?P<model>.+)/samples_leaderboard_arc_challenge_(?P<ts>[\d\-T.]+)\.json$")
 
 
-def list_models(n_models, cache_hours=24):
-    """Discover model ids with an ARC-Challenge v2 details dataset. Cached, since listing all
-    4,500 dataset names is itself a non-trivial number of API calls."""
+def list_models(cache_hours=24):
+    """Discover ALL `-details` dataset repos, not just the ones with an ARC-Challenge file --
+    that can only be known by listing each repo's own files, which main() does per-candidate.
+    Cached, since listing all ~4,500 dataset names is itself a non-trivial number of API calls.
+
+    No n_models truncation here (2026-08-10 fix): the leaderboard switched to a different task
+    suite (BBH/GPQA/IFEval/MATH/MMLU-Pro/MUSR) partway through v2's life, and on an alphabetical
+    sample of the archive only ~7% of models had an ARC-Challenge file at all (22/300, measured
+    directly). Truncating the *candidate* list to the target kept-count, as the original version
+    did, produced 0 kept models out of 300 attempted. main() now scans this full list and stops
+    once it has kept enough -- see its docstring for why that is still within the ~2.8 GB
+    authorization despite scanning far more than 300 candidates."""
     from huggingface_hub import HfApi
     cache_path = os.path.join(SUB, "v2_model_list_cache.json")
     if os.path.exists(cache_path) and (time.time() - os.path.getmtime(cache_path)) < cache_hours * 3600:
-        ids = json.load(open(cache_path))
-    else:
-        api = HfApi()
-        ids = sorted(d.id for d in api.list_datasets(author="open-llm-leaderboard", limit=None)
-                     if d.id.endswith("-details"))
-        json.dump(ids, open(cache_path, "w"))
-    return ids[:n_models] if n_models else ids
+        return json.load(open(cache_path))
+    api = HfApi()
+    ids = sorted(d.id for d in api.list_datasets(author="open-llm-leaderboard", limit=None)
+                 if d.id.endswith("-details"))
+    json.dump(ids, open(cache_path, "w"))
+    return ids
 
 
 def latest_arc_sample_file(model_id):
@@ -107,9 +121,25 @@ def extract_correctness(path, metric_preference=("acc", "acc_norm")):
     two disagree on a substantial fraction of ARC items.
 
     Raises SampleParseError rather than returning a partially-guessed vector.
+
+    A fourth property, found only once a real file could be downloaded (2026-08-10): despite the
+    `.json` extension, files in the archive are JSON Lines -- one JSON object per line, not a
+    single array or object -- confirmed on a 1,172-line real ARC-Challenge file. `json.load()` on
+    the whole file raises `JSONDecodeError: Extra data` at the start of line 2, which is exactly
+    what an all-attempts-crash run surfaced on 22/300 sampled models before this fix. Detected by
+    attempting a single `json.load()` first (some dumps genuinely are one JSON document) and
+    falling back to one `json.loads()` per line on that specific failure, rather than assuming
+    either format.
     """
     with open(path) as fh:
-        data = json.load(fh)
+        text = fh.read()
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        try:
+            data = [json.loads(line) for line in text.splitlines() if line.strip()]
+        except json.JSONDecodeError as e:
+            raise SampleParseError(f"neither a single JSON document nor JSON Lines: {e}") from e
 
     if isinstance(data, list):
         rows = data
@@ -158,22 +188,35 @@ def extract_correctness(path, metric_preference=("acc", "acc_norm")):
 
 
 def main(n_models=300):
+    """n_models is a TARGET KEPT COUNT, not an attempt budget (2026-08-10 fix -- see
+    list_models()'s docstring for why the original attempt-budget semantics kept 0/300).
+    Scans the full candidate list and stops once that many models have been kept, or the
+    candidates run out. Still bounded to the ~2.8 GB the user authorized 2026-08-07: a model
+    lacking an ARC-Challenge file is rejected from its file listing alone, with no download, and
+    that rejection is the overwhelmingly common case (~93% on the measured sample), so the
+    number of actual ~9.4 MB downloads stays close to n_models regardless of how many
+    no-file candidates are scanned to find them."""
     import numpy as np
     from huggingface_hub import hf_hub_download
     from huggingface_hub.utils import EntryNotFoundError, HfHubHTTPError
     from ratelimit import LIMITER, is_429
 
     os.makedirs(RAW, exist_ok=True)
-    models = list_models(n_models)
-    print(f"[v2-arc] targeting {len(models)} models (scoped, user-authorized 2026-08-07)",
-          flush=True)
+    candidates = list_models()
+    print(f"[v2-arc] scanning up to {len(candidates)} candidates for {n_models} kept models "
+          f"(scoped, user-authorized 2026-08-07)", flush=True)
 
     rows, kept_models, rejects = [], [], []
     n_items_ref = metric_ref = None
     t0 = time.time()
     total_bytes = 0
+    i = -1  # in case candidates is empty, so the summary below doesn't reference an unset name
 
-    for i, mid in enumerate(models):
+    for i, mid in enumerate(candidates):
+        if len(kept_models) >= n_models:
+            print(f"[v2-arc] reached target of {n_models} kept models "
+                  f"after scanning {i}/{len(candidates)} candidates", flush=True)
+            break
         try:
             LIMITER.acquire()
             rel = latest_arc_sample_file(mid)
@@ -208,8 +251,9 @@ def main(n_models=300):
 
         if (i + 1) % 10 == 0:
             gb = total_bytes / 1e9
-            print(f"  {i+1}/{len(models)}  kept={len(kept_models)} rejected={len(rejects)}  "
-                  f"{gb:.2f} GB downloaded  {time.time()-t0:.0f}s elapsed", flush=True)
+            print(f"  {i+1}/{len(candidates)} scanned  kept={len(kept_models)} target={n_models} "
+                  f"rejected={len(rejects)}  {gb:.2f} GB downloaded  {time.time()-t0:.0f}s elapsed",
+                  flush=True)
             # checkpoint every 10 models so a long-running, rate-limited harvest over ~300
             # models can't lose everything to a single failure late in the run
             if rows:
@@ -222,12 +266,15 @@ def main(n_models=300):
     np.savez_compressed(os.path.join(RAW, "arc_v2.npz"), prim=arr,
                         models=np.array(kept_models, dtype=object))
     json.dump(rejects, open(os.path.join(SUB, "v2_arc_rejects.json"), "w"), indent=1)
-    json.dump({"n_requested": len(models), "n_kept": len(kept_models), "n_rejected": len(rejects),
-              "n_items": n_items_ref, "total_bytes_downloaded": total_bytes,
-              "seconds_elapsed": time.time() - t0},
+    json.dump({"n_target": n_models, "n_scanned": min(i + 1, len(candidates)),
+              "n_candidates": len(candidates), "n_kept": len(kept_models),
+              "n_rejected": len(rejects), "n_items": n_items_ref,
+              "total_bytes_downloaded": total_bytes, "seconds_elapsed": time.time() - t0},
              open(os.path.join(SUB, "v2_arc_manifest.json"), "w"), indent=1)
 
-    print(f"\n[v2-arc] done: {len(kept_models)}/{len(models)} kept, {len(rejects)} rejected, "
+    print(f"\n[v2-arc] done: {len(kept_models)}/{n_models} kept "
+          f"(scanned {min(i + 1, len(candidates))} of {len(candidates)} candidates), "
+          f"{len(rejects)} rejected, "
           f"{n_items_ref} items, {total_bytes/1e9:.2f} GB, {time.time()-t0:.0f}s")
 
 
