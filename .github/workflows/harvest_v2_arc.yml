@@ -1,0 +1,68 @@
+name: v2 ARC-Challenge harvest (one-off)
+
+# Runs src/harvest_v2_arc.py: a single-task, ~300-model replication on the Open LLM Leaderboard
+# v2 archive, explicitly authorized by the user 2026-08-07 and scoped to ~2.8 GB (see the
+# docstring of that script and docs/NEURIPS_BLUEPRINT.md, "X7 feasibility check"). v2's
+# per-model details datasets are gated, so this requires an HF account token -- supplied via the
+# HF_TOKEN repository secret, never committed to the repository. This is a one-off replication
+# check, not a recurring job like layer_c_monitor.yml, so it is workflow_dispatch only.
+#
+# Runs on GitHub's infrastructure rather than locally because bulk HTTP+parquet/JSON harvest
+# workloads of this shape have reliably exceeded local sandbox resource limits in this project's
+# development environment (see docs/LAYER_C.md's OOM postmortem for the same failure signature
+# in the v1 harvester) -- untested for this specific script, but the same class of workload.
+
+on:
+  workflow_dispatch:
+    inputs:
+      n_models:
+        description: "Number of models to harvest (default 300, ~2.8 GB)"
+        required: false
+        default: "300"
+
+permissions:
+  contents: write
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: pip install -e ".[harvest]"
+
+      - name: Configure git identity
+        run: |
+          git config user.name "layer-c-bot"
+          git config user.email "actions@users.noreply.github.com"
+          cat > /tmp/push_with_retry.sh <<'EOF'
+          #!/usr/bin/env bash
+          set -e
+          for i in 1 2 3 4 5; do
+            if git push; then exit 0; fi
+            echo "push rejected (attempt $i/5), fetching and rebasing onto the new tip"
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "push still rejected after 5 attempts" >&2
+          exit 1
+          EOF
+          chmod +x /tmp/push_with_retry.sh
+
+      - name: Harvest v2 ARC-Challenge
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python src/harvest_v2_arc.py ${{ github.event.inputs.n_models }}
+
+      - name: Commit and push
+        run: |
+          git add substrate/raw/arc_v2.npz substrate/v2_arc_rejects.json substrate/v2_arc_manifest.json substrate/v2_model_list_cache.json
+          git diff --cached --quiet && echo "nothing to commit" && exit 0
+          git commit -m "v2 ARC-Challenge harvest: $(date -u +%Y-%m-%d)"
+          /tmp/push_with_retry.sh
