@@ -187,7 +187,7 @@ def fig_misspec():
             elems.append(f'<line x1="{left}" y1="{top+rh*(i+1):.1f}" x2="{right}" '
                          f'y2="{top+rh*(i+1):.1f}" stroke="{MUTED}" stroke-width="0.6"/>')
 
-    elems.append(text(left - 14, 24, "generating process (no clusters unless noted)", 10,
+    elems.append(text(left - 14, 24, "generating process", 10,
                       INK2, "end", "500"))
     elems.append(text(right + 14, 24, "PR/null", 10, INK2, "start", "500"))
     elems.append(text(left, bot + 62, "Discrimination heterogeneity alone (2PL) tops out at "
@@ -270,7 +270,7 @@ def fig_residual_summary():
                       "count” (Sec. 4.3): it is N/(1+(N−1)·mean Rᵢⱼ²).", 9,
                       INK2))
     elems.append(text(left, 314, "Reported here as the calibrated summary statistic; see "
-                      "Fig. \\ref{fig:misspec} for the identification diagnostics.", 9, INK2))
+                      "Fig. 3 for the identification diagnostics.", 9, INK2))
 
     save("fig_residual_summary", W, H, elems)
 

@@ -1,85 +1,54 @@
-\documentclass[11pt,a4paper]{article}
+\PassOptionsToPackage{hidelinks}{hyperref}
+\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage[utf8]{inputenc}
-\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{microtype}
-\usepackage[margin=2.6cm]{geometry}
-\usepackage[hidelinks]{hyperref}
-\usepackage{natbib}
 
+\theoremstyle{thmstyleone}
 \newtheorem{lemma}{Lemma}
-\theoremstyle{definition}
+\theoremstyle{thmstylethree}
 \newtheorem{definition}{Definition}
 
-\title{\bfseries How Many Independent Models Does an Open-Model\\
-Ecosystem Contain? Evidence at the Exact Conditional Null}
-
-\author{Shaurya Gupta\\\small\texttt{shauryaguptaa8@gmail.com}}
-\date{\today}
+\raggedbottom
 
 \begin{document}
+
+\title[Independent Models in an Open-Model Ecosystem]{How Many Independent Models Does an
+Open-Model Ecosystem Contain? Evidence at the Exact Conditional Null}
+
+\author*[1]{\fnm{Shaurya} \sur{Gupta}}\email{shauryaguptaa8@gmail.com}
+
+\affil*[1]{\orgname{Independent Researcher}, \orgaddress{\city{CITY\_PLACEHOLDER},
+\country{India}}}
+
+\abstract{Whether independently developed language models fail on the same inputs bears on
+ensemble reliability and model-as-judge evaluation. Prior work shows the answer depends on which
+null model is assumed, leaving the choice open \citep{jo2026subjectivity}. We argue one null is
+canonical: the row and column margins of a model-by-item outcome matrix are the jointly
+sufficient statistics of the Rasch family, so the uniform distribution over margin-matched
+matrices is the unique exact, fit-free conditional null for that family. Conditioning on it is
+forced by a theorem, not a choice: mean pairwise co-failure is a function of the item margins
+alone, so its excess over any margin-preserving null is identically zero --- a degeneracy
+independently proved in ecology, psychometrics, and inter-rater agreement. A pre-registered
+dispersion statistic came out inconsistent in sign across benchmarks and its kill condition
+fired; we report it as refuted. What survives is second-order: on $1{,}228$--$1{,}362$ open
+models per benchmark across five benchmarks, residual correlation after conditioning is
+$2.8$--$11.8\times$ its null, robust to removing near-duplicate models, and concentrated in a
+handful of latent dimensions rather than one shared factor --- a distinction the commonly
+reported ``effective number of independent models'' cannot make, since it is algebraic in mean
+squared correlation alone. We characterise what the test structurally cannot see: it has no
+power against every model sharing one item-difficulty profile, since that alternative is the
+null by construction. A further pre-registered check on real model responses finds one specific
+published accuracy--error-agreement claim survives conditioning and is reported as robust.}
+
+\keywords{exact conditional inference, Rasch model, ensemble diversity, correlated failure,
+benchmark evaluation}
+
 \maketitle
-
-\begin{abstract}
-\noindent
-Whether independently developed language models fail on the same inputs bears directly on
-systemic risk, ensemble reliability, and model-as-judge evaluation. Recent work has shown that
-the answer depends on the null model chosen, and concluded that monoculture inference is
-therefore \emph{subjective}, leaving open which null is appropriate
-\citep{jo2026subjectivity}. We argue that one null is canonical rather than arbitrary. Because
-the row and column margins of a model-by-item outcome matrix are the jointly sufficient
-statistics of the Rasch family, the uniform distribution over margin-matched matrices is the
-unique \emph{exact, fit-free} conditional null for that entire family: it estimates no
-parameters, applies no penalty, and makes no identification choice. We report what the answer
-is at that null, on $1{,}228$--$1{,}362$ open models per benchmark across five benchmarks --- a
-population three times larger than previously analysed.
-
-At the mean level there is nothing to find, and this is a theorem rather than a measurement:
-mean pairwise co-failure is a function of the item margins alone, so its excess over any
-margin-preserving null is identically zero. We show this degeneracy has been proved
-independently in three literatures --- as Schluter's V-ratio in ecology, as Kuder--Richardson /
-Cronbach's $\alpha$ in psychometrics, and as Fleiss's observed agreement for the multi-category
-case --- and give the translation between them, since none is cited in the model-evaluation
-literature. Empirically the measured excess matches the closed form to $10^{-16}$ on all five
-benchmarks. Our pre-registered dispersion statistic came out \emph{below} its null on three of
-five benchmarks and above on two; its pre-registered kill condition fired and we report it as
-refuted.
-
-What survives is second-order and large. On ARC, conditioning on the margins leaves residual
-correlation with root-mean-square $0.2483$ against $0.0449$ under the exact null --- a $5.5$-fold
-excess --- and six eigenvalues above the null spectral edge; across the five benchmarks the
-excess ranges from $2.8\times$ (GSM8K) to $11.8\times$ (HellaSwag). The effect is not an artifact
-of near-duplicate models: removing every model that agrees with a retained model above $0.95$
-discards $21$--$64\%$ of each population and moves these ratios by at most $1.14\times$. We deliberately do \emph{not} report this as an
-``effective number of independent models'': we show that the participation ratio is
-algebraically $N/(1+(N-1)\overline{R_{ij}^2})$, so it cannot distinguish one weak global factor
-from many tight clusters, and we give the diagnostics that can. Misspecification controls show
-that two-parameter discrimination heterogeneity cannot generate the observed effect
-(rms $\le0.076$), but a low-dimensional multi-ability structure generates much of it
-(rms $0.162$); the observed spectral signature resembles the latter, not duplicated model
-families. The honest reading is therefore that open-model failure is governed by a handful of
-latent dimensions beyond unidimensional ability. We also reconcile two apparently contradictory
-statistics exactly --- the excess variance is $29\times$ the null while its covariance with the
-margin-model prediction is strongly negative --- and show the effect is not an artifact of
-duplicate models, chain mixing, or the choice of spectral functional.
-
-We also state what the test cannot see, because it is not a detail. A planted-signal power study
-gives full power against shared failure modes at a planted rms of $0.048$, well below the
-$0.099$--$0.294$ observed, and detects copying of a reference model from a copy rate of $0.1$; but
-against the alternative in which every model shares one item-difficulty profile and differs only
-in overall ability --- arguably the strongest form of monoculture --- power equals the nominal
-$\alpha$ of $0.05$. That alternative \emph{is} the null, so the test has no power against it by
-construction. This is the Narcissus effect of \citet{colwell1984} in exact form: we measure
-departures from a shared difficulty profile and cannot measure the shared profile itself. A
-pre-registered test on
-real model responses (not just correctness) finds that our own critique does \emph{not} rescue
-one specific published claim: the reported association between model accuracy and error
-agreement attenuates only $12\%$ under conditioning and remains significant, so that finding is
-reported as robust rather than reinterpreted.
-\end{abstract}
 
 \section{Introduction}
 
@@ -774,7 +743,37 @@ attribution. The author directed the research, specified and pre-registered the 
 kill conditions, verified the derivations, and takes full responsibility for the content, in line
 with COPE guidance that AI tools cannot be authors.
 
-\bibliographystyle{plainnat}
+\section*{Statements and Declarations}
+
+\textbf{Funding.} This research received no external funding and was conducted without
+institutional support.
+
+\textbf{Competing Interests.} The author declares no financial or non-financial competing
+interests related to this work.
+
+\textbf{Ethics Approval and Consent to Participate.} Not applicable --- this study involved no
+human participants, human data, or animal subjects.
+
+\textbf{Consent for Publication.} Not applicable.
+
+\textbf{Data Availability.} All code, the harmonised substrate, and every results artifact
+described in this paper are archived at
+\href{https://doi.org/10.5281/zenodo.21860005}{doi:10.5281/zenodo.21860005}, with source under
+active development at \url{https://github.com/SilverCoin256/cofail}. The pre-registration,
+including dated amendments, is deposited at \url{https://osf.io/cmh7q/}. The upstream license of
+each harvested benchmark is documented in the datasheet released with the substrate; the
+reconstructed ARC-Challenge answer key is withheld from the archived snapshot as a derivative of
+a share-alike-licensed work (Section~\ref{sec:data}).
+
+\textbf{Materials Availability.} Not applicable --- no physical materials were used.
+
+\textbf{Code Availability.} The \texttt{cofail} estimator package and every script used to
+produce the results in this paper are released at the repository and archive cited under Data
+Availability above.
+
+\textbf{Author Contribution.} S.G.\ conceived the study, specified and pre-registered the
+hypotheses and kill conditions, directed the analysis, verified the derivations, and wrote the
+manuscript.
 \begin{thebibliography}{99}
 \small
 \bibitem[Andersen(1973)]{andersen1973} E.~B. Andersen. A goodness of fit test for the Rasch model. \emph{Psychometrika}, 38:123--140, 1973.

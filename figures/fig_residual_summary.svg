@@ -41,5 +41,5 @@
 <rect x="130.0" y="5.0" width="11" height="11" rx="2" fill="#eb6834" opacity="0.85"/><text x="146.0" y="14.0" font-size="9.5" fill="#52514e" text-anchor="start" font-weight="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >PR under exact-margin null</text>
 <rect x="325.0" y="5.0" width="11" height="11" rx="2" fill="#2a78d6"/><text x="341.0" y="14.0" font-size="9.5" fill="#52514e" text-anchor="start" font-weight="500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >PR observed</text>
 <text x="130.0" y="300.0" font-size="9" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >PR alone does not license “effective independent model count” (Sec. 4.3): it is N/(1+(N−1)·mean Rᵢⱼ²).</text>
-<text x="130.0" y="314.0" font-size="9" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >Reported here as the calibrated summary statistic; see Fig. \ref{fig:misspec} for the identification diagnostics.</text>
+<text x="130.0" y="314.0" font-size="9" fill="#52514e" text-anchor="start" font-weight="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" >Reported here as the calibrated summary statistic; see Fig. 3 for the identification diagnostics.</text>
 </svg>
