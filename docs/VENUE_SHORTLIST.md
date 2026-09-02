@@ -28,8 +28,10 @@ a literal unrendered `\ref{fig:misspec}` string baked into `fig_residual_summary
 `src/svg_figures.py` fix and `git log`) that had been sitting in the paper undetected regardless of
 document class.
 
-**Remaining before submission:** the title page's author location still reads `CITY_PLACEHOLDER`
-pending the author's city (Springer requires city + country for unaffiliated authors).
+**Remaining before submission:** none on the manuscript itself — the title page now reads
+"Mumbai, India" (filled 2026-09-02). Only the Editorial Manager account/submission step remains,
+and that requires the author directly (account creation and credential entry are outside what this
+assistant will do).
 
 The "before submitting" checklist at the bottom is now stale in one place: the tier-2 response
 analysis it lists as outstanding was run on 2026-07-26 (kill condition K7 fired; see
@@ -128,6 +130,7 @@ sold as a **bridge and a measurement**, not a discovery — which is how it is n
   Zhao 2026 "BenchScope") that a journal reviewer in this space would very plausibly know; the
   paper already positions against both (see `docs/PRIOR_ART_LEDGER.md`), so no action needed here
   beyond being aware a reviewer may raise them independently.
-- Fill in the author's city on the title page (currently `CITY_PLACEHOLDER` in `paper/main.tex`).
-- Find the actual "Submit manuscript" / Editorial Manager link and do the submission itself —
-  not yet located.
+- ~~Fill in the author's city on the title page.~~ **Done 2026-09-02** — "Mumbai, India".
+- Editorial Manager portal located (`https://www.editorialmanager.com/cost/`); cover letter drafted
+  (`docs/COVER_LETTER.md`). Submission itself still requires the author to create the account and
+  upload files directly.
