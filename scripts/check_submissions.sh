@@ -18,6 +18,7 @@ VENUES=(
   "E-Values:paper/workshops/e-values:4:single"
   "ATTRIB:paper/workshops/attrib:6:double"
   "EvoRobust:paper/workshops/evorobust:4:double"
+  "NeuralArtifacts:paper/workshops/neuralartifacts:12:double"
 )
 
 for spec in "${VENUES[@]}"; do

@@ -24,8 +24,11 @@ ROOT = os.path.join(HERE, "..")
 WS = os.path.join(ROOT, "paper", "workshops")
 RES = os.path.join(ROOT, "results")
 
-PAPERS = {"e-values": 4.0, "attrib": 6.0, "evorobust": 4.0}
-BLINDING = {"e-values": "single", "attrib": "double", "evorobust": "double"}
+PAPERS = {"e-values": 4.0, "attrib": 6.0, "evorobust": 4.0, "neuralartifacts": 12.0}
+BLINDING = {"e-values": "single", "attrib": "double", "evorobust": "double",
+            "neuralartifacts": "double"}
+# NeuralArtifacts full track is 8-12 pages; 8 is a floor, so it needs its own check.
+MIN_PAGES = {"neuralartifacts": 8.0}
 
 
 def art(name):
@@ -335,3 +338,68 @@ def test_attrib_states_the_snapshot_is_pinned():
     snap = art("w1_family_signal.json")["substrate_snapshot"]
     assert snap["sha256"].startswith("79d2490e")
     assert "79d2490e" in t, "attrib must name the snapshot hash its numbers came from"
+
+
+# --------------------------------------------------------------------------
+# NeuralArtifacts (full track, 8-12 pages)
+# --------------------------------------------------------------------------
+
+def test_neuralartifacts_meets_the_full_track_floor():
+    """The full-paper track is 8-12 pages; an under-length submission invites a track mismatch."""
+    text = rendered("neuralartifacts")
+    pages = text.split("\f")
+    for i, p in enumerate(pages):
+        if "References" in p:
+            lines = p.split("\n")
+            n = next(k for k, l in enumerate(lines) if "References" in l)
+            content = i + n / max(len(lines), 1)
+            assert content >= MIN_PAGES["neuralartifacts"], (
+                f"neuralartifacts is {content:.2f} content pages, below the 8-page full-track floor")
+            return
+    pytest.fail("neuralartifacts: no References heading found")
+
+
+def test_neuralartifacts_reuses_w1_numbers_consistently():
+    w1, c = art("w1_family_signal.json"), art("w1_controls.json")
+    t = tex("neuralartifacts")
+    for value, printed in [
+        (w1["arms"]["real_full"]["loo_knn_accuracy"], "0.807"),
+        (w1["arms"]["curveball_replicate"]["loo_knn_accuracy"], "0.318"),
+        (w1["arms"]["dedup_0.95"]["loo_knn_accuracy"], "0.787"),
+        (c["A_accuracy_only"]["acc"], "0.432"),
+        (c["A2_accuracy_regressed_out"]["acc"], "0.809"),
+        (c["B_raw_correlation"]["acc"], "0.760"),
+        (c["C_dedup_0.90"]["acc"], "0.551"),
+    ]:
+        assert f"{value:.3f}" == printed and printed in t, f"{printed} wrong or missing"
+
+
+def test_neuralartifacts_multicategory_numbers_trace_to_the_response_run():
+    """Section 6 quotes the real-response K7 result; it must match arc_responses.json."""
+    h4 = art("arc_responses.json")["H4"]
+    gold = art("arc_responses.json")["gold_recovery"]
+    t = tex("neuralartifacts")
+    assert f"{h4['slope_raw_excess_vs_accuracy']['beta']:.3f}" == "0.585" and "0.585" in t
+    assert f"{h4['slope_conditioned_excess_vs_accuracy']['beta']:.3f}" == "0.514" and "0.514" in t
+    assert f"{h4['attenuation']*100:.1f}" == "12.1" and "12.1" in t
+    assert f"{h4['mean_observed_agreement']:.4f}" == "0.7332" and "0.7332" in t
+    assert f"{h4['mean_conditional_independence_expectation']:.4f}" == "0.7324" and "0.7324" in t
+    assert str(h4["n_pairs"]) == "38238" and "38{,}238" in t
+    assert f"{gold['reproduces_reported_acc_frac']*100:.2f}" == "99.01" and "99.01" in t
+    # the kill condition fired: the paper must report the claim as robust, not debunked
+    assert h4["K7_H4_supported"] is False
+
+
+def test_neuralartifacts_reconciliation_numbers_trace():
+    r = art("arc_reconcile.json")
+    t = tex("neuralartifacts")
+    assert f"{r['observed']['corr_E_D']:.3f}" == "-0.285" and "-0.285" in t
+    ratio = r["observed"]["var_D"] / r["null_mean"]["var_D"]
+    assert round(ratio) == 29 and "29" in t
+
+
+def test_neuralartifacts_cites_the_model_atlas_and_zoo_prior_work():
+    """A full paper in this venue that ignores weight-space prior work invites a scope rejection."""
+    t = tex("neuralartifacts")
+    for key in ("horwitz2025", "schurholt2022", "unterthiner2021"):
+        assert f"{{{key}}}" in t, f"missing citation {key}"

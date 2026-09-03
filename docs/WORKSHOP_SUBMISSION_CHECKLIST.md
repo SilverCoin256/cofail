@@ -38,6 +38,7 @@ Check by logging in at https://openreview.net/ — an active profile resolves to
 | E-Values: From Statistics to ML | **Sep 5, 23:59 AoE** | **Sep 6, 17:29** | 4 pages + refs | single-blind (name shown) |
 | ATTRIB 2026 | **Sep 5 AoE** | **Sep 6, 17:29** | main track 3–6 pages | double-blind |
 | EvoRobust | **Sep 12, 23:59 AoE** | **Sep 13, 17:29** | 4 content pages | anonymised |
+| NeuralArtifacts (full track) | **Sep 7, 11:59 UTC** (see note) | **Sep 7, 17:29** | 8–12 pages | anonymised (assumed) |
 
 AoE is UTC−12. A deadline of "Sep 5 AoE" expires at 17:29 IST on **Sep 6**.
 
@@ -77,6 +78,8 @@ changed since the papers were written. Specifically confirmed:
 | ATTRIB: `dblblindworkshop`, anonymised | same | ✓ renders "Anonymous Author(s)" |
 | ATTRIB: appendix in the same PDF, no appendix limit | same | n/a — no appendix |
 | EvoRobust: ≤4 content pages, refs/supp unlimited | liuj-2023.github.io | 3.55 ✓ |
+| NeuralArtifacts full track: 8–12 pages, refs/supp excluded | artifactsasdata.org | 8.07 ✓ |
+| NeuralArtifacts: NeurIPS 2026 formatting + gen-AI guidelines | same | ✓ |
 | EvoRobust: anonymised, NeurIPS 2026 style, ≤50 MB | same | ✓ (0.2 MB) |
 | All three: non-archival | all three CFPs | ✓ |
 | Dual submission to non-archival workshops permitted | NeurIPS Main Track Handbook | ✓ journal track unaffected |
@@ -91,6 +94,28 @@ more transparent than the rule demands. The policy also states that agents and L
 authors (ours are not) and that hallucinated citations violate the Code of Conduct — every
 reference in all three bibliographies has been checked against a primary source (publisher page,
 PMLR, arXiv, or Project Euclid).
+
+### 4. NeuralArtifacts — `Neural Network Artifacts as a New Data Modality` (Paris, Dec 11)
+
+Added 2026-09-03. The strongest scope match of the four: their CFP lists **"Neural lineage,
+provenance, and relationships among models"** and a whole **"Model Populations and AI Supply
+Chains"** theme, and their overview opens by saying ML "has rarely turned that same population-level
+lens on its own products." Submitted to the **full-paper track (8–12 pages)** — the only one of the
+four venues that can carry the real content; ours is 8.07.
+
+- **YOU**: OpenReview profile (same bottleneck as above).
+- Portal: <https://openreview.net/group?id=NeurIPS.cc/2026/Workshop/NeuralArtifacts>
+- Upload `paper/workshops/neuralartifacts/main.pdf`.
+- **Two deadline sources disagree.** Their site shows *September 9 AoE* (with Sep 1 struck
+  through); the tracker's OpenReview sync says *Sep 7, 11:59 UTC*. The site is newer (generated
+  Sep 2) but **target Sep 7** and treat Sep 9 as slack you may not have.
+- **Blinding is not yet specified.** Their CFP says anonymity requirements "will be linked here
+  when available." We anonymised (`dblblindworkshop`), because an anonymous paper at a single-blind
+  venue is accepted while a named paper at a double-blind venue is desk-rejected. **Re-check the
+  portal before uploading**; if they confirm single-blind, switch the option and rebuild.
+- Their template ships in the CFP's own ZIP; we build against their copy of `neurips_2026.sty`.
+- Not a first-edition workshop: this is the second (inaugural was ICLR 2025 on weight-space
+  learning), though it is the first NeurIPS edition.
 
 ## Per-venue submission steps
 
