@@ -1,0 +1,152 @@
+\documentclass{article}
+\PassOptionsToPackage{round,authoryear}{natbib}
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{3rd Workshop on Attributing Model Behavior at Scale: Data Attribution and Provenance (ATTRIB 2026)}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\usepackage{graphicx}
+
+\newtheorem{lemma}{Lemma}
+
+\title{Correlated Failure as an Indirect Signature of Shared Model \\
+Provenance: A Population-Scale Complement to Instance-Level Attribution}
+
+\author{
+  Anonymous Author(s) \\
+  Affiliation \\
+  Address \\
+  \texttt{email}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Contributive and corroborative attribution methods answer ``which training data explains this
+output,'' one output at a time, and they need access to training data or model internals that is
+routinely unavailable for open leaderboard submissions. We describe a training-data-free,
+population-scale signal that is available even when neither is: after conditioning on the exact,
+fit-free null implied by Rasch sufficiency, $1{,}228$--$1{,}362$ open models per benchmark share
+residual failure correlation $2.8$--$11.8\times$ their null, concentrated in a handful of latent
+dimensions rather than one shared factor, and this signal survives removing exact near-duplicate
+submissions. We could not decompose this signal against declared model lineage --- a
+pre-registered check found only $23.3\%$ of models had a resolvable \texttt{base\_model} field, so
+we dropped the analysis rather than estimate it on a biased subset. We think that failure is itself
+informative: it is a concrete instance of exactly the provenance-opacity problem this workshop's
+community is positioned to attack, and we pose the residual correlation matrix as an idea-track
+candidate for what a black-box, aggregate provenance signal could look like when nothing about
+training data is disclosed.
+\end{abstract}
+
+\section{The gap we are pointing at}
+
+Contributive attribution estimates the causal effect of specific training examples on a specific
+generation; corroborative attribution finds sources that textually support a specific output. Both
+operate at the level of one model, one output. Neither is designed for --- and as far as we know,
+neither has been tried on --- the regime of an open leaderboard with thousands of independently
+submitted models, most of unknown or undisclosed lineage, where the question is not ``which
+example explains this generation'' but ``which models share unstated ancestry with which other
+models, and can that be seen at all without the training data.''
+
+We ran into this question directly, from the measurement side rather than the attribution side,
+while trying to characterize correlated failure between open language models on standard
+multiple-choice benchmarks. We report what we found because we think the gap between what we
+needed and what currently exists is itself a useful data point for this workshop, even though we
+do not close it.
+
+\section{A population-scale, training-data-free residual signal}
+
+Let $F_{im}=1$ iff model $i$ fails item $m$. The row and column margins of $F$ are the jointly
+sufficient statistics of the Rasch model, so conditioning on both --- sampled here with curveball
+\citep{strona2014}, verified against enumeration on small fibres --- gives an exact, fit-free null
+under which mean-level co-failure is provably degenerate: it is a deterministic function of item
+difficulty alone, independent of any shared behavior between models
+\citep{schluter1984,gotelli2000,cronbach1951}. At that null, on the archived Open LLM Leaderboard
+(five benchmarks, $1{,}228$--$1{,}362$ models each, harvested from result files at zero inference
+cost), the residual correlation structure that remains after removing the difficulty degeneracy is
+$2.8$--$11.8\times$ its null value, and spectrally concentrated: on ARC-Challenge, six eigenvalues
+exceed the null's spectral edge and the leading eigenvalue explains only $54\%$ of squared residual
+mass, the signature of several latent dimensions rather than one shared factor. This is not a
+duplicate-submission artifact: clustering models at agreement $1.0000$ and keeping one
+representative per cluster removes $900$ of $1{,}362$ ARC models and moves the calibrated
+participation-ratio ratio from $0.052$ only to $0.058$. Whatever produces this structure survives
+the crudest form of provenance filtering available to us.
+
+That last clause is doing real work: it is the crudest form available, because we do not have
+access to a better one. We do not observe pretraining corpora, fine-tuning data, or distillation
+relationships for the large majority of these models. A leaderboard submission carries an
+optional, self-reported \texttt{base\_model} field, and in our sample it was resolvable for only
+$23.3\%$ of models --- below a threshold we set before looking at the data specifically to decide
+whether a lineage decomposition was trustworthy. It fell short, so we dropped that analysis rather
+than report it on a biased subset. We are not claiming the residual correlation \emph{is} shared
+provenance; the honest statement is narrower and, we think, more useful to this audience: standard
+attribution machinery cannot currently tell us either way, because it needs exactly the access this
+population does not provide.
+
+\section{Why this might be attribution's problem, not measurement's}
+
+The residual structure has three properties that make it look like a provenance signal rather than
+a pure behavioral coincidence. First, it is not explained by discrimination heterogeneity alone: a
+two-parameter item-response simulation with realistic discrimination variance produces residual
+correlation of at most $0.076$ (rms), against an observed $0.248$ on ARC. Second, it is not
+explained by literal duplicate submissions, as above. Third, its dimensionality is stable and
+benchmark-dependent ($4$--$6$ latent dimensions on four benchmarks, $12$ on HellaSwag), which is
+the kind of structure one would expect from a handful of dominant pretraining lineages or shared
+distillation teachers producing correlated errors along a few behavioral axes, rather than from
+either a single dominant lineage or from fully independent training runs.
+
+None of this is proof of shared provenance --- discrimination heterogeneity, unmodeled ability
+dimensions, and genuinely convergent training choices are alternative explanations we cannot rule
+out with this design, and our own limitations section says so plainly. What we can say is that the
+exact conditional null gives a population-scale test that is exactly invariant to item difficulty
+by construction (Lemma~\ref{lem:mean}), costs no training-data access, and is sensitive to
+structure at a scale (thousands of models) where per-example causal attribution is not currently
+run at all.
+
+\begin{lemma}[Mean co-failure depends only on item margins]
+\label{lem:mean}
+$O = \frac{1}{MN(N-1)}\sum_m(c_m^2-c_m)$, where $c_m$ is the number of models failing item $m$;
+hence any randomization preserving item margins leaves $O$ exactly invariant.
+\end{lemma}
+
+\section{An idea-track question}
+
+We pose this as a question rather than a method: can the residual eigenvectors of a
+margin-conditioned co-failure matrix be matched --- even loosely, even just as a screening tool ---
+against known facts about model families, base-model announcements, or public distillation claims,
+to turn an aggregate statistical signal into something closer to an attribution claim? If so, this
+would be a training-data-free, black-box complement to contributive and corroborative methods,
+useful specifically in the regime where those methods' preconditions (access to training data,
+identified individual outputs to explain) do not hold, such as regulatory or journalistic audits of
+a leaderboard's actual diversity of origin. If not --- if the residual structure is better
+explained by convergent unimodal training choices than by shared lineage, which our own spectral
+diagnostics do not rule out --- that would itself be a useful negative result about how much
+population-scale behavioral correlation the field should be willing to read as a provenance signal
+at all. We do not know which is true, and we think that is the right question for this venue rather
+than for a measurement paper on its own.
+
+\section{Limitations}
+
+We did not attempt any form of causal or corroborative attribution ourselves; this paper reports a
+measurement and a gap, not an attribution method. Discrimination heterogeneity and unmodeled ability
+dimensions are alternative explanations for the residual structure that our design cannot rule out.
+Claims are restricted to the evaluated open-model ecosystem on multiple-choice benchmarks. Code,
+data, and the pre-registration are archived and linked in the full paper.
+
+\begin{thebibliography}{9}
+\small
+\bibitem[Cronbach(1951)]{cronbach1951} L.~J. Cronbach. Coefficient alpha and the internal structure of tests. \emph{Psychometrika}, 16:297--334, 1951.
+\bibitem[Gotelli(2000)]{gotelli2000} N.~J. Gotelli. Null model analysis of species co-occurrence patterns. \emph{Ecology}, 81(9):2606--2621, 2000.
+\bibitem[Schluter(1984)]{schluter1984} D.~Schluter. A variance test for detecting species associations, with some example applications. \emph{Ecology}, 65:998--1005, 1984.
+\bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
+\end{thebibliography}
+
+\end{document}

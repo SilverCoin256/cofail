@@ -1,0 +1,162 @@
+\documentclass{article}
+\PassOptionsToPackage{round,authoryear}{natbib}
+\usepackage[dblblindworkshop]{neurips_2026}
+\workshoptitle{Self-Evolving Diversity-Driven Search for Robust AI Systems (EvoRobust 2026)}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\usepackage{graphicx}
+
+\newtheorem{lemma}{Lemma}
+
+\title{Diversity You Cannot See From the Mean: Calibrated Detection of \\
+Latent Failure-Mode Structure in Open-Model Ecosystems}
+
+\author{
+  Anonymous Author(s) \\
+  Affiliation \\
+  Address \\
+  \texttt{email}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Standard mean-level diversity statistics for model panels --- double-fault, pairwise disagreement,
+observed agreement --- are computed the same way whether the panel is meant to be diverse or not:
+count how often members fail, or answer, alike. We show this class of statistic is provably
+degenerate for the failure case: mean pairwise co-failure is a deterministic function of item
+difficulty alone and carries no information about shared behavior once that is accounted for. On
+$1{,}228$--$1{,}362$ open language models across five benchmarks, the mean-level ``excess''
+co-failure a naive computation reports is identically zero under the correct null, yet a genuine,
+calibration-only-visible residual correlation of $2.8$--$11.8\times$ its null survives, concentrated
+in $4$--$12$ latent behavioral dimensions depending on benchmark. An uncalibrated version of the
+same summary statistic reads $1.5$--$3.6$ on every benchmark before conditioning --- easily
+misread as near-total diversity --- and only calibration against an exact, fit-free reference
+distribution reveals the real structure underneath. We argue this measurement-validity problem
+transfers directly to diversity-aware and continuously evolving safety benchmarks wherever coverage
+is scored from pairwise (dis)agreement rates, and we describe the calibration as a drop-in
+diagnostic rather than a replacement for search-based diversity methods.
+\end{abstract}
+
+\section{The measurement problem}
+
+A recurring move in both classifier-ensemble diversity and, increasingly, in diversity- and
+coverage-aware safety evaluation is to summarize a panel's behavioral spread from pairwise
+(dis)agreement: how often do two members fail, or answer, the same way. This workshop's own scope
+lists ``diversity and coverage metrics for safety evaluation'' and ``behavioral repertoires of
+failures'' as central objects of study. We show that the most common member of this family --- mean
+pairwise co-failure, one of the ten classifier-diversity measures catalogued by
+\citet{kuncheva2003} under the name double-fault --- has a property that makes it a poor diversity
+signal on its own: it is a deterministic function of item-level difficulty alone.
+
+\begin{lemma}[Mean co-failure depends only on item margins]
+Let $F_{im}=1$ iff panel member $i$ fails item $m$, with $c_m$ the number of members failing item
+$m$. Then $O = \frac{1}{MN(N-1)}\sum_m(c_m^2-c_m)$, a function of the column counts $\{c_m\}$
+alone.
+\end{lemma}
+\noindent Consequently, any randomization of which member fails which item that preserves each
+item's failure count leaves $O$ exactly invariant, with zero variance. A benchmark with a few very
+hard items will show high mean co-failure even if every member fails independently given the
+item; a benchmark with uniformly moderate items will show low co-failure even if members are
+identical clones. The statistic conflates \emph{item difficulty} with \emph{shared behavior}, and
+no amount of more data resolves this — it is an identity, not a sampling artifact.
+
+\section{A calibrated diversity signal, at scale}
+
+The fix is to condition on the item margins exactly rather than compare against an uninformative
+uniform baseline. The row and column margins of a binary outcome matrix are the jointly sufficient
+statistics of the Rasch model, so the uniform distribution over margin-matched matrices --- sampled
+here with curveball \citep{strona2014}, verified against direct enumeration on small fibres --- is
+the unique exact, fit-free null that removes item difficulty without fitting anything. We apply
+this to the archived Open LLM Leaderboard: $1{,}228$--$1{,}362$ open models per benchmark, five
+benchmarks, harvested from result files at zero inference cost.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Benchmark & $N$ & PR obs. (calibrated) & PR / null & rms excess ($\times$ null) & latent dims \\
+\midrule
+ARC-Challenge & 1362 & 23.6 & 0.052 & $5.5\times$ & 6 \\
+Winogrande & 1361 & 20.1 & 0.041 & $4.6\times$ & 5 \\
+TruthfulQA & 1334 & 17.4 & 0.056 & $4.1\times$ & 5 \\
+GSM8K & 1228 & 118.6 & 0.214 & $2.8\times$ & 4 \\
+HellaSwag & 1362 & 27.3 & 0.028 & $11.8\times$ & 12 \\
+\bottomrule
+\end{tabular}
+\caption{Participation ratio (PR) of the residual correlation spectrum after exact-margin
+conditioning, against its own exact-margin null (mean of $400$ curveball replicates). ``Latent
+dims'' counts eigenvalues exceeding the null's spectral edge (parallel analysis against the exact
+null rather than iid noise). Before conditioning, the same statistic reads $1.5$--$3.6$ on every
+benchmark, driven almost entirely by the shared item-difficulty eigenvalue.}
+\label{tab:neff}
+\end{table}
+
+Table~\ref{tab:neff} makes the calibration gap concrete. The uncalibrated participation ratio
+--- the same summary statistic, computed the naive way --- sits at $1.5$--$3.6$ on every benchmark:
+read directly, that looks like near-total redundancy in the panel. After conditioning, real
+structure appears: the calibrated ratio is only $2.8$--$21.4\%$ of its own null, meaning the panel
+retains substantially more residual, non-difficulty-driven correlated structure than the calibrated
+comparison would suggest by coincidence, and that structure is not one dominant shared factor but
+$4$--$12$ separate latent dimensions (eigenvalues above the null's spectral edge). Neither number is
+visible from the mean-level statistic alone.
+
+\section{This is not just duplicate members}
+
+A natural objection to any diversity shortfall is that it is driven by near-duplicate panel
+members. We check this directly: clustering models at agreement $1.0000$ and keeping one
+representative per cluster removes $900$ of ARC's $1{,}362$ models, and moves the calibrated ratio
+from $0.052$ only to $0.058$. We also check whether ordinary discrimination heterogeneity among
+otherwise-independent members is sufficient to produce the effect: a two-parameter item-response
+simulation with realistic discrimination variance tops out at rms residual correlation $0.076$,
+against an observed $0.248$ on ARC. What best matches the observed spectral signature
+($\lambda_1^2/\sum\lambda^2=0.540$) is a simulated population with two \emph{additional} latent
+ability dimensions ($0.457$), not a population of duplicated members ($0.102$). The calibrated
+diagnostic is therefore picking up genuine multi-dimensional behavioral structure, not an artifact
+of redundant submissions or of a single unmodeled discrimination parameter.
+
+\section{Relevance to diversity-aware benchmark governance}
+
+This workshop's scope explicitly includes diversity-aware and continuously evolving safety
+benchmarks and coverage metrics for dynamic evaluation. The measurement failure mode we describe
+is not specific to static multiple-choice accuracy: any coverage or diversity score computed from
+raw pairwise (dis)agreement rates over a set of test cases --- attack variants, red-team probes,
+behavioral test suites --- inherits the same degeneracy whenever test-case difficulty (or, in a
+safety setting, attack potency) varies across the suite. A search procedure that appears to be
+discovering diverse failure modes because raw disagreement is high may instead be finding items of
+heterogeneous difficulty; a procedure that looks converged because raw agreement is high may be
+sitting on a benchmark of uniform difficulty despite covering genuinely distinct behavioral axes.
+Margin-calibration --- comparing against the exact conditional null implied by the test suite's own
+per-item difficulty profile, rather than against an uninformative uniform baseline --- is a
+domain-agnostic correction available as a diagnostic wherever a diversity or coverage score is built
+from pairwise outcome comparisons, independent of whether the underlying search procedure is
+evolutionary, adversarial, or manual.
+
+\section{Limitations}
+
+We study existing open models on static, single-turn multiple-choice benchmarks, not the
+multi-turn, tool-using, or agentic settings central to this workshop; we have not applied this
+calibration inside an active evolutionary or quality-diversity search loop, and doing so is the
+natural next step rather than something we report here. Our conditioning model is unidimensional
+(Rasch); Section 3's diagnostics rule out discrimination heterogeneity and duplicate members as
+sufficient explanations but cannot fully separate genuine behavioral concentration from an
+underfit null family. Claims are restricted to the evaluated open-model ecosystem. Code, data, and
+the pre-registration are archived and linked in the full paper.
+
+\begin{thebibliography}{9}
+\small
+\bibitem[Kuncheva \& Whitaker(2003)]{kuncheva2003} L.~I. Kuncheva and C.~J. Whitaker. Measures of diversity in classifier ensembles and their relationship with the ensemble accuracy. \emph{Machine Learning}, 51(2):181--207, 2003.
+\bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
+\end{thebibliography}
+
+\end{document}
