@@ -302,3 +302,36 @@ def test_workshop_title_is_declared(venue):
     """Both \\title and \\workshoptitle are required by the NeurIPS workshop template."""
     t = tex(venue)
     assert "\\workshoptitle{" in t and "\\title{" in t
+
+
+# --------------------------------------------------------------------------
+# Substrate drift
+# --------------------------------------------------------------------------
+
+def test_experiment_artifacts_pin_their_input_snapshot():
+    """W1/W2 ran on a snapshot of an archive that is still growing.
+
+    src/monitor.py commits new harvests on a schedule -- one landed the same day these
+    experiments ran and took ARC from N=3,762 to N=4,562. An experiment whose input file has
+    changed underneath it is only reproducible if it names the snapshot it used, so every
+    artifact must carry one and the paper must not call that snapshot "current".
+    """
+    for name in ("w1_family_signal.json", "w1_controls.json", "w2_sequential_evalue.json"):
+        snap = art(name).get("substrate_snapshot")
+        assert snap, f"{name} does not record which substrate snapshot it ran on"
+        assert len(snap["sha256"]) == 64, f"{name} snapshot hash is malformed"
+
+
+def test_papers_do_not_claim_the_snapshot_is_current():
+    """'The current harvest' silently goes stale the next time the monitor runs."""
+    for venue in PAPERS:
+        t = tex(venue)
+        assert "current harvest" not in t.lower(), \
+            f"{venue} calls its snapshot 'current'; pin it by hash instead"
+
+
+def test_attrib_states_the_snapshot_is_pinned():
+    t = tex("attrib")
+    snap = art("w1_family_signal.json")["substrate_snapshot"]
+    assert snap["sha256"].startswith("79d2490e")
+    assert "79d2490e" in t, "attrib must name the snapshot hash its numbers came from"

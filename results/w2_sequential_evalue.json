@@ -313,5 +313,13 @@
  "final_merged_e_real": 3.2015621187164243,
  "final_merged_e_control": 0.9024362618309206,
  "max_merged_e_control": 1.165491240698548,
- "KW4_control_exceeds_20": false
+ "KW4_control_exceeds_20": false,
+ "substrate_snapshot": {
+  "file": "substrate/raw/arc.npz",
+  "sha256": "79d2490ea7297e99c9ec2555e974d1f3cd68273415b2b9326fd4c8527716780a",
+  "git_blob": "e9250096efd1d2d8640e3f019b5e728e4a899173",
+  "N_after_degeneracy_filter": 3762,
+  "M_after_degeneracy_filter": 1169,
+  "note": "The archive grows and src/monitor.py commits new harvests, so this file changes. Recover the exact input with: git cat-file blob e9250096efd1d2d8640e3f019b5e728e4a899173 > substrate/raw/arc.npz"
+ }
 }

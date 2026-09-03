@@ -28,6 +28,20 @@ SEED = 20260903
 MIN_N = 100
 
 
+
+def substrate_fingerprint(path):
+    """Content hash of the input matrix file, recorded in every artifact.
+
+    The archive grows and src/monitor.py commits new harvests, so an experiment is only
+    reproducible if it names the snapshot it ran on. This is that name.
+    """
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return {"file": os.path.relpath(path), "sha256": h.hexdigest()}
+
 def rms_resid(F, P, iu):
     D = excess_gram(np.ascontiguousarray(F, dtype=np.uint8), P)
     d = np.sqrt(np.clip(np.diag(D).astype(np.float64), 1e-12, None))
@@ -104,6 +118,7 @@ def main(bench="arc"):
     e_floor = calibrate(1.0 / (R_NULL + 1))
     ctrl_max = max(x["e_merged_running_mean"] for x in ctrl) if ctrl else 0.0
     out = {"bench": bench, "seed": SEED, "R_null": R_NULL, "kappa": KAPPA,
+           "substrate_snapshot": substrate_fingerprint(os.path.join(SUB, f"{bench}.npz")),
            "mc_p_floor": 1.0 / (R_NULL + 1), "e_value_ceiling_at_mc_floor": e_floor,
            "n_looks": len(real), "real_stream": real, "null_stream_control": ctrl,
            "final_merged_e_real": real[-1]["e_merged_running_mean"] if real else None,

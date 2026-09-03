@@ -89,11 +89,14 @@ every parameter value \citep{rasch1960,andersen1973}; we sample it with curvebal
 $D=(FF^{\!\top}-PP^{\!\top})/M$ and $R$ for $D$ scaled to unit diagonal, we take the top-$k$
 eigenvectors of $R$, with $k$ the number of eigenvalues exceeding the exact null's spectral edge.
 
-\paragraph{Population.} The current harvest of the archived Open LLM Leaderboard, ARC-Challenge:
+\paragraph{Population.} A dated snapshot of the archived Open LLM Leaderboard, ARC-Challenge:
 $N=3{,}762$ models, $M=1{,}169$ items, read from result files at zero inference cost. On this
 population $k=4$ (null edge $79.5$) and the residual correlation is $5.4\times$ its null. This is a
 larger, later harvest than the $N=1{,}362$ sample in our companion manuscript, and every number
-here refers to $N=3{,}762$.
+here refers to $N=3{,}762$. The archive grows continuously and a scheduled process keeps harvesting
+it, so the snapshot is pinned by content hash (SHA-256 \texttt{79d2490e\ldots}) in the released
+artifacts rather than described as current; re-running on a later snapshot will not reproduce these
+counts exactly, and the pin is what makes the run reproducible.
 
 \paragraph{Labels.} Base family is assigned by string matching on the model identifier against a
 list of known base-model names. This is a coarse lower bound on relatedness and explicitly not

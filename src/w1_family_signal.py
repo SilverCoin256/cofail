@@ -28,6 +28,20 @@ TOP_FAMILIES = 5
 SEED = 20260903
 
 
+
+def substrate_fingerprint(path):
+    """Content hash of the input matrix file, recorded in every artifact.
+
+    The archive grows and src/monitor.py commits new harvests, so an experiment is only
+    reproducible if it names the snapshot it ran on. This is that name.
+    """
+    import hashlib
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return {"file": os.path.relpath(path), "sha256": h.hexdigest()}
+
 def residual_eigvecs(F, n_edge_null, rng):
     """Top eigenvectors of R, and how many eigenvalues clear the exact null's spectral edge."""
     N, M = F.shape
@@ -138,6 +152,7 @@ def main(bench="arc"):
     }
     verdict["reportable"] = bool(verdict["KW3_null_arm_at_chance"])
     out = {"bench": bench, "seed": SEED, "n_perm": N_PERM, "knn": KNN,
+           "substrate_snapshot": substrate_fingerprint(os.path.join(SUB, f"{bench}.npz")),
            "arms": {"real_full": real, "curveball_replicate": null_arm, "dedup_0.95": dd},
            "verdict": verdict}
     json.dump(out, open(os.path.join(RES, "w1_family_signal.json"), "w"), indent=1)

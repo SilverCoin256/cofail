@@ -896,3 +896,30 @@ traces to one of these artifacts, that each kill condition's recorded verdict st
 claim the paper makes from it, that the disagreement identity holds numerically, and — on the
 *rendered* PDFs — that page limits and blinding are correct. `scripts/check_submissions.sh` is the
 pre-upload gate. Suite: 72 passing.
+
+## Substrate drift, found 2026-09-03 after the experiments ran
+
+The Layer C monitor (`src/monitor.py`, commit `db12a90`) committed a fresh ARC harvest the same day
+W1/W2 ran, taking `substrate/raw/arc.npz` from N=3,762 to **N=4,562** (M 1,169 -> 1,170). The W1/W2
+numbers above were computed on the earlier snapshot and a re-run on the current file will not
+reproduce them.
+
+Handled by pinning rather than by re-running, because the archive keeps growing and re-running
+chases a moving target:
+
+| | value |
+|---|---|
+| snapshot the experiments used | `substrate/raw/arc.npz`, N=3,762, M=1,169 |
+| SHA-256 | `79d2490ea7297e99c9ec2555e974d1f3cd68273415b2b9326fd4c8527716780a` |
+| git blob | `e9250096efd1d2d8640e3f019b5e728e4a899173` |
+| recover it | `git cat-file blob e9250096 > substrate/raw/arc.npz` |
+
+`substrate_snapshot` is now recorded in `w1_family_signal.json`, `w1_controls.json` and
+`w2_sequential_evalue.json`; `src/w1_family_signal.py` and `src/w2_sequential_evalue.py` compute
+and store the hash on every future run. The ATTRIB paper names the hash and no longer describes its
+population as "the current harvest" — that phrasing goes stale the next time the monitor runs, and
+`tests/test_workshop_papers.py` now fails if it reappears in any of the three papers.
+
+Not fixed here, flagged: the `db12a90` harvest committed only the `.npz`. It appended no
+`timeseries.csv` row and no `CHANGELOG.md` entry for 2026-09-03, so the statistics half of that
+Layer C run did not complete. Worth checking the workflow logs.
