@@ -806,3 +806,93 @@ equivalent evidence.
 
 Artifact: `results/v2_comparison.json`. Not added to the abstract or headline claims — this
 answers one specific, anticipated reviewer objection and is reported in Limitations at that scope.
+
+---
+
+# W1/W2/W3 — the three workshop-paper experiments (2026-09-03)
+
+Pre-registered in `docs/PREREG_WORKSHOP_EXPERIMENTS.md`, committed before any of them ran. Each
+short paper had proposed work it had not done; these are that work. **Population for W1 and W2 is
+the current 2026-08-09 harvest (ARC N=3,762, M=1,169), not the manuscript's frozen N=1,362**, which
+came from an earlier partial harvest and is not reproducible from the current substrate. The
+headline statistics for this exact population are the `2026-08-09,arc` row of `timeseries.csv`.
+
+## W1 — model family IS recoverable from co-failure (`src/w1_family_signal.py`, `src/w1_controls.py`)
+
+Top-k eigenvectors of the margin-conditioned residual correlation matrix (k=4, the count above the
+exact null's spectral edge of 79.5); family from the existing name-string matcher; leave-one-out
+5-NN over the 916 models in the five largest families.
+
+| arm | accuracy | permutation null | reading |
+|---|---|---|---|
+| **real data, real labels** | **0.807** | 0.287 ± 0.017 (p=0.001) | signal present |
+| curveball replicate, real labels (KW3) | 0.318 | 0.289 (p=0.056) | at chance — not manufactured |
+| accuracy as the only feature | 0.432 | 0.288 | accuracy carries some, not most |
+| accuracy projected out of loadings | 0.809 | 0.286 | **not an accuracy artifact** |
+| raw (unconditioned) eigenvectors | 0.760 | 0.287 | **conditioning is not the source** |
+| dedup 0.95 (N=2,350) (KW2) | 0.787 | 0.276 | survives |
+| dedup 0.90 (N=1,288) | 0.551 | 0.264 | weakened, still ~2x chance |
+
+Majority-class rate 0.382. Per-family recall: mistral 0.926, llama-2 0.839, llama-3 0.777,
+qwen 0.714, mixtral 0.386. Accuracy rises monotonically with k: 0.452 (k=1), 0.807 (k=4),
+0.864 (k=6), 0.905 (k=20) — the signal is spread across dimensions, not carried by one.
+
+**KW1/KW2/KW3 all pass.** Two results cut against the strongest reading and are reported in the
+paper rather than buried: the margin conditioning is *not* what creates the signal (raw
+correlation already reaches 0.760), and a third of the margin over chance is near-duplicate
+structure (0.807 → 0.551 at the 0.90 threshold, which discards two thirds of the population).
+
+Figure: `figures/fig_w1_family.pdf` (`src/w1_figure.py`) — observed vs exact-null projection.
+
+## W2 — the sequential monitor, built and controlled (`src/w2_sequential_evalue.py`)
+
+Twelve monthly looks over the accumulating ARC population (N: 241 → 3,762). Per look: rms|R|
+against R=40 curveball replicates drawn for that population, Monte Carlo p, calibrated by
+e = κp^(κ−1) with κ=1/2, merged by arithmetic mean (valid under arbitrary dependence — the looks
+are nested and so maximally dependent).
+
+- **Real stream:** p = 1/41 at *every* look (the Monte Carlo floor), so e pins at the calibrator's
+  ceiling of 3.202. **This is a resolution limit, not unbounded evidence**, and the paper says so
+  in those words. Stated in advance in the pre-registration that this would happen.
+- **Control stream** (observed matrix replaced by a draw from that look's own null): per-look p
+  ranges [0.049, 0.951], merged e ends at 0.90 and never exceeds 1.165. **KW4 does not fire** — the
+  construction does not accumulate evidence when there is none, which is the property that makes
+  it a monitor.
+- rms ratio is flat to slightly declining as the population quadruples: 5.90x at N=241 → 5.38x at
+  N=3,762. Residual co-failure is not visibly worsening over this window.
+
+What is still missing, and stated as the open problem rather than glossed: this is valid for a
+*pre-specified set of looks*, not for optional stopping. Conditioning gives no null for the
+increment — given the first N_t rows and the new margins, the arriving row is determined.
+
+## W3 — the degeneracy reverses a real decision (`src/w3_diversity_decision.py`)
+
+200 members x 500 probes, red-teaming shaped (F=1 means the probe succeeded). 2x2: probe potency
+heterogeneous (sd 2.0) or homogeneous (0.15), members independent or in 5 clusters with planted
+shared failure modes. Within a difficulty regime the independent suite is the diverse one.
+
+| potency | structure | double-fault | disagreement | rms ratio | dims>edge |
+|---|---|---|---|---|---|
+| heterogeneous | independent | 0.3447 | 0.3092 | 1.04x | 1 |
+| heterogeneous | shared modes | 0.3184 | 0.3431 | 2.18x | 4 |
+| homogeneous | independent | 0.2624 | 0.4976 | 0.99x | 0 |
+| homogeneous | shared modes | 0.2561 | 0.4724 | 2.89x | 4 |
+
+- **Double-fault is wrong in BOTH regimes** — it ranks the shared-modes suite as more diverse.
+- **Disagreement is wrong when potency is heterogeneous**, right when homogeneous. Exactly what the
+  identity predicts: mean disagreement = 2p̄ − 2O, so it inherits the degeneracy and is rescued
+  only when the margins happen not to vary.
+- **The calibrated statistic is right in all four cells**, putting both independent suites at their
+  own null (1.04x, 0.99x) and both shared-modes suites well above it (2.18x, 2.89x).
+
+**KW5 fires as "decision-relevant"; KW6 does not fire.** The suites are synthetic and their
+generating process is the one the calibration assumes is wrong, so this shows the naive metrics
+*can* invert a real ordering, not how often that happens in a deployed pipeline. Said in the paper.
+
+## Enforcement
+
+`tests/test_workshop_papers.py` (28 tests) asserts that every number in all three workshop papers
+traces to one of these artifacts, that each kill condition's recorded verdict still supports the
+claim the paper makes from it, that the disagreement identity holds numerically, and — on the
+*rendered* PDFs — that page limits and blinding are correct. `scripts/check_submissions.sh` is the
+pre-upload gate. Suite: 72 passing.

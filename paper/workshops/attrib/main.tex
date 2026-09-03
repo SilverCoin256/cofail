@@ -10,12 +10,13 @@
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb}
 \usepackage{amsfonts}
+\usepackage{amsthm}
 \usepackage{microtype}
 \usepackage{graphicx}
 
 \newtheorem{lemma}{Lemma}
 
-\title{Correlated Failure as an Indirect Signature of Shared Model Provenance: A Population-Scale Complement to Instance-Level Attribution}
+\title{Model Family Is Recoverable From Co-Failure Alone: Population-Scale Provenance Signal Without Training-Data Access}
 
 \author{
   Anonymous Author(s) \\
@@ -30,132 +31,187 @@
 
 \begin{abstract}
 Contributive and corroborative attribution answer ``which training data explains this output,''
-one output at a time, and need access to training data or model internals that is routinely
-unavailable for open leaderboard submissions. This idea-track paper describes a training-data-free,
-population-scale signal available even when neither is. After conditioning on the exact,
-fit-free null implied by Rasch sufficiency, $1{,}228$--$1{,}362$ open models per benchmark share
-residual failure correlation $2.9$--$11.9\times$ its null, concentrated in $4$--$12$ latent
-dimensions rather than one shared factor, and the signal survives removing $21$--$64\%$ of models
-as near-duplicates. We tried to decompose it against declared lineage and could not: a
-pre-registered gate found a declared parent model for only $23.3\%$ of models, below the $40\%$
-threshold set in advance, so the analysis was dropped rather than run on a biased subset. We
-think that failure is itself the useful datum for this venue: it is a concrete, quantified
-instance of the provenance-opacity problem this community studies, and we pose the residual
-correlation matrix, together with the coarse family labels we do have, as a candidate for what an
-aggregate, black-box provenance signal could look like when nothing about training data is
-disclosed.
+one output at a time, and need access to training data or model internals that is unavailable for
+most open leaderboard submissions. We ask whether anything about provenance survives in the only
+signal such a population does expose: which items each model gets wrong. Conditioning a
+model-by-item failure matrix on the exact, fit-free null implied by Rasch sufficiency and taking
+the leading eigenvectors of the residual correlation matrix, a $5$-nearest-neighbour classifier
+recovers a model's base family with leave-one-out accuracy $0.807$ over $916$ labelled models from
+five families, against a label-permutation null of $0.287 \pm 0.017$ and a majority-class rate of
+$0.382$. The same pipeline run on a draw from the exact null returns $0.318$, at chance, so the
+construction does not manufacture the signal. It is not an accuracy artifact: projecting model
+accuracy out of the loadings leaves accuracy at $0.809$. It is partly, but not mostly, a
+near-duplicate artifact: deduplicating at pairwise agreement $0.95$ leaves $0.787$, and the much
+more aggressive $0.90$ threshold leaves $0.551$, still far above chance. We report one negative
+result prominently: margin conditioning is not what creates the signal, since unconditioned
+correlation eigenvectors already reach $0.760$. We did not set out to build an attribution method,
+and this is not one; it is evidence that population-scale behavioural correlation carries
+recoverable provenance information, obtained on a population where a pre-registered lineage
+analysis had to be abandoned for lack of declared metadata.
 \end{abstract}
 
 \section{The gap we are pointing at}
 
 Contributive attribution estimates the causal effect of specific training examples on a specific
 output \citep{kohliang2017,park2023trak}; corroborative attribution finds sources that support a
-specific output \citep{worledge2024}. Both operate at the level of one model and one output.
-Neither is designed for the regime of an open leaderboard with thousands of independently
-submitted models, most of undisclosed lineage, where the question is not ``which example explains
-this generation'' but ``which models share unstated ancestry with which others, and can that be
-seen at all without the training data.''
+specific output \citep{worledge2024}. Both operate on one model and one output, and both need
+access, to training data or to internals, that an open leaderboard population does not provide.
+Thousands of models are submitted with undisclosed lineage. The question there is not ``which
+example explains this generation'' but ``which models share unstated ancestry, and can that be seen
+at all from behaviour.''
 
 We met this question from the measurement side, while characterising correlated failure between
-open language models on standard multiple-choice benchmarks. We report what we found, and what we
-could not do, because the gap between what we needed and what exists seems to us a useful data
-point for this workshop even though we do not close it.
+open language models, and we met it as a dead end: a pre-registered lineage decomposition had to be
+abandoned because the metadata it needed does not exist at usable coverage
+(Section~\ref{sec:opacity}). This paper reports what we did instead, and what it found.
 
-\section{A population-scale, training-data-free residual signal}
+\section{Setup: the exact conditional null and its residual spectrum}
 
-Let $F_{im}=1$ iff model $i$ fails item $m$, with $c_m$ the number of models failing item $m$.
+Let $F\in\{0,1\}^{N\times M}$ with $F_{im}=1$ iff model $i$ fails item $m$, row sums $r_i$, column
+sums $c_m$.
 
 \begin{lemma}[Mean co-failure depends only on item margins]
 \label{lem:mean}
-$O = \frac{1}{MN(N-1)}\sum_m(c_m^2-c_m)$; hence any randomization preserving the item margins
-leaves the mean pairwise co-failure rate $O$ exactly invariant, with zero variance.
+$O=\frac{1}{MN(N-1)}\sum_m(c_m^2-c_m)$, so any randomization preserving the item margins leaves the
+mean pairwise co-failure rate exactly invariant, with zero variance.
 \end{lemma}
+\begin{proof}
+$\sum_{i\neq j}F_{im}F_{jm}=(\sum_i F_{im})^2-\sum_i F_{im}^2=c_m^2-c_m$ for $F_{im}\in\{0,1\}$.
+\end{proof}
 
-The row and column margins of $F$ are the jointly sufficient statistics of the Rasch model, so
-conditioning on both, sampled with curveball \citep{strona2014} and verified against exhaustive
-enumeration on small fibres, gives an exact, fit-free null under which mean-level co-failure is
-provably uninformative about shared behaviour (Lemma~\ref{lem:mean}; the same degeneracy is
-Schluter's V-ratio in ecology and Cronbach's $\alpha$ in psychometrics
-\citep{schluter1984,gotelli2000,cronbach1951}). At that null, on the archived Open LLM Leaderboard
-(five benchmarks, $1{,}228$--$1{,}362$ models each, harvested from result files at zero inference
-cost), the residual correlation that remains after the difficulty degeneracy is removed is
-$2.9$--$11.9\times$ its null and spectrally concentrated: on ARC-Challenge, six eigenvalues exceed
-the null's spectral edge and the leading eigenvalue carries $54\%$ of squared residual mass, the
-signature of several latent dimensions rather than one shared factor. This is not a
-duplicate-submission artifact. Clustering models by pairwise agreement and keeping one
-representative per cluster at threshold $0.90$ removes $900$ of $1{,}362$ ARC models and moves the
-participation ratio of the residual spectrum from $23.6$ only to $29.0$ (its exact-margin null
-falls from $449.6$ to $289.3$); recomputing every statistic at threshold $0.95$, which discards
-$21$--$64\%$ of each benchmark's models with the Rasch fit and the null redrawn, moves the rms
-excess ratio by at most $1.14\times$ on every benchmark (ARC $5.58\to5.44$). Whatever produces this
-structure survives the crudest form of provenance filtering available to us.
+Lemma~\ref{lem:mean} says the first thing one would compute carries no provenance information at
+all once item difficulty is accounted for; the same degeneracy is known in ecology and
+psychometrics \citep{schluter1984,gotelli2000,cronbach1951}. We therefore work with second-order
+structure. The row and column margins of $F$ are the jointly sufficient statistics of the Rasch
+model, so the conditional law of $F$ given its margins is uniform on the margin-matched set for
+every parameter value \citep{rasch1960,andersen1973}; we sample it with curveball
+\citep{strona2014,carstens2015}. Writing $P$ for the Rasch mean field matching the margins,
+$D=(FF^{\!\top}-PP^{\!\top})/M$ and $R$ for $D$ scaled to unit diagonal, we take the top-$k$
+eigenvectors of $R$, with $k$ the number of eigenvalues exceeding the exact null's spectral edge.
 
-That last clause is doing real work: it is the crudest form available because we do not have a
-better one. We do not observe pretraining corpora, fine-tuning data, or distillation relationships
-for the large majority of these models. Two attribution routes were tried. The leaderboard's
-optional, self-reported \texttt{base\_model} field resolved a declared parent for $317$ of
-$1{,}362$ ARC models ($23.3\%$), with $315$ model repositories no longer retrievable at all; we had
-pre-registered a $40\%$ coverage threshold below which a lineage decomposition would not be
-trusted, so it was dropped rather than reported on a biased subset. Name-string matching against
-known family names attributes $34.5$--$35.7\%$ of model identifiers per benchmark, with roughly
-$125$ models per benchmark carrying merge-related names and the five largest named families
-(Mistral, Llama-2, Llama-3, Mixtral, and a fifth that varies) covering only $25$--$26\%$. We are
-not claiming the residual correlation \emph{is} shared provenance; the honest statement is
-narrower and, we think, more useful to this audience: standard attribution machinery cannot
-currently tell us either way, because it needs exactly the access this population does not
-provide.
+\paragraph{Population.} The current harvest of the archived Open LLM Leaderboard, ARC-Challenge:
+$N=3{,}762$ models, $M=1{,}169$ items, read from result files at zero inference cost. On this
+population $k=4$ (null edge $79.5$) and the residual correlation is $5.4\times$ its null. This is a
+larger, later harvest than the $N=1{,}362$ sample in our companion manuscript, and every number
+here refers to $N=3{,}762$.
 
-\section{Why this might be attribution's problem, not measurement's}
+\paragraph{Labels.} Base family is assigned by string matching on the model identifier against a
+list of known base-model names. This is a coarse lower bound on relatedness and explicitly not
+lineage ground truth; it attributes $34.5$--$35.7\%$ of identifiers per benchmark. We use the five
+largest families, $916$ labelled models: Mistral $350$, Llama-2 $211$, Llama-3 $188$, Qwen $84$,
+Mixtral $83$.
 
-Three properties of the residual structure make it look more like a provenance signal than a
-behavioural coincidence, and we label the inference that follows as a conjecture. First, it is not
-explained by discrimination heterogeneity: a two-parameter item-response simulation with
-$\mathrm{sd}(\log a)=0.60$ yields rms residual correlation $0.076$ against an observed $0.248$ on
-ARC. Second, it is not explained by literal duplicate submissions, as above. Third, its
-dimensionality is benchmark-specific and broadly stable under deduplication ($4$--$6$ dimensions
-above the null's spectral edge on four benchmarks, $12$ on HellaSwag). \emph{Conjecture:} this is
-the structure one would expect from a handful of dominant pretraining lineages or shared
-distillation teachers producing correlated errors along a few behavioural axes, rather than from
-one dominant lineage or from fully independent training runs. None of this is proof, and our own
-simulations show that a population with two ability dimensions and no shared lineage reproduces
-much of the effect ($\lambda_1^2/\sum\lambda_k^2=0.457$ against the observed $0.540$), so
-unmodelled ability dimensions remain an alternative we cannot exclude. What we can say is that the
-exact conditional null gives a population-scale test that is invariant to item difficulty by
-construction, costs no training-data access, and is sensitive to structure at a scale (thousands
-of models) at which per-example causal attribution is not, to our knowledge, currently run.
+\section{Result: family is recoverable from co-failure}
+\label{sec:result}
 
-\section{An idea-track question}
+Figure~\ref{fig:family} shows the effect directly. Leave-one-out $5$-nearest-neighbour
+classification in the standardised $k$-dimensional loading space recovers family at accuracy $\mathbf{0.807}$, against a label-permutation null of
+$0.287\pm0.017$ (1{,}000 permutations, $p=0.001$, the resolution floor) and a majority-class rate
+of $0.382$. Recall is above chance for four of five families: Mistral $0.926$, Llama-2 $0.839$,
+Llama-3 $0.777$, Qwen $0.714$, Mixtral $0.386$. Accuracy rises monotonically with the number of
+eigenvectors used, from $0.452$ at $k=1$ to $0.864$ at $k=6$ and $0.905$ at $k=20$, so the signal
+is distributed across many residual dimensions rather than carried by one.
 
-We pose this as a question rather than a method, and it is now concretely testable with the coarse
-labels above: do the leading residual eigenvectors of a margin-conditioned co-failure matrix
-separate, even loosely, the Mistral-7B-derived population from the Llama-2-derived one, or the
-merge-named models from the rest? If they do, the residual matrix would be a training-data-free,
-black-box complement to contributive and corroborative attribution, useful precisely in the regime
-where those methods' preconditions (access to training data; an identified individual output to
-explain) fail, such as a regulatory or journalistic audit of a leaderboard's actual diversity of
-origin. If they do not, and the residual structure is better explained by convergent training
-choices than by shared lineage, that is itself a useful negative result about how much
-population-scale behavioural correlation should ever be read as a provenance signal. We do not know
-which is true; we have not run the eigenvector-versus-family comparison, and we think this venue
-is the right place to decide whether it is worth running.
+Every kill condition and control was specified before the experiment ran.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../../../figures/fig_w1_family.pdf}
+\caption{Models projected on the top two eigenvectors of the margin-conditioned residual
+correlation matrix, coloured by base family (left), and the identical pipeline applied to a
+curveball replicate of the same matrix (right). The replicate preserves both margins exactly and so
+destroys any real association between behaviour and family: it is what the left panel would look
+like if the construction were manufacturing the structure. Only the five largest families are
+drawn; the classifier of Section~\ref{sec:result} uses four eigenvectors, not the two shown here.}
+\label{fig:family}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrrl}
+\toprule
+Arm & What it tests & Acc. & Perm. & Reading \\
+\midrule
+Main & residual eigenvectors, real labels & \textbf{0.807} & $0.287$ & signal present \\
+Exact-null draw & pipeline on a curveball replicate & $0.318$ & $0.289$ & at chance \\
+Accuracy only & accuracy as the sole feature & $0.432$ & $0.288$ & carries some, not most \\
+Accuracy proj.\ out & loadings orthogonalised to accuracy & $0.809$ & $0.286$ & not an accuracy artifact \\
+Raw correlation & unconditioned eigenvectors & $0.760$ & $0.287$ & conditioning not the source \\
+Dedup $0.95$ & $N=2{,}350$, $591$ labelled & $0.787$ & $0.276$ & survives \\
+Dedup $0.90$ & $N=1{,}288$, $301$ labelled & $0.551$ & $0.264$ & weakened, above chance \\
+\bottomrule
+\end{tabular}
+\caption{Pre-registered controls. The exact-null arm (KW3) is the calibration check: because the
+curveball replicate destroys any real association between behaviour and family while preserving
+both margins, a pipeline that reported signal there would be reporting an artifact. It does not.}
+\label{tab:controls}
+\end{table}
+
+\paragraph{What we are careful not to claim.} Three things in Table~\ref{tab:controls} cut against
+the strongest reading, and we state them rather than bury them. First, margin conditioning is
+\emph{not} what produces the signal: unconditioned correlation eigenvectors already reach $0.760$,
+so conditioning adds about five points, not the effect. The exact null earns its place here as the
+calibration arm and as what makes the mean-level statistic provably uninformative
+(Lemma~\ref{lem:mean}), not as the source of the result. Second, part of the signal is
+near-duplicate structure: accuracy falls from $0.807$ to $0.551$ under aggressive deduplication at
+agreement $0.90$, which discards two thirds of the population. The residue is still roughly twice
+the permutation null, so the signal is not only duplicates, but it is partly duplicates. Third, the
+labels are name strings. A model named for a base it was not derived from, or derived from a base it
+is not named for, is mislabelled here, and we have no way to audit that.
+
+\section{The provenance opacity this was a response to}
+\label{sec:opacity}
+
+We did not choose an indirect route for its own sake. The direct one failed, and quantifiably. The
+leaderboard's optional, self-reported \texttt{base\_model} field resolved a declared parent for
+$317$ of $1{,}362$ models ($23.3\%$) in our earlier harvest, with $315$ repositories no longer
+retrievable at all. A $40\%$ coverage threshold had been registered in advance as the point below
+which a lineage decomposition would not be trusted; it fired, and the decomposition was dropped
+rather than run on the surviving quarter. Name-string matching, used above, reaches $34.5$--$35.7\%$
+and is coarser still.
+
+That failure is the reason this result matters for this workshop rather than only for the
+correlated-failure literature. On a population where declared provenance is missing for three
+quarters of models, a behavioural signal that recovers family at $0.81$ from outcome data alone is
+the only provenance evidence available. It costs one Rasch fit and an eigendecomposition, needs no
+access to weights, training data, or inference, and scales to the full population.
+
+\section{What this is and is not}
+
+It is not an attribution method. It returns a coordinate in a residual eigenspace, not a claim
+about which examples caused which behaviour, and it has no notion of a specific output to explain.
+The natural next questions are whether the loadings support pairwise ancestry tests rather than
+family classification, whether the recovered structure survives against config-hash ground truth
+instead of name strings, and whether it degrades gracefully as families proliferate. What the
+result does establish is the premise those questions need: population-scale co-failure structure is
+not provenance-blind. Under an exact null that removes item difficulty by construction, and after
+projecting out model accuracy, behaviour alone still locates a model in its family most of the time.
 
 \section{Limitations}
 
-This paper reports a measurement and a gap, not an attribution method; we performed no causal or
-corroborative attribution. Discrimination heterogeneity is ruled out as a sufficient explanation
-but unmodelled ability dimensions are not. The name-string family labels are a lower bound on
-lineage, not ground truth. Claims are restricted to the evaluated open-model ecosystem on
-multiple-choice benchmarks. Code, data, and the pre-registration with dated amendments will be
-linked in the camera-ready. A large language model was used as a coding and drafting assistant;
-the authors specified and pre-registered the hypotheses, verified every derivation and number
-against executed-run artifacts, and are responsible for the content.
+Single benchmark, single archive, one coarse labelling scheme; the five families used are the five
+largest and the sixth-largest onward are excluded. Deduplication at $0.90$ costs the signal a
+third of its margin over chance, so a population with a different duplicate structure could behave
+differently. We report classification accuracy, not a calibrated provenance probability, and offer
+no decision procedure. An alternative explanation we cannot exclude is that the residual dimensions
+track training recipe or data mixture, which correlates with family without ancestry: that would
+make this a signature of convergent practice rather than of lineage, and distinguishing the two
+needs the ground truth this population lacks. Code, data, the pre-registration with its dated kill
+conditions, and every artifact behind the numbers above are archived and will be linked in the
+camera-ready. A large language model was used as a coding and drafting assistant; the authors
+specified and pre-registered the hypotheses and kill conditions, verified every derivation and
+every number against executed-run artifacts, and are responsible for the content.
 
 \begin{thebibliography}{99}
 \small
+\bibitem[Andersen(1973)]{andersen1973} E.~B. Andersen. A goodness of fit test for the Rasch model. \emph{Psychometrika}, 38:123--140, 1973.
+\bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015.
 \bibitem[Cronbach(1951)]{cronbach1951} L.~J. Cronbach. Coefficient alpha and the internal structure of tests. \emph{Psychometrika}, 16:297--334, 1951.
 \bibitem[Gotelli(2000)]{gotelli2000} N.~J. Gotelli. Null model analysis of species co-occurrence patterns. \emph{Ecology}, 81(9):2606--2621, 2000.
 \bibitem[Koh \& Liang(2017)]{kohliang2017} P.~W. Koh and P.~Liang. Understanding black-box predictions via influence functions. \emph{ICML}, 2017.
 \bibitem[Park et al.(2023)]{park2023trak} S.~M. Park, K.~Georgiev, A.~Ilyas, G.~Leclerc, and A.~Madry. TRAK: Attributing model behavior at scale. \emph{ICML}, 2023.
+\bibitem[Rasch(1960)]{rasch1960} G.~Rasch. \emph{Probabilistic Models for Some Intelligence and Attainment Tests}. Danmarks P\ae dagogiske Institut, 1960.
 \bibitem[Schluter(1984)]{schluter1984} D.~Schluter. A variance test for detecting species associations, with some example applications. \emph{Ecology}, 65:998--1005, 1984.
 \bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
 \bibitem[Worledge et al.(2024)]{worledge2024} T.~Worledge, J.~H. Shen, N.~Meister, C.~Winston, and C.~Guestrin. Unifying corroborative and contributive attributions in large language models. \emph{IEEE Conference on Secure and Trustworthy Machine Learning (SaTML)}, 2024.

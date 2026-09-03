@@ -40,12 +40,17 @@ benchmarks, the commonly reported mean-level ``excess'' co-failure is a determin
 item difficulty and vanishes identically, while a second-order residual correlation of
 $2.9$--$11.9\times$ its null survives, is robust to removing $21$--$64\%$ of models as
 near-duplicates, and concentrates in $4$--$12$ latent dimensions rather than one shared factor.
-Our test is a fixed-sample exact randomization test. Because open leaderboards grow
-continuously, the natural downstream use is a standing monitor, which is an anytime-valid inference
-problem. We state what the exact null already gives for that purpose (a valid per-look $p$-value,
-hence calibrated e-values that merge validly across a fixed set of looks) and what it does not (an
-e-process with optional stopping), and pose the missing construction as an open problem for this
-workshop rather than as a result.
+Our test is a fixed-sample exact randomization test, and because open leaderboards grow
+continuously the natural downstream use is a standing monitor. We build the fixed-set-of-looks
+version on the real arrival stream: twelve monthly looks over a population growing from $241$ to
+$3{,}762$ models, a Monte Carlo $p$-value against each look's own exact null, the standard
+calibrator, and the arithmetic mean of the calibrated e-values, which is valid under the severe
+dependence that nested populations induce. Against a control stream in which the null holds by
+construction the merged e-value stays at $0.90$ (maximum $1.17$ over all looks), as a valid
+e-value must; on real data every look saturates the Monte Carlo resolution ceiling, which we
+report as a ceiling rather than as unbounded evidence. What the exact null does not yet supply is
+an e-process permitting optional stopping, and we state precisely why: conditioning on the
+accumulated margins does not deliver a null for the increment when a row is added.
 \end{abstract}
 
 \section{Motivation}
@@ -58,9 +63,8 @@ are independent. \citet{jo2026} show this comparison is highly sensitive to the
 assumed baseline: conditioning on item difficulty attenuates residual correlations, ``some even
 flipping from strongly positive to slightly negative,'' and they prove that a sufficiently
 expressive null can explain away any observed dependence. Their stated conclusion is that the
-choice of null is subjective. This paper argues that the ladder of nulls has a canonical rung,
-reports what the exact answer is there, and states precisely what that answer does and does not
-provide for the sequential-monitoring problem this workshop's machinery addresses.
+choice of null is subjective. This paper argues that the ladder of nulls has a canonical rung, reports the exact answer there,
+and builds the sequential monitor that answer supports.
 
 \section{The canonical null}
 
@@ -97,23 +101,19 @@ reports the statistic, and the full paper states and attributes the identities.
 \section{What survives at the exact null}
 \label{sec:survives}
 
-\paragraph{Statistics.} Let $P_{im}=\sigma(\hat\alpha_i+\hat\beta_m)$ be the maximum-entropy
-(Rasch) mean field matching the observed margins, fitted to a maximum absolute margin error below
-$10^{-11}$. It is a point estimate of the null mean of $FF^{\!\top}/M$, and we validate it against
-the randomization itself: over $319{,}600$ model pairs on ARC, the curveball expectation of
-$C_{ij}=\frac1M\sum_m F_{im}F_{jm}$ and the Rasch prediction correlate at $0.99999$. The residual
-matrix is $D=(FF^{\!\top}-PP^{\!\top})/M$ and $R$ is $D$ scaled to unit diagonal. We report (i)
-the root-mean-square off-diagonal $|R_{ij}|$ and (ii) the participation ratio
-$\mathrm{PR}=(\sum_k\lambda_k^{+})^2/\sum_k(\lambda_k^{+})^2$ of $R$'s positive eigenvalues, each
-against the same quantity on exact-margin curveball replicates, and (iii) the number of
-eigenvalues of $R$ exceeding the null's largest eigenvalue (parallel analysis against the exact
-null rather than against iid noise).
+\paragraph{Statistics.} Let $P$ be the Rasch mean field matching the observed margins (margin
+error below $10^{-11}$), a point estimate of the null mean of $FF^{\!\top}/M$ that we validate
+against the randomization itself: over $319{,}600$ ARC model pairs the curveball expectation of
+$C_{ij}=\frac1M\sum_m F_{im}F_{jm}$ and the Rasch prediction correlate at $0.99999$. With
+$D=(FF^{\!\top}-PP^{\!\top})/M$ and $R$ its unit-diagonal scaling, we report the rms off-diagonal
+$|R_{ij}|$, the participation ratio $\mathrm{PR}=(\sum_k\lambda_k^{+})^2/\sum_k(\lambda_k^{+})^2$ of
+$R$'s positive spectrum, and the number of eigenvalues of $R$ above the null's largest (parallel
+analysis against the exact null rather than iid noise), each against exact-margin replicates.
 
 \paragraph{Data.} Per-item outcomes are harvested from the archived Open LLM Leaderboard
-($1{,}228$--$1{,}362$ models per benchmark after removing degenerate rows and columns; five
-benchmarks) at zero inference cost by reading only the metric column of each result file. Item
-identity is resolved by row index, licensed by a verified zero-mismatch row-order audit over $334$
-models spanning the archive's two schema generations.
+($1{,}228$--$1{,}362$ models per benchmark, five benchmarks) at zero inference cost by reading only
+the metric column of each result file. Item identity is resolved by row index, licensed by a
+zero-mismatch row-order audit over $334$ models spanning the archive's two schema generations.
 
 \begin{table}[t]
 \centering
@@ -139,14 +139,6 @@ eigenvalue that conditioning removes.}
 \label{tab:neff}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.85\linewidth]{../../../figures/fig_residual_summary.pdf}
-\caption{Observed participation ratio against its exact-margin null on all five benchmarks.
-Reported as a calibrated summary statistic, not as a count of independent models
-(Section~\ref{sec:survives}).}
-\label{fig:residualsummary}
-\end{figure}
 
 \paragraph{Results.} Table~\ref{tab:neff} shows residual correlation at $2.9$--$11.9\times$ its
 null and a participation ratio at $2.8$--$21.4\%$ of its null on every benchmark. Neither number
@@ -163,78 +155,102 @@ $0.248$, so discrimination heterogeneity alone is not a sufficient explanation, 
 population with two ability dimensions and no shared lineage reproduces much of the effect
 ($\lambda_1^2/\sum\lambda_k^2=0.457$ against the observed $0.540$).
 
-\paragraph{Robustness.} Recomputing every statistic on populations deduplicated at agreement
-threshold $0.95$, which discards $21$--$64\%$ of models, with the Rasch fit and the null redrawn
-each time, moves the rms ratio by at most $1.14\times$ (ARC $5.58\to5.44$) and leaves the
-eigenvalue count unchanged on three of five benchmarks; the PR ratio is the one statistic that
-moves materially, by $2.44\times$ on HellaSwag and by at most $1.46\times$ elsewhere. A later pass of the identical estimator
-over the growing archive ($2{,}972$--$3{,}762$ models per benchmark, $2.2$--$2.8\times$ the
-population here) moved every PR ratio down, by $0.005$--$0.010$ on four benchmarks and by $0.023$
-on GSM8K. On the independently implemented successor harness (ARC, $212$ models) the rms excess is
-$4.1\times$ its null with four eigenvalues above the edge, agreeing in direction but not in
-magnitude. On planted data ($400$ models, $700$ items, $20$ datasets per condition), the test
-reaches power $1.00$ against shared failure modes at a planted rms of $0.048$ and rejects at
-$0.017$ under the null; against the alternative in which every model shares one item-difficulty
-profile and differs only in ability, power is exactly $\alpha$, because that alternative is the
-null by construction.
+\paragraph{Robustness.} Deduplicating at agreement $0.95$, which discards $21$--$64\%$ of models,
+with the Rasch fit and null redrawn, moves the rms ratio by at most $1.14\times$ (ARC
+$5.58\to5.44$); the PR ratio moves more, by $2.44\times$ on HellaSwag and at most $1.46\times$
+elsewhere. A later pass over the growing archive ($2.2$--$2.8\times$ this population) moved every PR
+ratio down, by $0.005$--$0.010$ on four benchmarks and $0.023$ on GSM8K. On the independently
+implemented successor harness (ARC, $212$ models) the rms excess is $4.1\times$, agreeing in
+direction but not magnitude. On planted data the test reaches power $1.00$ against shared failure
+modes at a planted rms of $0.048$ and rejects at $0.017$ under the null; against the alternative in
+which every model shares one item-difficulty profile, power is exactly $\alpha$, because that
+alternative is the null by construction.
 
 \paragraph{A refuted pre-registration.} The pre-registered primary statistic was the dispersion
 $\operatorname{Var}_{i<j}(C_{ij})$. It came out below its null on three benchmarks and above on
 two, its kill condition fired, and we report it as refuted rather than reinterpreted. The
 second-order structure above is what survives, not the statistic we planned to report.
 
-\section{What the exact null gives, and does not give, for anytime-valid monitoring}
+\section{A monitor on the real arrival stream}
 \label{sec:evalues}
 
 Everything above is a fixed-$N$ exact test. The population is not fixed: the leaderboard and its
-successors add models continuously, and the natural downstream use of the test is a standing
-monitor (``has correlated failure in the open ecosystem worsened since last quarter?'') checked
-repeatedly as submissions arrive, without the type-I inflation that repeated testing on a growing
-sample otherwise incurs. That is the problem this community formalizes with e-values and test
-martingales \citep{shafer2021,vovkwang2021,ramdas2023,grunwald2024}.
+successors add models continuously, and the natural downstream use is a standing monitor (``has
+correlated failure in the open ecosystem worsened since last quarter?'') checked repeatedly as
+submissions arrive, without the type-I inflation that repeated testing on a growing sample incurs.
+That is the problem this community formalizes with e-values and test martingales
+\citep{shafer2021,vovkwang2021,ramdas2023,grunwald2024}. We build the version the exact null
+already supports, and report where it stops.
 
-\paragraph{What is already in hand.} At any population size $N_t$ the null law of the accumulated
-matrix given its current margins is exactly uniform on a finite set, so the Monte Carlo $p$-value
-$p_t$ at each look is exactly valid. Two consequences follow directly from the e-value literature.
-Any single $p_t$ can be calibrated into an e-value, for instance $\kappa p_t^{\kappa-1}$ with
-$\kappa\in(0,1)$ \citep{vovkwang2021}; and the arithmetic mean of e-values is an e-value under
-arbitrary dependence \citep{vovkwang2021}, so averaging calibrated e-values over a pre-specified
-set of monitoring dates is a valid combined test across those looks even though nested populations
-are strongly dependent. What this does not give is optional stopping: it is valid for a fixed set
-of looks, not for stopping the first time the running evidence looks large, which is the guarantee
-an e-process provides \citep{ramdas2023}.
+\paragraph{Construction.} Order the ARC models by leaderboard submission date and take monthly
+looks over the accumulating population, $N_t$ growing from $241$ to $3{,}762$ across twelve looks.
+At each look the null law of the accumulated matrix given its current margins is exactly uniform on
+a finite set, so the Monte Carlo $p$-value $p_t$ for rms $|R_{ij}|$ against $R=40$ curveball
+replicates drawn for that population is exactly valid. Calibrate each with $e_t=\kappa
+p_t^{\kappa-1}$, $\kappa=1/2$ \citep{vovkwang2021}, and merge by the arithmetic mean, which is an
+e-value under arbitrary dependence \citep{vovkwang2021} and so tolerates the nesting of the
+populations, which is as dependent as looks get. As a control we run the identical pipeline with
+the observed matrix at each look replaced by a curveball draw from that look's own null, a stream
+in which the null is true by construction.
 
-\paragraph{What is missing, and why.} A test martingale needs a null for the transition from the
-population at time $t$ to that at $t+1$. Conditioning on the margins of the accumulated matrix
-eliminates the Rasch parameters at each fixed $t$, but the margins themselves change when a row is
-added, and the conditional argument does not supply the null distribution of that increment: given
-the first $N_t$ rows and the new margins, the new row is determined. The sequential object must
-therefore be built differently, for instance by conditioning each arriving row on its own row sum
-(which eliminates that model's ability parameter but not the item parameters) and handling the
-item parameters as a composite nuisance with a mixture or plug-in e-value over the evidence
-accumulated about them, at the cost of the exactness that motivates the fixed-$N$ test. A second
-obstacle is selection: new models are not exchangeable arrivals but are submitted by people who
-observe the current leaderboard, which is the population-dependence objection \citet{jo2026} raise
-about a fixed null, now posed sequentially. We state both as the concrete open problem we would
-bring to this workshop, not as a result. The exact conditional null is, we think, the right
-fixed-sample primitive for an anytime-valid ecosystem monitor; we have not built the monitor.
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Look & $N_t$ & rms ratio & $p_t$ (real) & merged $e$ (real) & merged $e$ (control) \\
+\midrule
+2023-07 & 241   & $5.90\times$ & 0.024 & 3.20 & 0.51 \\
+2023-11 & 918   & $5.58\times$ & 0.024 & 3.20 & 1.17 \\
+2024-01 & 1737  & $5.24\times$ & 0.024 & 3.20 & 1.01 \\
+2024-03 & 2849  & $5.36\times$ & 0.024 & 3.20 & 0.95 \\
+2024-06 & 3762  & $5.38\times$ & 0.024 & 3.20 & 0.90 \\
+\bottomrule
+\end{tabular}
+\caption{Five of the twelve monthly looks. The control column is the same pipeline on a stream
+where the null holds by construction; its merged e-value never exceeds $1.17$, which is the
+behaviour a valid e-value must show. The real stream sits at the Monte Carlo floor
+$p=1/41$ at every look, so its calibrated e-value sits at that resolution's ceiling of $3.20$.}
+\label{tab:monitor}
+\end{table}
+
+\paragraph{What it shows.} The control stream is the informative arm: its per-look $p$-values range
+over $[0.049,0.951]$ and its merged e-value ends at $0.90$ having never exceeded $1.17$, so the
+construction does not accumulate evidence when there is none, which is the property that makes it
+worth calling a monitor. On real data every look returns the smallest $p$-value $40$ replicates can
+express, so the merged e-value pins at $3.20$; that number is the calibrator's value at $p=1/41$
+and is a statement about Monte Carlo resolution, not a likelihood ratio, and buying a larger one
+means buying more replicates rather than finding more evidence. The substantive reading is in the ratio
+column, flat to slightly declining as the population quadruples ($5.90\times$ at $N=241$,
+$5.38\times$ at $N=3{,}762$): residual co-failure is not visibly worsening over this window, and the
+monitor is what would show it if it were.
+
+\paragraph{What is still missing.} This is valid for a pre-specified set of looks, not for optional
+stopping, which is what an e-process provides \citep{ramdas2023}. A test martingale needs a null for
+the transition from the population at time $t$ to that at $t+1$, and conditioning does not supply
+one: given the first $N_t$ rows and the new margins, the arriving row is determined, so there is no
+conditional law left to bet against. The sequential object must be built differently, for instance
+by conditioning each arriving row on its own row sum, which eliminates that model's ability
+parameter but not the item parameters, and handling the item parameters as a composite nuisance
+with a mixture or plug-in e-value, at the cost of the exactness that motivates the fixed-$N$ test. A
+second obstacle is selection: models are submitted by people who observe the current leaderboard,
+so arrivals are not exchangeable, which is the population-dependence objection \citet{jo2026} raise
+about a fixed null, posed sequentially. We bring both to this workshop as the open problem.
 
 \section{Limitations}
 
-Claims cover the evaluated open-model ecosystem on multiple-choice-style benchmarks, not deployed
-proprietary systems, and the population is self-selected leaderboard submissions. The conditioning
-model is unidimensional; Section~\ref{sec:survives} rules out discrimination heterogeneity and
-duplicate models as sufficient explanations but cannot separate genuine behavioural concentration
-from an underfit null family, and on the spectral evidence the latter is the better description.
-Two candid points about the null itself: its rms sits only $1.25$--$2.0\times$ above the analytic
-$1/\sqrt{M}$ floor, and conditioning on the item margins alone reproduces it to within $8.3\%$ on
-every benchmark, so the item margins do essentially all of the conditioning work for this
-statistic. Code, the harmonised substrate, and every results artifact are archived at
-\href{https://doi.org/10.5281/zenodo.21860005}{doi:10.5281/zenodo.21860005}
-(\url{https://github.com/SilverCoin256/cofail}); the pre-registration with dated amendments is at
-\url{https://osf.io/cmh7q/}. A large language model (Claude, Anthropic) was used as a coding and
-drafting assistant; the author specified and pre-registered the hypotheses, verified every
-derivation and every reported number against executed-run artifacts, and is responsible for the
+Claims cover the evaluated open-model ecosystem on multiple-choice-style benchmarks, and the
+population is self-selected leaderboard submissions. The conditioning model is unidimensional;
+Section~\ref{sec:survives} rules out discrimination heterogeneity and duplicate models as
+sufficient explanations but cannot separate genuine behavioural concentration from an underfit null
+family, and on the spectral evidence the latter is the better description. Two candid points about
+the null: its rms sits only $1.25$--$2.0\times$ above the analytic $1/\sqrt{M}$ floor, and
+conditioning on the item margins alone reproduces it to within $8.3\%$ on every benchmark, so the
+item margins do essentially all of the conditioning work. Code, substrate, results artifacts and the dated pre-registration are archived at
+\href{https://doi.org/10.5281/zenodo.21860005}{doi:10.5281/zenodo.21860005},
+\url{https://github.com/SilverCoin256/cofail} and \url{https://osf.io/cmh7q/}. A large language
+model assisted with code and drafting; the author pre-registered the hypotheses and kill
+conditions, verified every number against an executed-run artifact, and is responsible for the
 content.
 
 \begin{thebibliography}{99}

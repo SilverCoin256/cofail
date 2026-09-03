@@ -1,6 +1,14 @@
 # Target venue shortlist
 
-**Status — 2026-09-02: journal track is now the sole active plan.** This document was originally
+**Status — 2026-09-03: two tracks are active.** Three NeurIPS 2026 workshop short papers were
+written and are ready to submit (`paper/workshops/{e-values,attrib,evorobust}`); see
+`docs/WORKSHOP_SUBMISSION_CHECKLIST.md` for deadlines, portals, and the ATTRIB reciprocal-reviewing
+obligation, and run `scripts/check_submissions.sh` before uploading anything. All three venues are
+non-archival and all three CFPs permit concurrent submission elsewhere, so none of this blocks the
+journal track below. Each paper carries its own experiment (W1/W2/W3, pre-registered in
+`docs/PREREG_WORKSHOP_EXPERIMENTS.md`, results in `results/RESULTS_DIGEST.md`).
+
+**Superseded status — 2026-09-02: journal track is the sole active plan.** This document was originally
 written for a Q2 statistics journal, then partly superseded on 2026-08-07 when the project added a
 parallel NeurIPS 2026 workshop track (`paper/workshop.tex`, `docs/NEURIPS_BLUEPRINT.md`). That
 window has since closed: the two best-fit workshops found on the NeurIPS 2026 announcement

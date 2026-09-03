@@ -1,0 +1,113 @@
+{
+ "bench": "arc",
+ "seed": 20260903,
+ "n_perm": 1000,
+ "knn": 5,
+ "arms": {
+  "real_full": {
+   "tag": "real_full",
+   "N": 3762,
+   "M": 1169,
+   "rasch_margin_error": 1.546140993013978e-11,
+   "n_eigen_above_edge": 4,
+   "k_used": 4,
+   "null_spectral_edge": 79.50200922712496,
+   "families_used": [
+    "mistral",
+    "llama-2",
+    "llama-3",
+    "qwen",
+    "mixtral"
+   ],
+   "n_models_labelled": 916,
+   "family_counts": {
+    "mistral": 350,
+    "llama-2": 211,
+    "llama-3": 188,
+    "qwen": 84,
+    "mixtral": 83
+   },
+   "loo_knn_accuracy": 0.8067685589519651,
+   "perm_mean": 0.2871342794759826,
+   "perm_sd": 0.01716609851608553,
+   "perm_p95": 0.31768558951965065,
+   "perm_max": 0.3373362445414847,
+   "p_permutation": 0.000999000999000999,
+   "majority_class_rate": 0.38209606986899564,
+   "excess_over_perm_mean": 0.5196342794759825,
+   "KW1_signal_detected": true
+  },
+  "curveball_replicate": {
+   "tag": "curveball_replicate",
+   "N": 3762,
+   "M": 1169,
+   "rasch_margin_error": 1.546140993013978e-11,
+   "n_eigen_above_edge": 0,
+   "k_used": 2,
+   "null_spectral_edge": 79.65670798871453,
+   "families_used": [
+    "mistral",
+    "llama-2",
+    "llama-3",
+    "qwen",
+    "mixtral"
+   ],
+   "n_models_labelled": 916,
+   "family_counts": {
+    "mistral": 350,
+    "llama-2": 211,
+    "llama-3": 188,
+    "qwen": 84,
+    "mixtral": 83
+   },
+   "loo_knn_accuracy": 0.31768558951965065,
+   "perm_mean": 0.2888791848617176,
+   "perm_sd": 0.01788452043124205,
+   "perm_p95": 0.31768558951965065,
+   "perm_max": 0.3558951965065502,
+   "p_permutation": 0.05647840531561462,
+   "majority_class_rate": 0.38209606986899564,
+   "excess_over_perm_mean": 0.02880640465793305,
+   "KW1_signal_detected": false
+  },
+  "dedup_0.95": {
+   "tag": "dedup_0.95",
+   "N": 2350,
+   "M": 1169,
+   "rasch_margin_error": 3.637978807091713e-12,
+   "n_eigen_above_edge": 4,
+   "k_used": 4,
+   "null_spectral_edge": 46.61278376817228,
+   "families_used": [
+    "mistral",
+    "llama-2",
+    "llama-3",
+    "qwen",
+    "mixtral"
+   ],
+   "n_models_labelled": 591,
+   "family_counts": {
+    "mistral": 218,
+    "llama-2": 140,
+    "llama-3": 111,
+    "qwen": 62,
+    "mixtral": 60
+   },
+   "loo_knn_accuracy": 0.7868020304568528,
+   "perm_mean": 0.2754653130287648,
+   "perm_sd": 0.02224305527396263,
+   "perm_p95": 0.31142131979695425,
+   "perm_max": 0.3316412859560068,
+   "p_permutation": 0.001996007984031936,
+   "majority_class_rate": 0.3688663282571912,
+   "excess_over_perm_mean": 0.5113367174280881,
+   "KW1_signal_detected": true
+  }
+ },
+ "verdict": {
+  "KW1_signal_detected": true,
+  "KW2_survives_dedup": true,
+  "KW3_null_arm_at_chance": true,
+  "reportable": true
+ }
+}

@@ -41,10 +41,13 @@ conditional distribution implied by Rasch sufficiency, reveals structure invisib
 both directions: the raw participation ratio of $1.5$--$3.6$, which reads as near-total
 redundancy, becomes $17$--$119$ once calibrated, while a residual correlation of
 $2.9$--$11.9\times$ its null remains and is concentrated in $4$--$12$ latent behavioural dimensions
-rather than one shared factor. We argue the same measurement-validity problem applies to any
-mean-level coverage or diversity score built from pairwise (dis)agreement wherever test-case
-difficulty varies, and describe the calibration as a drop-in diagnostic for diversity-aware
-benchmarks rather than a replacement for search-based diversity methods.
+rather than one shared factor. We then show the degeneracy is not merely an identity but reverses a decision:
+on a $2\times2$ grid of synthetic red-teaming suites with known ground truth, double-fault ranks a
+suite with planted shared failure modes as \emph{more} diverse than an independent one in both
+difficulty regimes, and pairwise disagreement does so whenever probe potency is heterogeneous,
+while the calibrated statistic is correct in every cell. We describe the calibration as a drop-in
+diagnostic for diversity-aware benchmarks rather than a replacement for search-based diversity
+methods.
 \end{abstract}
 
 \section{The measurement problem}
@@ -151,10 +154,60 @@ diagnostic is picking up genuine multi-dimensional behavioural structure, not re
 submissions or a single unmodelled discrimination parameter, though we cannot exclude that the
 extra dimensions are unmodelled abilities rather than shared failure modes.
 
+\section{Does the degeneracy change a decision?}
+\label{sec:decision}
+
+Lemma~\ref{lem:mean} is an identity, and an identity does not by itself show that any decision goes
+wrong. We tested that directly, with the kill condition registered in advance: if the naive metrics
+rank the suites correctly, the degeneracy is not decision-relevant and the governance claim below
+must be withdrawn.
+
+We generate suites of $200$ members $\times$ $500$ probes in the shape of a red-teaming evaluation,
+where $F_{im}=1$ means probe $m$ succeeded against member $i$, and cross two factors: probe potency
+heterogeneous ($\mathrm{sd}$ of logit difficulty $2.0$) or near-homogeneous ($0.15$), and members
+either conditionally independent given the probe or drawn in five clusters with planted shared
+failure modes. Ground truth is known by construction: within a difficulty regime, the independent
+suite is the diverse one. A metric is correct if it scores that suite as more diverse.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{llrrrr}
+\toprule
+Probe potency & Structure & Double-fault & Disagreement & rms ratio & dims $>$ edge \\
+\midrule
+heterogeneous & independent   & 0.3447 & 0.3092 & $1.04\times$ & 1 \\
+heterogeneous & shared modes  & 0.3184 & 0.3431 & $2.18\times$ & 4 \\
+homogeneous   & independent   & 0.2624 & 0.4976 & $0.99\times$ & 0 \\
+homogeneous   & shared modes  & 0.2561 & 0.4724 & $2.89\times$ & 4 \\
+\bottomrule
+\end{tabular}
+\caption{Synthetic suites with known ground truth. Lower double-fault and higher disagreement are
+conventionally read as more diverse. Within each difficulty regime the independent suite is the
+diverse one, so a correct metric puts it at lower double-fault and higher disagreement than the
+shared-modes suite in the row below it.}
+\label{tab:decision}
+\end{table}
+
+Table~\ref{tab:decision} separates the two naive metrics. \textbf{Double-fault is wrong in both
+regimes}: it scores the shared-modes suite as more diverse than the independent one under
+heterogeneous potency ($0.3184$ against $0.3447$) and again under homogeneous potency ($0.2561$
+against $0.2624$), because it tracks the overall failure rate that planting shared modes also
+changes. \textbf{Disagreement is wrong when potency is heterogeneous} ($0.3431$ for shared modes
+against $0.3092$ for independent) and right when it is homogeneous ($0.4976$ against $0.4724$),
+which is what Lemma~\ref{lem:mean} predicts: disagreement is $2\bar p - 2O$, so it inherits the
+degeneracy exactly and is rescued only when the margins happen not to vary. \textbf{The calibrated
+statistic is correct in all four cells}, scoring both independent suites at their own null
+($1.04\times$ and $0.99\times$, with $\le 1$ eigenvalue above the edge) and both shared-modes suites
+well above it ($2.18\times$ and $2.89\times$, four eigenvalues above the edge). A search procedure
+scored by double-fault would prefer the wrong suite in either regime; one scored by disagreement
+would do so exactly when its probe suite has variable potency, which is the realistic case.
+
 \section{Relevance to diversity-aware benchmark governance}
 
-This workshop's scope includes diversity-aware, continuously evolving safety benchmarks and
-coverage metrics for dynamic evaluation. The failure mode above is not specific to static
+Section~\ref{sec:decision} shows the failure is not hypothetical, and this workshop's scope
+includes diversity-aware, continuously evolving safety benchmarks and coverage metrics for dynamic
+evaluation. The failure mode above is not specific to static
 multiple-choice accuracy: any \emph{mean-level} coverage or diversity score computed from raw
 pairwise (dis)agreement over a set of test cases, whether attack variants, red-team probes or
 behavioural test suites, inherits the same degeneracy whenever test-case difficulty (in a safety
@@ -174,7 +227,10 @@ requires no access to the models beyond their per-item outcomes.
 We study existing open models on static, single-turn multiple-choice benchmarks, not the
 multi-turn, tool-using or agentic settings central to this workshop, and we have not run the
 calibration inside an active evolutionary or quality-diversity search loop; that is the natural
-next step rather than something we report. The conditioning model is unidimensional; Section~3
+next step rather than something we report. The suites of Section~\ref{sec:decision} are synthetic
+and their generating process is the one the calibration assumes is wrong, so they establish that
+the naive metrics \emph{can} invert a real ordering, not how often that happens in a deployed
+red-teaming pipeline. The conditioning model is unidimensional; Section~3
 rules out discrimination heterogeneity and duplicate members as sufficient explanations but cannot
 separate genuine behavioural concentration from an underfit null family. The population is
 self-selected leaderboard submissions. Code, data and the pre-registration with dated amendments
