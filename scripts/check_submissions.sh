@@ -59,6 +59,28 @@ PY
   if [ "$PAGE_RC" -eq 0 ]; then echo "  ok: $CONTENT content pages (limit $MAXP)"
   else echo "  FAIL: $CONTENT content pages exceeds limit $MAXP"; FAIL=1; fi
 
+  # NeurIPS: "Your PDF file must only contain Type 1 or Embedded TrueType fonts."
+  FONTS=$(pdffonts main.pdf 2>/dev/null | tail -n +3)
+  T3=$(printf '%s\n' "$FONTS" | awk 'NF && $2=="Type" && $3=="3" {n++} END{print n+0}')
+  NOEMB=$(printf '%s\n' "$FONTS" | awk 'NF && $(NF-3)=="no" {n++} END{print n+0}')
+  if [ "$T3" -gt 0 ]; then
+    echo "  FAIL: $T3 Type 3 font(s) — NeurIPS rejects these"; FAIL=1
+  else echo "  ok: no Type 3 fonts"; fi
+  if [ "$NOEMB" -gt 0 ]; then
+    echo "  FAIL: $NOEMB non-embedded font(s)"; FAIL=1
+  else echo "  ok: all fonts embedded"; fi
+
+  # NeurIPS: "prepare submission files with paper size US Letter, and not, for example, A4."
+  if pdfinfo main.pdf 2>/dev/null | grep -q "612 x 792"; then
+    echo "  ok: US Letter page size"
+  else echo "  FAIL: page size is not US Letter"; FAIL=1; fi
+
+  # Anonymity can also leak through PDF metadata, not just the visible page.
+  META=$(pdfinfo main.pdf 2>/dev/null | grep -iE "^(Title|Author|Subject|Keywords):")
+  if [ "$BLIND" = "double" ] && printf '%s' "$META" | grep -qiE "Shaurya|Gupta|shauryaguptaa8|SilverCoin256"; then
+    echo "  FAIL: author identity leaks through PDF metadata"; FAIL=1
+  else echo "  ok: no identity in PDF metadata"; fi
+
   TXT=$(pdftotext main.pdf - 2>/dev/null)
   if [ "$BLIND" = "double" ]; then
     if grep -qiE 'Shaurya|Gupta|shauryaguptaa8|SilverCoin256' <<< "$TXT"; then

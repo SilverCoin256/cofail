@@ -403,3 +403,47 @@ def test_neuralartifacts_cites_the_model_atlas_and_zoo_prior_work():
     t = tex("neuralartifacts")
     for key in ("horwitz2025", "schurholt2022", "unterthiner2021"):
         assert f"{{{key}}}" in t, f"missing citation {key}"
+
+
+# --------------------------------------------------------------------------
+# The W1 figure must depict the same population the papers describe
+# --------------------------------------------------------------------------
+
+def test_w1_figure_legend_matches_the_artifact_family_counts():
+    """The figure is regenerated from the substrate, which drifts; the papers are not.
+
+    This exists because the figure was once regenerated against a later, larger snapshot than
+    the one its caption and the surrounding numbers describe.
+    """
+    fig = os.path.join(ROOT, "figures", "fig_w1_family.pdf")
+    if not os.path.exists(fig) or shutil.which("pdftotext") is None:
+        pytest.skip("figure or pdftotext unavailable")
+    text = subprocess.run(["pdftotext", fig, "-"], capture_output=True, text=True).stdout
+    counts = art("w1_family_signal.json")["arms"]["real_full"]["family_counts"]
+    for fam, n in counts.items():
+        assert f"({n})" in text, f"figure legend is missing {fam} ({n}); regenerated on a different snapshot?"
+
+
+def test_w1_figure_script_pins_its_input():
+    with open(os.path.join(ROOT, "src", "w1_figure.py")) as f:
+        src = f.read()
+    assert "def pinned_substrate" in src, "the figure script must pin its input snapshot"
+    assert "substrate_snapshot" in src
+
+
+def test_no_type3_or_unembedded_fonts():
+    """NeurIPS: PDFs must contain only Type 1 or embedded TrueType fonts."""
+    if shutil.which("pdffonts") is None:
+        pytest.skip("pdffonts unavailable")
+    for venue in PAPERS:
+        pdf = os.path.join(WS, venue, "main.pdf")
+        if not os.path.exists(pdf):
+            pytest.skip(f"{venue}/main.pdf not built")
+        rows = subprocess.run(["pdffonts", pdf], capture_output=True, text=True).stdout.splitlines()[2:]
+        for r in rows:
+            parts = r.split()
+            if not parts:
+                continue
+            assert not (len(parts) > 2 and parts[1] == "Type" and parts[2] == "3"), \
+                f"{venue}: Type 3 font {parts[0]}"
+            assert parts[-4] != "no", f"{venue}: non-embedded font {parts[0]}"

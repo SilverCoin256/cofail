@@ -31,14 +31,20 @@ non-institutional bucket.** Today is Sep 3; the E-values and ATTRIB deadlines ar
 Check by logging in at https://openreview.net/ — an active profile resolves to
 `https://openreview.net/profile?id=~Firstname_Lastname1`.
 
-## Deadlines (verified against each workshop's own site, 2026-09-03)
+## Deadlines — re-verified 2026-09-04 against each workshop's page
 
-| Venue | Deadline | Local (IST, UTC+5:30) | Page limit | Blinding |
+All four are **OPEN**. Times below are Asia/Kolkata. Where two sources disagree by under an hour,
+the earlier is shown: treat it as the real deadline.
+
+| Venue | Deadline (IST) | Time left at check | Page limit | Blinding |
 |---|---|---|---|---|
-| E-Values: From Statistics to ML | **Sep 5, 23:59 AoE** | **Sep 6, 17:29** | 4 pages + refs | single-blind (name shown) |
-| ATTRIB 2026 | **Sep 5 AoE** | **Sep 6, 17:29** | main track 3–6 pages | double-blind |
-| EvoRobust | **Sep 12, 23:59 AoE** | **Sep 13, 17:29** | 4 content pages | anonymised |
-| NeuralArtifacts (full track) | **Sep 7, 11:59 UTC** (see note) | **Sep 7, 17:29** | 8–12 pages | anonymised (assumed) |
+| **E-Values** | **Sat Sep 6, 17:29** | ~2d 17h | ≤4 excl. refs | single-blind (name shown) |
+| **ATTRIB** (main track) | **Sat Sep 6, 17:29** | ~2d 16h | 3–6 | double-blind |
+| **NeuralArtifacts** (full track) | **Mon Sep 7, 17:29** | ~3d 16h | 8–12 | anonymised (assumed) |
+| **EvoRobust** | **Sun Sep 13, 17:59** | ~9d 17h | ≤4 content | anonymised |
+
+Every one of these was extended at least once (by 4–14 days), so re-check before relying on slack.
+NeurIPS's own suggested date was Aug 29; the two venues we lost early (JUDGe, TAI-Eval) kept it.
 
 AoE is UTC−12. A deadline of "Sep 5 AoE" expires at 17:29 IST on **Sep 6**.
 
@@ -116,6 +122,34 @@ four venues that can carry the real content; ours is 8.07.
 - Their template ships in the CFP's own ZIP; we build against their copy of `neurips_2026.sty`.
 - Not a first-edition workshop: this is the second (inaugural was ICLR 2025 on weight-space
   learning), though it is the first NeurIPS edition.
+
+## PDF production checks (all four pass)
+
+Three of these are explicit NeurIPS formatting requirements that a source-level review would not
+catch, and two of them initially **failed**:
+
+- **Type 3 fonts — was failing on all four, now fixed.** The instructions say a submission "must
+  only contain Type 1 or Embedded TrueType fonts." Two independent causes: the official template's
+  own `\usepackage[T1]{fontenc}` made `\texttt` fall back to a bitmap EC font, and matplotlib's
+  default PDF backend emits Type 3. Fixed by dropping `[T1]{fontenc}` (keeps the template's Times
+  body font; `lmodern` would have silently replaced it) and setting `pdf.fonttype = 42`.
+- **US Letter page size** — required explicitly, not A4. All four are 612×792.
+- **PDF metadata** — anonymity can leak through the Title/Author fields even when the visible page
+  is clean. All four are empty.
+
+`scripts/check_submissions.sh` now enforces all three plus page limits, blinding, compile errors,
+undefined references and overfull boxes. It is the gate; run it before every upload.
+
+## What to upload, per venue
+
+Only the PDF is required anywhere — none of the four asks for LaTeX source.
+
+| Venue | File | Track to select |
+|---|---|---|
+| E-Values | `paper/workshops/e-values/main.pdf` | short paper |
+| ATTRIB | `paper/workshops/attrib/main.pdf` | **main track** (not idea track) |
+| NeuralArtifacts | `paper/workshops/neuralartifacts/main.pdf` | **full paper** (not extended abstract) |
+| EvoRobust | `paper/workshops/evorobust/main.pdf` | — |
 
 ## Per-venue submission steps
 

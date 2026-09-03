@@ -8,10 +8,14 @@ look like if the pipeline were manufacturing the structure.
 
 Run: python src/w1_figure.py -> figures/fig_w1_family.pdf
 """
-import os, sys
+import json, os, sys
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
+# NeurIPS requires PDFs contain only Type 1 or embedded TrueType fonts; matplotlib's
+# default PDF backend emits Type 3, which the formatting instructions reject.
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,13 +26,46 @@ from w1_family_signal import residual_eigvecs, TOP_FAMILIES, SEED
 
 SUB = os.path.join(HERE, "..", "substrate", "raw")
 FIG = os.path.join(HERE, "..", "figures")
+RES = os.path.join(HERE, "..", "results")
 COLORS = {"mistral": "#d95f02", "llama-2": "#1b9e77", "llama-3": "#7570b3",
           "qwen": "#e7298a", "mixtral": "#66a61e"}
 
 
+def pinned_substrate(bench):
+    """Return a path to the exact snapshot the W1 analysis ran on.
+
+    The archive is live and src/monitor.py commits new harvests, so substrate/raw/{bench}.npz
+    drifts. Drawing the figure from whatever happens to be checked out would show a different
+    population from the one the paper reports -- which happened once and is why this exists.
+    If the working file does not match the pinned hash, recover the pinned blob from git.
+    """
+    import hashlib, subprocess, tempfile
+    art = os.path.join(RES, "w1_family_signal.json")
+    want = json.load(open(art))["substrate_snapshot"]
+    live = os.path.join(SUB, f"{bench}.npz")
+    have = hashlib.sha256(open(live, "rb").read()).hexdigest()
+    if have == want["sha256"]:
+        print(f"[{bench}] working substrate matches the pinned snapshot", flush=True)
+        return live
+    blob = want.get("git_blob")
+    if not blob:
+        raise SystemExit(f"substrate drifted from the pin and no git blob is recorded in {art}")
+    out = os.path.join(tempfile.gettempdir(), f"pinned_{blob[:12]}_{bench}.npz")
+    if not os.path.exists(out):
+        with open(out, "wb") as f:
+            subprocess.run(["git", "cat-file", "blob", blob], cwd=os.path.join(HERE, ".."),
+                           stdout=f, check=True)
+    got = hashlib.sha256(open(out, "rb").read()).hexdigest()
+    if got != want["sha256"]:
+        raise SystemExit(f"recovered blob hashes {got[:16]}, expected {want['sha256'][:16]}")
+    print(f"[{bench}] working substrate has drifted ({have[:12]}); "
+          f"drawing from the pinned snapshot {got[:12]} instead", flush=True)
+    return out
+
+
 def main(bench="arc"):
     rng = np.random.default_rng(SEED)
-    z = np.load(os.path.join(SUB, f"{bench}.npz"), allow_pickle=True)
+    z = np.load(pinned_substrate(bench), allow_pickle=True)
     models = np.array([str(m) for m in z["models"]])
     F = (1 - z["prim"]).astype(np.uint8)
     keep = (F.sum(1) > 0) & (F.sum(1) < F.shape[1]); F, models = F[keep], models[keep]

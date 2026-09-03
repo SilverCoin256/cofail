@@ -4,7 +4,9 @@
 \workshoptitle{E-Values: From Statistics to ML}
 
 \usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% NOTE: no [T1]{fontenc}. With T1 the EC typewriter falls back to a bitmap PK font, which
+% lands in the PDF as Type 3; the NeurIPS instructions require Type 1 or embedded TrueType
+% only. OT1 keeps the template's Times body font and gives a real Type 1 CMTT for \texttt.
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{booktabs}
