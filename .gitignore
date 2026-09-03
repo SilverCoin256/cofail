@@ -9,3 +9,7 @@ __pycache__/
 *.blg
 *.synctex.gz
 .DS_Store
+
+# LaTeX template downloads kept locally as reference, not part of the repo
+paper/workshops/neurips2026.zip
+paper/workshops/neurips2026_template/
