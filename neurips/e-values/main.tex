@@ -1,0 +1,278 @@
+\documentclass{article}
+\PassOptionsToPackage{round,authoryear}{natbib}
+\usepackage[sglblindworkshop]{neurips_2026}
+\workshoptitle{E-Values: From Statistics to ML}
+
+\usepackage[utf8]{inputenc}
+% NOTE: no [T1]{fontenc}. With T1 the EC typewriter falls back to a bitmap PK font, which
+% lands in the PDF as Type 3; the NeurIPS instructions require Type 1 or embedded TrueType
+% only. OT1 keeps the template's Times body font and gives a real Type 1 CMTT for \texttt.
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{microtype}
+\usepackage{graphicx}
+
+\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
+
+\title{An Exact Conditional Null for Correlated Failure in Open-Model Ecosystems, and a Route to Anytime-Valid Monitoring}
+
+\author{
+  Shaurya Gupta \\
+  Independent Researcher \\
+  Mumbai, India \\
+  \texttt{shauryaguptaa8@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Measuring correlated failure between language models requires a null hypothesis for
+``independent enough,'' and prior work shows the conclusion is highly sensitive to which null is
+chosen, leaving the choice apparently subjective. We show one null is not a choice: the row and
+column margins of a model-by-item outcome matrix are the jointly sufficient statistics of the
+Rasch family, so the uniform distribution over margin-matched matrices is the unique fit-free
+conditional null for that family. At this null, on $1{,}228$--$1{,}362$ open models across five
+benchmarks, the commonly reported mean-level ``excess'' co-failure is a deterministic function of
+item difficulty and vanishes identically, while a second-order residual correlation of
+$2.9$--$11.9\times$ its null survives, is robust to removing $21$--$64\%$ of models as
+near-duplicates, and concentrates in $4$--$12$ latent dimensions rather than one shared factor.
+Our test is a fixed-sample exact randomization test, and because open leaderboards grow
+continuously the natural downstream use is a standing monitor. We build the fixed-set-of-looks
+version on the real arrival stream: twelve monthly looks over a population growing from $241$ to
+$3{,}762$ models, a Monte Carlo $p$-value against each look's own exact null, the standard
+calibrator, and the arithmetic mean of the calibrated e-values, which is valid under the severe
+dependence that nested populations induce. Against a control stream in which the null holds by
+construction the merged e-value stays at $0.90$ (maximum $1.17$ over all looks), as a valid
+e-value must; on real data every look saturates the Monte Carlo resolution ceiling, which we
+report as a ceiling rather than as unbounded evidence. What the exact null does not yet supply is
+an e-process permitting optional stopping, and we state precisely why: conditioning on the
+accumulated margins does not deliver a null for the increment when a row is added.
+\end{abstract}
+
+\section{Motivation}
+
+If many deployed models share blind spots, an ensemble, a panel of model judges, or a market of
+competing screening vendors supplies far less independent evidence than its headcount suggests.
+A growing literature measures how often models err together \citep{kim2025}, almost all of it
+by comparing the rate at which models fail the same items against a baseline in which failures
+are independent. \citet{jo2026} show this comparison is highly sensitive to the
+assumed baseline: conditioning on item difficulty attenuates residual correlations, ``some even
+flipping from strongly positive to slightly negative,'' and they prove that a sufficiently
+expressive null can explain away any observed dependence. Their stated conclusion is that the
+choice of null is subjective. This paper argues that the ladder of nulls has a canonical rung, reports the exact answer there,
+and builds the sequential monitor that answer supports.
+
+\section{The canonical null}
+
+Let $F \in \{0,1\}^{N\times M}$ record $F_{im}=1$ iff model $i$ fails item $m$, with row sums
+$r_i$ and column sums $c_m$. The Rasch model $\Pr(F_{im}=1)=\sigma(\alpha_i+\beta_m)$ has
+$\{r_i\}$ and $\{c_m\}$ as jointly sufficient statistics, so the conditional law of $F$ given its
+margins is uniform on the set of margin-matched binary matrices for every parameter value
+\citep{rasch1960,andersen1973}. That set is the ecologists' fixed-fixed null. We sample it with
+curveball \citep{strona2014}, whose convergence to the uniform distribution on the fibre is proved
+by \citet{carstens2015} provided failed trades are counted as steps (ours does), and which we
+verify directly: enumerating every matrix on four small fibres (sizes $48$, $90$, $204$, $1{,}170$)
+and drawing $60{,}000$ thinned samples, a $\chi^2$ test against uniformity is not rejected on any
+($p=0.23, 0.05, 0.73, 0.15$); on the real matrices, four dispersed chains give Gelman--Rubin
+$\hat R\in[0.98,1.03]$ at the burn-in used. Unlike a fitted item-response null, this null requires
+no optimizer, no penalty, and no identification convention: within the Rasch family it is the
+strongest ability-and-difficulty control obtainable without estimating anything.
+
+\begin{lemma}[Mean co-failure depends only on item margins]
+\label{lem:mean}
+The mean pairwise co-failure rate satisfies
+$O=\frac{1}{N(N-1)}\sum_{i\neq j}\frac1M\sum_m F_{im}F_{jm}=\frac{1}{MN(N-1)}\sum_m (c_m^2 - c_m)$.
+\end{lemma}
+\begin{proof}
+$\sum_{i\neq j}F_{im}F_{jm}=(\sum_i F_{im})^2-\sum_i F_{im}^2=c_m^2-c_m$ since $F_{im}\in\{0,1\}$.
+\end{proof}
+\noindent Any randomization preserving the item margins therefore leaves $O$ invariant with
+exactly zero variance, so the ``excess'' of $O$ over this null is identically zero by
+construction rather than empirically small. The same degeneracy is known in ecology as that of
+Schluter's V-ratio \citep{schluter1984,gotelli2000}, in psychometrics as Cronbach's $\alpha$
+\citep{cronbach1951}, and in inter-rater agreement as Fleiss's observed agreement
+\citep{fleiss1971}; to our knowledge none of these is cited in the model-evaluation literature that
+reports the statistic, and the full paper states and attributes the identities.
+
+\section{What survives at the exact null}
+\label{sec:survives}
+
+\paragraph{Statistics.} Let $P$ be the Rasch mean field matching the observed margins (margin
+error below $10^{-11}$), a point estimate of the null mean of $FF^{\!\top}/M$ that we validate
+against the randomization itself: over $319{,}600$ ARC model pairs the curveball expectation of
+$C_{ij}=\frac1M\sum_m F_{im}F_{jm}$ and the Rasch prediction correlate at $0.99999$. With
+$D=(FF^{\!\top}-PP^{\!\top})/M$ and $R$ its unit-diagonal scaling, we report the rms off-diagonal
+$|R_{ij}|$, the participation ratio $\mathrm{PR}=(\sum_k\lambda_k^{+})^2/\sum_k(\lambda_k^{+})^2$ of
+$R$'s positive spectrum, and the number of eigenvalues of $R$ above the null's largest (parallel
+analysis against the exact null rather than iid noise), each against exact-margin replicates.
+
+\paragraph{Data.} Per-item outcomes are harvested from the archived Open LLM Leaderboard
+($1{,}228$--$1{,}362$ models per benchmark, five benchmarks) at zero inference cost by reading only
+the metric column of each result file. Item identity is resolved by row index, licensed by a
+zero-mismatch row-order audit over $334$ models spanning the archive's two schema generations.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrrrrr}
+\toprule
+ & & \multicolumn{3}{c}{rms $|R_{ij}|$} & \multicolumn{3}{c}{participation ratio} & \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-8}
+Benchmark & $N$ & obs. & null & ratio & obs. & null & ratio & dims $>$ edge \\
+\midrule
+ARC-Challenge & 1362 & 0.2483 & 0.0449 & $5.5\times$ & 23.6 & $449.3\pm3.4$ & 0.052 & 6 \\
+Winogrande    & 1361 & 0.2691 & 0.0409 & $6.6\times$ & 20.1 & $493.8\pm3.0$ & 0.041 & 5 \\
+TruthfulQA    & 1334 & 0.2942 & 0.0583 & $5.1\times$ & 17.4 & $309.7\pm2.4$ & 0.056 & 5 \\
+GSM8K         & 1228 & 0.0987 & 0.0346 & $2.9\times$ & 118.6 & $553.1\pm2.2$ & 0.214 & 4 \\
+HellaSwag     & 1362 & 0.2457 & 0.0206 & $11.9\times$ & 27.3 & $958.0\pm3.2$ & 0.028 & 12 \\
+\bottomrule
+\end{tabular}
+\caption{Residual structure after exact-margin conditioning. Null rms is the mean over $40$
+curveball replicates; null PR is mean $\pm$ SD over $60$ independent-chain replicates, each burned
+in for $50$ trades per model with both margins exactly preserved. Uncalibrated, PR reads
+$1.5$--$3.6$ on every benchmark, a number driven almost entirely by the shared item-difficulty
+eigenvalue that conditioning removes.}
+\label{tab:neff}
+\end{table}
+
+
+\paragraph{Results.} Table~\ref{tab:neff} shows residual correlation at $2.9$--$11.9\times$ its
+null and a participation ratio at $2.8$--$21.4\%$ of its null on every benchmark. Neither number
+licenses the reading ``$1{,}362$ models behave like $24$'': for the unclipped spectrum,
+$\mathrm{PR}=N/(1+(N-1)\,\overline{R_{ij}^2})$ exactly ($16.04$ on ARC computed either way), so
+PR is a monotone transform of mean squared residual correlation and cannot separate one weak
+global factor from a partition into tight clusters. The diagnostics that can separate them say the
+structure is neither: on ARC the leading eigenvalue carries $54\%$ of squared residual mass (a
+single factor would carry $\approx99\%$, twenty exact clone blocks $\approx10\%$), deflating it
+raises PR only to $46.8$ rather than toward $N$, and six eigenvalues exceed the null's spectral
+edge of $27.9$. A two-parameter item-response simulation with discrimination heterogeneity of
+$\mathrm{sd}(\log a)=0.60$ produces rms residual correlation of $0.076$ against the observed
+$0.248$, so discrimination heterogeneity alone is not a sufficient explanation, while a simulated
+population with two ability dimensions and no shared lineage reproduces much of the effect
+($\lambda_1^2/\sum\lambda_k^2=0.457$ against the observed $0.540$).
+
+\paragraph{Robustness.} Deduplicating at agreement $0.95$, which discards $21$--$64\%$ of models,
+with the Rasch fit and null redrawn, moves the rms ratio by at most $1.14\times$ (ARC
+$5.58\to5.44$); the PR ratio moves more, by $2.44\times$ on HellaSwag and at most $1.46\times$
+elsewhere. A later pass over the growing archive ($2.2$--$2.8\times$ this population) moved every PR
+ratio down, by $0.005$--$0.010$ on four benchmarks and $0.023$ on GSM8K. On the independently
+implemented successor harness (ARC, $212$ models) the rms excess is $4.1\times$, agreeing in
+direction but not magnitude. On planted data the test reaches power $1.00$ against shared failure
+modes at a planted rms of $0.048$ and rejects at $0.017$ under the null; against the alternative in
+which every model shares one item-difficulty profile, power is exactly $\alpha$, because that
+alternative is the null by construction.
+
+\paragraph{A refuted pre-registration.} The pre-registered primary statistic was the dispersion
+$\operatorname{Var}_{i<j}(C_{ij})$. It came out below its null on three benchmarks and above on
+two, its kill condition fired, and we report it as refuted rather than reinterpreted. The
+second-order structure above is what survives, not the statistic we planned to report.
+
+\section{A monitor on the real arrival stream}
+\label{sec:evalues}
+
+Everything above is a fixed-$N$ exact test. The population is not fixed: the leaderboard and its
+successors add models continuously, and the natural downstream use is a standing monitor (``has
+correlated failure in the open ecosystem worsened since last quarter?'') checked repeatedly as
+submissions arrive, without the type-I inflation that repeated testing on a growing sample incurs.
+That is the problem this community formalizes with e-values and test martingales
+\citep{shafer2021,vovkwang2021,ramdas2023,grunwald2024}. We build the version the exact null
+already supports, and report where it stops.
+
+\paragraph{Construction.} Order the ARC models by leaderboard submission date and take monthly
+looks over the accumulating population, $N_t$ growing from $241$ to $3{,}762$ across twelve looks,
+on a snapshot pinned by content hash in the released artifacts (the archive is still growing, so a
+later snapshot gives different counts).
+At each look the null law of the accumulated matrix given its current margins is exactly uniform on
+a finite set, so the Monte Carlo $p$-value $p_t$ for rms $|R_{ij}|$ against $R=40$ curveball
+replicates drawn for that population is exactly valid. Calibrate each with $e_t=\kappa
+p_t^{\kappa-1}$, $\kappa=1/2$ \citep{vovkwang2021}, and merge by the arithmetic mean, which is an
+e-value under arbitrary dependence \citep{vovkwang2021} and so tolerates the nesting of the
+populations, which is as dependent as looks get. As a control we run the identical pipeline with
+the observed matrix at each look replaced by a curveball draw from that look's own null, a stream
+in which the null is true by construction.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Look & $N_t$ & rms ratio & $p_t$ (real) & merged $e$ (real) & merged $e$ (control) \\
+\midrule
+2023-07 & 241   & $5.90\times$ & 0.024 & 3.20 & 0.51 \\
+2023-11 & 918   & $5.58\times$ & 0.024 & 3.20 & 1.17 \\
+2024-01 & 1737  & $5.24\times$ & 0.024 & 3.20 & 1.01 \\
+2024-03 & 2849  & $5.36\times$ & 0.024 & 3.20 & 0.95 \\
+2024-06 & 3762  & $5.38\times$ & 0.024 & 3.20 & 0.90 \\
+\bottomrule
+\end{tabular}
+\caption{Five of the twelve monthly looks. The control column is the same pipeline on a stream
+where the null holds by construction; its merged e-value never exceeds $1.17$, which is the
+behaviour a valid e-value must show. The real stream sits at the Monte Carlo floor
+$p=1/41$ at every look, so its calibrated e-value sits at that resolution's ceiling of $3.20$.}
+\label{tab:monitor}
+\end{table}
+
+\paragraph{What it shows.} The control stream is the informative arm: its per-look $p$-values range
+over $[0.049,0.951]$ and its merged e-value ends at $0.90$ having never exceeded $1.17$, so the
+construction does not accumulate evidence when there is none, which is the property that makes it
+worth calling a monitor. On real data every look returns the smallest $p$-value $40$ replicates can
+express, so the merged e-value pins at $3.20$; that number is the calibrator's value at $p=1/41$
+and is a statement about Monte Carlo resolution, not a likelihood ratio, and buying a larger one
+means buying more replicates rather than finding more evidence. The substantive reading is in the ratio
+column, flat to slightly declining as the population quadruples ($5.90\times$ at $N=241$,
+$5.38\times$ at $N=3{,}762$): residual co-failure is not visibly worsening over this window, and the
+monitor is what would show it if it were.
+
+\paragraph{What is still missing.} This is valid for a pre-specified set of looks, not for optional
+stopping, which is what an e-process provides \citep{ramdas2023}. A test martingale needs a null for
+the transition from the population at time $t$ to that at $t+1$, and conditioning does not supply
+one: given the first $N_t$ rows and the new margins, the arriving row is determined, so there is no
+conditional law left to bet against. The sequential object must be built differently, for instance
+by conditioning each arriving row on its own row sum, which eliminates that model's ability
+parameter but not the item parameters, and handling the item parameters as a composite nuisance
+with a mixture or plug-in e-value, at the cost of the exactness that motivates the fixed-$N$ test. A
+second obstacle is selection: models are submitted by people who observe the current leaderboard,
+so arrivals are not exchangeable, which is the population-dependence objection \citet{jo2026} raise
+about a fixed null, posed sequentially. We bring both to this workshop as the open problem.
+
+\section{Limitations}
+
+Claims cover the evaluated open-model ecosystem on multiple-choice-style benchmarks, and the
+population is self-selected leaderboard submissions. The conditioning model is unidimensional;
+Section~\ref{sec:survives} rules out discrimination heterogeneity and duplicate models as
+sufficient explanations but cannot separate genuine behavioural concentration from an underfit null
+family, and on the spectral evidence the latter is the better description. Two candid points about
+the null: its rms sits only $1.25$--$2.0\times$ above the analytic $1/\sqrt{M}$ floor, and
+conditioning on the item margins alone reproduces it to within $8.3\%$ on every benchmark, so the
+item margins do essentially all of the conditioning work. Code, substrate, results artifacts and the dated pre-registration are archived at
+\href{https://doi.org/10.5281/zenodo.21860005}{doi:10.5281/zenodo.21860005},
+\url{https://github.com/SilverCoin256/cofail} and \url{https://osf.io/cmh7q/}. A large language
+model assisted with code and drafting; the author pre-registered the hypotheses and kill
+conditions, verified every number against an executed-run artifact, and is responsible for the
+content.
+
+\begin{thebibliography}{99}
+\small
+\bibitem[Andersen(1973)]{andersen1973} E.~B. Andersen. A goodness of fit test for the Rasch model. \emph{Psychometrika}, 38:123--140, 1973.
+\bibitem[Carstens(2015)]{carstens2015} C.~J. Carstens. Proof of uniform sampling of binary matrices with fixed row sums and column sums for the fast Curveball algorithm. \emph{Physical Review E}, 91:042812, 2015. Erratum: \emph{Phys.\ Rev.\ E} 94:039902, 2016.
+\bibitem[Cronbach(1951)]{cronbach1951} L.~J. Cronbach. Coefficient alpha and the internal structure of tests. \emph{Psychometrika}, 16:297--334, 1951.
+\bibitem[Fleiss(1971)]{fleiss1971} J.~L. Fleiss. Measuring nominal scale agreement among many raters. \emph{Psychological Bulletin}, 76:378--382, 1971.
+\bibitem[Gotelli(2000)]{gotelli2000} N.~J. Gotelli. Null model analysis of species co-occurrence patterns. \emph{Ecology}, 81(9):2606--2621, 2000.
+\bibitem[Gr{\"u}nwald et al.(2024)]{grunwald2024} P.~Gr{\"u}nwald, R.~de Heide, and W.~Koolen. Safe testing. \emph{Journal of the Royal Statistical Society Series B}, 86(5):1091--1128, 2024.
+\bibitem[Kim et al.(2025)]{kim2025} E.~Kim, A.~Garg, K.~Peng, and N.~Garg. Correlated errors in large language models. \emph{ICML}, 2025.
+\bibitem[Jo et al.(2026)]{jo2026} N.~Jo, N.~Garg, and M.~Raghavan. The subjectivity of monoculture. \emph{arXiv:2602.24086}, 2026.
+\bibitem[Ramdas et al.(2023)]{ramdas2023} A.~Ramdas, P.~Gr{\"u}nwald, V.~Vovk, and G.~Shafer. Game-theoretic statistics and safe anytime-valid inference. \emph{Statistical Science}, 38(4):576--601, 2023.
+\bibitem[Rasch(1960)]{rasch1960} G.~Rasch. \emph{Probabilistic Models for Some Intelligence and Attainment Tests}. Danmarks P\ae dagogiske Institut, 1960.
+\bibitem[Schluter(1984)]{schluter1984} D.~Schluter. A variance test for detecting species associations, with some example applications. \emph{Ecology}, 65:998--1005, 1984.
+\bibitem[Shafer(2021)]{shafer2021} G.~Shafer. Testing by betting: A strategy for statistical and scientific communication. \emph{Journal of the Royal Statistical Society Series A}, 184(2):407--431, 2021.
+\bibitem[Strona et al.(2014)]{strona2014} G.~Strona, D.~Nappo, F.~Boccacci, S.~Fattorini, and J.~San-Miguel-Ayanz. A fast and unbiased procedure to randomize ecological binary matrices with fixed row and column totals. \emph{Nature Communications}, 5:4114, 2014.
+\bibitem[Vovk \& Wang(2021)]{vovkwang2021} V.~Vovk and R.~Wang. E-values: Calibration, combination and applications. \emph{Annals of Statistics}, 49(3):1736--1754, 2021.
+\end{thebibliography}
+
+\end{document}

@@ -447,3 +447,39 @@ def test_no_type3_or_unembedded_fonts():
             assert not (len(parts) > 2 and parts[1] == "Type" and parts[2] == "3"), \
                 f"{venue}: Type 3 font {parts[0]}"
             assert parts[-4] != "no", f"{venue}: non-embedded font {parts[0]}"
+
+
+# --------------------------------------------------------------------------
+# neurips/ staging mirror
+# --------------------------------------------------------------------------
+
+STAGED = os.path.join(ROOT, "neurips")
+
+
+@pytest.mark.parametrize("venue", sorted(PAPERS))
+def test_staged_source_matches_paper_workshops(venue):
+    """neurips/<venue>/ is a generated mirror; catch anyone who hand-edits it or forgets to re-stage."""
+    staged_tex = os.path.join(STAGED, venue, "main.tex")
+    if not os.path.exists(staged_tex):
+        pytest.skip(f"neurips/{venue} not staged yet — run scripts/stage_submissions.sh")
+    with open(staged_tex) as f:
+        staged = f.read()
+    assert staged == tex(venue), (
+        f"neurips/{venue}/main.tex has drifted from paper/workshops/{venue}/main.tex — "
+        "re-run scripts/stage_submissions.sh (never hand-edit files under neurips/)")
+
+
+@pytest.mark.parametrize("venue", sorted(PAPERS))
+def test_staged_folder_has_the_upload_manifest(venue):
+    d = os.path.join(STAGED, venue)
+    if not os.path.isdir(d):
+        pytest.skip(f"neurips/{venue} not staged yet")
+    for fname in ("main.pdf", "main.tex", "neurips_2026.sty", "SUBMISSION.md"):
+        assert os.path.exists(os.path.join(d, fname)), f"neurips/{venue}/{fname} missing"
+
+
+def test_stage_script_refuses_on_gate_failure():
+    with open(os.path.join(ROOT, "scripts", "stage_submissions.sh")) as f:
+        s = f.read()
+    assert "check_submissions.sh" in s
+    assert "exit 1" in s
