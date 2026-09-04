@@ -103,7 +103,7 @@ statistics without evaluating it on data, and released $120$k CNNs to support th
 right. Our zoo is complementary in construction and in cost: it is not generated but harvested, the
 models are the ecosystem's actual submissions rather than a controlled sweep, and the artifact is a
 behavioural trace, which is available for models whose weights are impractical to collect or absent
-entirely. The trade is real in both directions --- weights support parameter-space operations such
+entirely. The trade is real in both directions: weights support parameter-space operations such
 as merging and editing that a trace cannot, while a trace is obtainable at population scale for
 essentially free and is architecture-agnostic by construction.
 
@@ -111,8 +111,8 @@ Closest to our lineage result is the model atlas of \citet{horwitz2025}, who cha
 documented lineage graph, demonstrate applications including attribute prediction, and, because
 ``most models are poorly documented'', propose recovering undocumented regions from structural
 priors on real-world training practice. We attack the same documentation gap from the opposite
-side. We quantify it on our population --- a declared parent resolves for $23.3\%$ of models, with
-$315$ of $1{,}362$ repositories no longer retrievable --- and then ask what can be recovered with no
+side. We quantify it on our population (a declared parent resolves for $23.3\%$ of models, with
+$315$ of $1{,}362$ repositories no longer retrievable) and then ask what can be recovered with no
 documentation and no priors on training practice at all, using only behaviour. The two are
 complementary: structural priors and behavioural evidence are independent sources on the same latent
 graph, and a signal that recovers family at $0.807$ from traces is a candidate edge weight for
@@ -132,7 +132,7 @@ Let $F\in\{0,1\}^{N\times M}$ with $F_{im}=1$ iff model $i$ fails item $m$; row 
 sums $c_m$. One row is one model's behavioural trace on one probe set.
 
 We harvest $F$ from the archived Open LLM Leaderboard. Only the metric column of each result file
-is read --- $1.4$\,KB out of a $63$\,MB file for HellaSwag --- which is what makes an
+is read ($1.4$\,KB out of a $63$\,MB file for HellaSwag), which is what makes an
 ecosystem-scale harvest possible at zero inference cost.
 
 \paragraph{Two pitfalls, documented because they are silent.} Item identifiers are not stable
@@ -205,7 +205,7 @@ $\{r_i\}$ and $\{c_m\}$ as jointly sufficient statistics, so the conditional law
 margins is uniform on the set of margin-matched binary matrices, for every parameter value
 \citep{rasch1960,andersen1973}. That set is the ecologists' fixed-fixed null. Conditioning on it
 removes model ability and item difficulty exactly, without an optimizer, a penalty, or an
-identification convention --- which matters here because the alternative, fitting an item-response
+identification convention. That matters here because the alternative, fitting an item-response
 model to each population, introduces analyst choices that a population study should not have to
 defend.
 
@@ -221,8 +221,8 @@ $\hat R\in[0.98,1.03]$ at the burn-in used.
 margin error below $10^{-11}$), $D=(FF^{\!\top}-PP^{\!\top})/M$, and $R$ the unit-diagonal scaling
 of $D$. We report the rms off-diagonal $|R_{ij}|$, the participation ratio
 $\mathrm{PR}=(\sum_k\lambda_k^{+})^2/\sum_k(\lambda_k^{+})^2$ of $R$'s positive spectrum, and the
-count of eigenvalues of $R$ above the null's largest --- parallel analysis against the exact null
-rather than against iid noise. Each is compared to the same quantity on margin-matched replicates.
+count of eigenvalues of $R$ above the null's largest (parallel analysis against the exact null
+rather than against iid noise). Each is compared to the same quantity on margin-matched replicates.
 $P$ is validated against the randomization itself: over $319{,}600$ ARC model pairs, the curveball
 expectation of $\frac1M\sum_m F_{im}F_{jm}$ and the Rasch prediction correlate at $0.99999$.
 
@@ -260,7 +260,7 @@ an artifact of the statistic rather than a property of the population.
 Table~\ref{tab:structure} as ``$1{,}362$ models behave like $24$''. That reading is wrong for an
 algebraic reason worth stating in this venue, because the participation ratio is a natural summary
 for any artifact population. For the unclipped spectrum,
-$\mathrm{PR}=N/(1+(N-1)\overline{R_{ij}^2})$ exactly --- $16.04$ on ARC computed either way --- so
+$\mathrm{PR}=N/(1+(N-1)\overline{R_{ij}^2})$ exactly ($16.04$ on ARC computed either way), so
 PR is a monotone transform of mean squared residual correlation and the eigendecomposition
 contributes nothing. An equicorrelated matrix and a partition into $24$ tight clusters give the same
 value. The statistic cannot license a count of independent models, and we report it only as a
@@ -270,7 +270,7 @@ give $\approx99\%$, twenty clone blocks $\approx10\%$), deflating it raises PR o
 rather than toward $N$, and six eigenvalues clear the null's spectral edge.
 
 \paragraph{What else could produce this.} Each row below is a simulated population with no clusters,
-no clones and no shared lineage --- errors conditionally independent given the item.
+no clones and no shared lineage: errors conditionally independent given the item.
 
 \begin{table}[t]\centering\small
 \begin{tabular}{lrrrr}
@@ -306,7 +306,7 @@ moves $14$ of $15$ statistic--benchmark pairs by at most $1.5\times$; the except
 PR ratio at $2.44\times$. On planted data the test reaches power $1.00$ against shared failure modes
 at a planted rms of $0.048$, far below the $0.099$--$0.294$ observed, and rejects at $0.017$ under
 the null. Against the alternative in which every model shares one item-difficulty profile and
-differs only in ability, power is exactly $\alpha$ --- that alternative \emph{is} the null, and we
+differs only in ability, power is exactly $\alpha$: that alternative \emph{is} the null, and we
 report the blind spot as a property of the design rather than a caveat. Two candid points about the
 null itself: its rms sits only $1.25$--$2.01\times$ above the analytic $1/\sqrt{M}$ floor, and
 conditioning on item margins alone reproduces the both-margin null to within $8.3\%$ on every
@@ -334,14 +334,14 @@ which recorded answer, item by item, leaves $A$ exactly invariant with zero vari
 answer-copying detection in psychometrics. It matters here because it is easy to demonstrate
 constructively: in a simulation where models err \emph{conditionally independently} given the item,
 drawing from a shared per-item distractor-attractiveness distribution, agreement-given-both-wrong is
-$0.5567$ against a uniform baseline of $0.3333$ --- an apparent excess of $+0.2233$ that looks like
-shared behaviour and is not --- while the excess over the composition-preserving null implied by
-Lemma~\ref{lem:fleiss} is $-1.1\times10^{-16}$. Independent models, large apparent error
+$0.5567$ against a uniform baseline of $0.3333$, an apparent excess of $+0.2233$ that looks like
+shared behaviour and is not. The excess over the composition-preserving null implied by
+Lemma~\ref{lem:fleiss} is $-1.1\times10^{-16}$: independent models, large apparent error
 correlation, purely from the distractor structure of the probe set.
 
 \paragraph{The critique does not always bite, and we report where it does not.} A degeneracy result
 invites the conclusion that findings in this modality are artifacts. We tested that against a
-specific published claim --- that more accurate models give more similar wrong answers --- with a
+specific published claim (that more accurate models give more similar wrong answers) with a
 kill condition fixed in advance: if the accuracy--agreement slope survives conditioning with a
 confidence interval excluding zero, the critique does not apply and the claim stands. We
 reconstructed each model's chosen answer from per-choice log-likelihoods on a $600$-model ARC
@@ -354,9 +354,9 @@ is $+0.585$ ($95\%$ CI $[0.577,0.594]$); conditioned on the composition-preservi
 $+0.514$ ($[0.506,0.522]$), an attenuation of only $12.1\%$. The kill condition fired: the claim is
 not an artifact of item-level distractor composition and we report it as robust. Two things are
 true at once, and both are properties of the modality worth knowing. The mean-level excess is
-essentially zero --- $0.7332$ observed against $0.7324$ expected under conditional independence,
-$+0.00085$, exactly as Lemma~\ref{lem:fleiss} predicts --- while the \emph{relationship} between
-accuracy and agreement is not a mean-level statistic and is not absorbed by the same conditioning.
+essentially zero ($0.7332$ observed against $0.7324$ expected under conditional independence,
+$+0.00085$), exactly as Lemma~\ref{lem:fleiss} predicts. The \emph{relationship} between
+accuracy and agreement, though, is not a mean-level statistic and is not absorbed by the same conditioning.
 Degeneracy of a summary does not imply degeneracy of every claim built on the underlying trace, and
 the way to tell is to condition and look.
 
@@ -394,7 +394,7 @@ would be worth having.
 \paragraph{Setup.} On the pinned ARC snapshot ($N=3{,}762$, $M=1{,}169$, SHA-256
 \texttt{79d2490e\ldots}), take the top-$k$ eigenvectors of $R$ with $k$ the number of eigenvalues
 above the exact null's spectral edge ($k=4$, edge $79.5$). Label base family by string matching on
-the model identifier against known base-model names --- a coarse lower bound on relatedness,
+the model identifier against known base-model names, a coarse lower bound on relatedness,
 explicitly not lineage ground truth, reaching $34.5$--$35.7\%$ of identifiers. Use the five largest
 families: $916$ models, Mistral $350$, Llama-2 $211$, Llama-3 $188$, Qwen $84$, Mixtral $83$.
 Classify by leave-one-out $5$-nearest-neighbour in the standardised loading space.
@@ -414,8 +414,8 @@ The classifier uses four eigenvectors, not the two drawn here.}
 null of $0.287\pm0.017$ ($1{,}000$ permutations, $p=0.001$, the resolution floor) and a
 majority-class rate of $0.382$. Per-family recall is above chance for four of five: Mistral $0.926$,
 Llama-2 $0.839$, Llama-3 $0.777$, Qwen $0.714$, Mixtral $0.386$. Accuracy rises monotonically with
-the number of eigenvectors used --- $0.452$ at $k=1$, $0.807$ at $k=4$, $0.864$ at $k=6$, $0.905$ at
-$k=20$ --- so the lineage signal is spread across many residual dimensions rather than carried by
+the number of eigenvectors used: $0.452$ at $k=1$, $0.807$ at $k=4$, $0.864$ at $k=6$, $0.905$ at
+$k=20$. The lineage signal is spread across many residual dimensions rather than carried by
 one. Every control below was specified before the experiment ran.
 
 \begin{table}[t]\centering\small
@@ -452,7 +452,7 @@ cannot audit that.
 \paragraph{What this does and does not establish.} It is not an attribution method: it returns a
 coordinate in a residual eigenspace, not a claim about which examples caused which behaviour. An
 alternative explanation we cannot exclude is that the residual dimensions track training recipe or
-data mixture, which correlates with family without ancestry --- that would make this a signature of
+data mixture, which correlates with family without ancestry. That would make this a signature of
 convergent practice rather than of lineage, and separating the two needs ground truth this
 population lacks. What it does establish is the premise the lineage agenda needs in this modality:
 behavioural traces are not provenance-blind. Under a null that removes item difficulty by
@@ -472,7 +472,7 @@ We order the ARC models by submission date and take twelve monthly looks as the 
 from $241$ to $3{,}762$. At each look we compute a Monte Carlo $p$-value against $R=40$ curveball
 replicates drawn for that population, calibrate it to an e-value by $e_t=\kappa p_t^{\kappa-1}$ with
 $\kappa=1/2$, and merge by the arithmetic mean, which is valid under arbitrary dependence
-\citep{vovkwang2021} --- necessary here, since nested populations are as dependent as looks get. As
+\citep{vovkwang2021}; that is necessary here, since nested populations are as dependent as looks get. As
 a control we run the identical pipeline with the observed matrix at each look replaced by a draw
 from that look's own null.
 
