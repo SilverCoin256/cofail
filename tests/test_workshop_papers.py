@@ -450,36 +450,36 @@ def test_no_type3_or_unembedded_fonts():
 
 
 # --------------------------------------------------------------------------
-# neurips/ staging mirror
+# Downloads staging script (scripts/stage_submissions.sh)
+#
+# The staged copy lives in the user's Downloads folder, outside this repo and not
+# git-tracked, so there is nothing under the repo tree to assert on here (no ROOT/neurips
+# path exists on other machines or in CI). These tests check the script's behaviour and
+# content instead of a staged output.
 # --------------------------------------------------------------------------
 
-STAGED = os.path.join(ROOT, "neurips")
-
-
-@pytest.mark.parametrize("venue", sorted(PAPERS))
-def test_staged_source_matches_paper_workshops(venue):
-    """neurips/<venue>/ is a generated mirror; catch anyone who hand-edits it or forgets to re-stage."""
-    staged_tex = os.path.join(STAGED, venue, "main.tex")
-    if not os.path.exists(staged_tex):
-        pytest.skip(f"neurips/{venue} not staged yet — run scripts/stage_submissions.sh")
-    with open(staged_tex) as f:
-        staged = f.read()
-    assert staged == tex(venue), (
-        f"neurips/{venue}/main.tex has drifted from paper/workshops/{venue}/main.tex — "
-        "re-run scripts/stage_submissions.sh (never hand-edit files under neurips/)")
-
-
-@pytest.mark.parametrize("venue", sorted(PAPERS))
-def test_staged_folder_has_the_upload_manifest(venue):
-    d = os.path.join(STAGED, venue)
-    if not os.path.isdir(d):
-        pytest.skip(f"neurips/{venue} not staged yet")
-    for fname in ("main.pdf", "main.tex", "neurips_2026.sty", "SUBMISSION.md"):
-        assert os.path.exists(os.path.join(d, fname)), f"neurips/{venue}/{fname} missing"
+def _stage_script():
+    with open(os.path.join(ROOT, "scripts", "stage_submissions.sh")) as f:
+        return f.read()
 
 
 def test_stage_script_refuses_on_gate_failure():
-    with open(os.path.join(ROOT, "scripts", "stage_submissions.sh")) as f:
-        s = f.read()
+    s = _stage_script()
     assert "check_submissions.sh" in s
     assert "exit 1" in s
+
+
+def test_stage_script_targets_downloads_not_the_repo():
+    """The staged copy must land outside the repo (Downloads), never back under ROOT/neurips."""
+    s = _stage_script()
+    assert "Downloads/neurips" in s
+    assert "NEURIPS_STAGE_DIR" in s, "destination should be overridable, not hardcoded"
+    assert '"$ROOT/neurips' not in s, "must not write the staged copy back inside the repo"
+
+
+def test_stage_script_stages_all_four_venues_with_manifests():
+    s = _stage_script()
+    for venue in PAPERS:
+        assert f'"{venue}|' in s, f"stage script is missing venue {venue}"
+    assert "SUBMISSION.md" in s
+    assert "README.md" in s
