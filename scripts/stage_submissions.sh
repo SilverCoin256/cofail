@@ -1,16 +1,21 @@
 #!/usr/bin/env bash
-# Populate neurips/<venue>/ with the exact, gate-verified materials to upload.
+# Populate ~/Downloads/neurips/<venue>/ with the exact, gate-verified materials to upload.
 #
-# paper/workshops/<venue>/ is the source of truth (edited, compiled, tested there).
-# neurips/<venue>/ is a staging mirror: this script is the ONLY thing that should write to it.
-# It refuses to stage anything until scripts/check_submissions.sh passes on every venue, so
-# neurips/ can never hold a PDF that failed a formatting or blinding check.
+# paper/workshops/<venue>/ (inside this repo) is the source of truth: edited, compiled, tested
+# there, and pushed to GitHub. The staged copy is deliberately OUTSIDE the repo, in the user's
+# own Downloads folder — nothing under the destination is version-controlled or pushed anywhere.
+# This script is the only thing that should write to it.
+# It refuses to stage anything until scripts/check_submissions.sh passes on every venue, so the
+# staged folder can never hold a PDF that failed a formatting or blinding check.
+#
+# Destination is $NEURIPS_STAGE_DIR if set, else ~/Downloads/neurips.
 #
 # Run this after any edit to a paper, and always right before uploading:
 #   ./scripts/stage_submissions.sh
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 2
 ROOT=$(pwd)
+STAGE_DIR="${NEURIPS_STAGE_DIR:-$HOME/Downloads/neurips}"
 
 echo "Running the submission gate first — staging is refused if it fails."
 echo
@@ -20,7 +25,7 @@ if ! "$ROOT/scripts/check_submissions.sh"; then
   exit 1
 fi
 echo
-echo "Gate passed. Staging neurips/<venue>/ ..."
+echo "Gate passed. Staging to $STAGE_DIR ..."
 echo
 
 # venue : dir : display name : portal : deadline (IST) : track : blinding
@@ -33,7 +38,7 @@ VENUES=(
 
 for spec in "${VENUES[@]}"; do
   IFS='|' read -r SLUG SRC NAME PORTAL DEADLINE TRACK BLIND <<< "$spec"
-  DST="$ROOT/neurips/$SLUG"
+  DST="$STAGE_DIR/$SLUG"
   mkdir -p "$DST"
   cp "$ROOT/$SRC/main.pdf" "$DST/main.pdf"
   cp "$ROOT/$SRC/main.tex" "$DST/main.tex"
@@ -52,9 +57,10 @@ PY
   cat > "$DST/SUBMISSION.md" <<EOF
 # $NAME
 
-Staged $(date "+%Y-%m-%d %H:%M %Z") by \`scripts/stage_submissions.sh\` from \`$SRC/\`.
-This file and the two beside it (\`main.pdf\`, \`main.tex\`, \`neurips_2026.sty\`) are a mirror —
-edit the paper in \`$SRC/\`, never here, then re-run the staging script.
+Staged $(date "+%Y-%m-%d %H:%M %Z") by \`scripts/stage_submissions.sh\` from the
+\`model-monoculture\` repo (\`$SRC/\`). This folder lives in Downloads and is not part of that repo
+or git-tracked — edit the paper at its source, never here, then re-run the staging script to
+refresh this copy.
 
 | | |
 |---|---|
@@ -72,16 +78,52 @@ edit the paper in \`$SRC/\`, never here, then re-run the staging script.
 2. Open \`main.pdf\` in this folder and confirm it shows what the Blinding row above says it
    should (author name for single-blind, "Anonymous Author(s)" for double-blind).
 3. Full details, per-venue reminders, and the ATTRIB reciprocal-reviewing obligation:
-   see \`../../docs/WORKSHOP_SUBMISSION_CHECKLIST.md\`.
+   see \`docs/WORKSHOP_SUBMISSION_CHECKLIST.md\` in the \`model-monoculture\` repo
+   (\`$ROOT/docs/WORKSHOP_SUBMISSION_CHECKLIST.md\` on this machine).
 
 ## After you upload
 
 Note the submission ID/URL somewhere durable — this repo does not track it automatically.
 EOF
 
-  echo "  staged neurips/$SLUG/  ($PAGES content pages)"
+  echo "  staged $STAGE_DIR/$SLUG/  ($PAGES content pages)"
 done
 
+cat > "$STAGE_DIR/README.md" <<EOF
+# NeurIPS 2026 workshop submissions
+
+Four ready-to-upload deliverables, one per subfolder. Regenerated $(date "+%Y-%m-%d %H:%M %Z") by
+\`scripts/stage_submissions.sh\` in the \`model-monoculture\` repo — this whole folder is a mirror,
+not the source; edit the papers in the repo, then re-run that script to refresh this copy. Nothing
+here is version-controlled or pushed anywhere.
+
+| Venue | Folder | Deadline (IST) | Track | Blinding |
+|---|---|---|---|---|
+EOF
+for spec in "${VENUES[@]}"; do
+  IFS='|' read -r SLUG SRC NAME PORTAL DEADLINE TRACK BLIND <<< "$spec"
+  echo "| $NAME | [\`$SLUG/\`]($SLUG/) | $DEADLINE | $TRACK | $BLIND |" >> "$STAGE_DIR/README.md"
+done
+cat >> "$STAGE_DIR/README.md" <<EOF
+
+Every deadline above has already been extended at least once — re-verify on the portal, don't trust
+this table alone. Each subfolder's \`SUBMISSION.md\` carries the same row plus the portal link and
+upload steps specific to that venue.
+
+## Before uploading anything
+
+1. **OpenReview profile.** All four venues submit through OpenReview. A profile created without an
+   institutional email is moderated for up to two weeks — check at <https://openreview.net/>.
+2. **ATTRIB only:** submitting the PDF is not enough — it uses reciprocal reviewing (register on
+   the Reviewer Registration Form linked from its OpenReview portal; reviews due Sep 22 AoE).
+3. **NeuralArtifacts only:** its CFP had not published anonymity requirements as of staging; we
+   built it anonymised (the safe default) but re-check the portal before uploading.
+
+Full detail, verified against each venue's live CFP:
+\`$ROOT/docs/WORKSHOP_SUBMISSION_CHECKLIST.md\` in the repo.
+EOF
+
 echo
-echo "Done. neurips/<venue>/main.pdf is what to upload; neurips/<venue>/SUBMISSION.md has the portal"
-echo "link, track, blinding and deadline for that venue."
+echo "Done. $STAGE_DIR/<venue>/main.pdf is what to upload; SUBMISSION.md alongside it has the"
+echo "portal link, track, blinding and deadline for that venue."
+echo "Nothing under $STAGE_DIR is part of this repo or git-tracked."
