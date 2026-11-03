@@ -31,3 +31,10 @@ Appended automatically by `src/monitor.py`. Each entry is a re-application of th
 - **truthfulqa**: N=4924 (+695 since last run), PR=18.9 vs null 369.2±1.6 (ratio 0.051), rms|R|=0.2907 vs null 0.0585.
 - **gsm8k**: N=4880 (+716 since last run), PR=155.4 vs null 824.0±1.8 (ratio 0.189), rms|R|=0.0898 vs null 0.0347.
 - **hellaswag**: N=4572 (+800 since last run), PR=26.5 vs null 1864.8±7.9 (ratio 0.014), rms|R|=0.2567 vs null 0.0208.
+
+## 2026-11-03
+- **arc**: N=6160 (+799 since last run), PR=25.6 vs null 588.1±2.4 (ratio 0.043), rms|R|=0.2432 vs null 0.0456.
+- **winogrande**: N=6134 (+795 since last run), PR=22.2 vs null 667.5±2.7 (ratio 0.033), rms|R|=0.2622 vs null 0.0414.
+- **truthfulqa**: N=5600 (+676 since last run), PR=18.8 vs null 373.8±1.9 (ratio 0.050), rms|R|=0.2913 vs null 0.0584.
+- **gsm8k**: N=5590 (+710 since last run), PR=153.2 vs null 847.5±2.2 (ratio 0.181), rms|R|=0.0906 vs null 0.0345.
+- **hellaswag**: N=5371 (+799 since last run), PR=26.6 vs null 1971.8±7.2 (ratio 0.013), rms|R|=0.2565 vs null 0.0209.
