@@ -1,4 +1,4 @@
-# cofail — measuring correlated failure between models, at the exact conditional null
+# cofail
 
 [![Layer C monitor](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml/badge.svg)](https://github.com/SilverCoin256/cofail/actions/workflows/layer_c_monitor.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21860005.svg)](https://doi.org/10.5281/zenodo.21860005)
@@ -6,11 +6,9 @@
 
 **[Project page](https://silvercoin256.github.io/cofail/)** · **[Paper (PDF)](docs/paper.pdf)** ·
 **[Short version, 4pp](docs/workshop.pdf)** · **[One-page brief](docs/brief/brief.pdf)** ·
-**[Layer C — live changelog](CHANGELOG.md)**
+**[Layer C changelog](CHANGELOG.md)**
 
-Do independently developed language models fail on the same inputs more than chance? The usual
-evidence is a co-failure or agreement rate compared against an independence baseline. That
-comparison cannot answer the question, for a reason that is arithmetic rather than statistical:
+Two language models can fail on the same inputs simply because some questions are harder than others. The conditional test holds fixed each model’s failure count and each item’s failure count. It then checks how the remaining overlap is distributed among model pairs. The example below uses ARC-Challenge data.
 
 ```
 $ cofail excess --matrix arc_failures.npy
@@ -19,11 +17,7 @@ forced by the item margins alone  : +0.114174444
 residual carrying any information : -1.388e-17
 ```
 
-The mean pairwise co-failure rate over a population of models is a function of the **item
-margins alone**. Any randomisation that preserves item difficulty leaves it exactly unchanged,
-so the excess over such a null is identically zero — not small, zero. This package supplies the
-conditioning that does carry information, and the calibration without which the conditioned
-number is equally uninterpretable.
+Each item’s failure count fixes how many pairs failed that item. Any randomisation that preserves those counts leaves the mean pairwise co-failure rate unchanged. The package measures how unevenly co-failures are distributed across pairs, then calibrates that measure against the conditional null.
 
 ## Install
 
@@ -46,9 +40,7 @@ cofail.marginal_artifact(F)        # what the margins alone force — equal to t
 print(cofail.neff(F, calibrate=True))
 ```
 
-`calibrate=True` is not optional in spirit: the null value of the statistic is emphatically not
-the model count, and an uncalibrated figure is not interpretable. See the caveat below on what
-the participation ratio does and does not measure.
+Use `calibrate=True` to compare the statistic with its conditional null value. See [what the test can establish](#what-the-test-can-establish) for the limits of the participation ratio.
 
 ```bash
 cofail audit --matrix F.npy --json report.json   # start here
@@ -111,7 +103,7 @@ into a nested `metrics` struct in 2024. Item identity here is the row index, ver
 (`src/audit_roworder.py`). Still a sample of ~1,400, not a proof, and only the ARC and
 HellaSwag samples span both identity-column schema generations.
 
-## Honest caveats
+## What the test can establish
 
 **The participation ratio does not count independent models.** For any unit-diagonal `R`,
 `PR = N / (1 + (N−1)·mean(R_ij²))` exactly — the eigendecomposition contributes nothing, and PR
